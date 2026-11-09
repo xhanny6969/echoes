@@ -5,6 +5,7 @@ Give an agent a wallet without giving it the keys to everything.
 
 `Track 06 — AI Security & Defense` · NEAR Hackathon 2026
 
+- Repo: https://github.com/xhanny6969/echoes
 - Live demo: https://shell-vacancies-out-larry.trycloudflare.com/landing
 - Contract: [`allowance-swarm.testnet`](https://testnet.nearblocks.io/address/allowance-swarm.testnet)
 - Deployed code hash: `9JNpk7uGkuWyp6Yd834muCtADcjGXFufHJu6A3jdMTrn`
