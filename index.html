@@ -2324,6 +2324,7 @@
     // ==========================================================================
     const YOCTO = 1e24;
     let LIVE_SYNCED_AT = null;
+    let LIVE_SOURCE = '/api/state';
 
     function shortKeyHex(k) {
       if (!k) return '—';
@@ -2459,6 +2460,7 @@
           // static hosting: no backend, read the chain ourselves
           s = await directRpcState();
         }
+        if (s.source === 'direct-rpc') LIVE_SOURCE = 'NEAR RPC';
         vaultState = Object.assign({}, vaultState, mapChainState(s));
         LIVE_SYNCED_AT = new Date();
         renderAll();
@@ -2481,7 +2483,7 @@
         return;
       }
       const t = LIVE_SYNCED_AT ? LIVE_SYNCED_AT.toISOString().slice(11, 19) + 'Z' : '—';
-      el.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-near-green animate-pulse"></span> LIVE · /api/state · ${t}`;
+      el.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-near-green animate-pulse"></span> LIVE · ${LIVE_SOURCE} · ${t}`;
       el.className = 'font-mono text-[10px] px-2 py-0.5 rounded border border-near-green/40 text-near-green flex items-center gap-1.5';
     }
 
