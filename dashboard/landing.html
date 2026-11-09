@@ -657,6 +657,30 @@
     </section>
 
     <!-- ========================================================================
+         SECTION 01b // PROOF STRIP — source, build, live agent run
+         ======================================================================== -->
+    <section id="proof" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="swiss-box p-5 rounded">
+        <div class="font-mono text-[11px] text-near-slate">SOURCE</div>
+        <a href="https://github.com/xhanny6969/echoes" target="_blank" rel="noopener noreferrer" class="block mt-2 font-mono text-sm text-near-green hover:underline">github.com/xhanny6969/echoes ↗</a>
+        <div class="mt-2 text-[11px] text-near-dim font-mono leading-relaxed">Rust contract, CLI, agent and dashboard. MIT.</div>
+      </div>
+      <div class="swiss-box p-5 rounded">
+        <div class="font-mono text-[11px] text-near-slate">BUILD IS REPRODUCIBLE</div>
+        <div class="mt-2 font-mono text-[11px] text-near-alabaster break-all">9JNpk7uGkuWyp6Yd834muCtADcjGXFufHJu6A3jdMTrn</div>
+        <div class="mt-2 text-[11px] text-near-dim font-mono leading-relaxed">Rebuild from <code class="text-near-cyan">contract/</code> and the sha256 matches the live code hash byte for byte.</div>
+      </div>
+      <div class="swiss-box p-5 rounded border-near-red/30">
+        <div class="font-mono text-[11px] text-near-slate">REAL AGENT, TWO OUTCOMES</div>
+        <div class="mt-2 font-mono text-[11px] space-y-1">
+          <div class="text-near-green">ACCEPTED <a href="https://testnet.nearblocks.io/txns/CDvHsjSSqThEhDjN5vUVndR255iiEvw24oQFNvivymLf" target="_blank" rel="noopener noreferrer" class="hover:underline text-near-cyan">CDvHsjSS…mLf</a></div>
+          <div class="text-near-red">REVERTED <a href="https://testnet.nearblocks.io/txns/9jr3XDnRhevFkbMfY44xK6M8uvZWb13ypTe6L7kv9aXj" target="_blank" rel="noopener noreferrer" class="hover:underline text-near-cyan">9jr3XDnR…aXj</a></div>
+        </div>
+        <div class="mt-2 text-[11px] text-near-dim font-mono leading-relaxed">Same model. Hijacked vendor invoice &rarr; payout reverted at the allowlist.</div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
          SECTION 02 // SWARM AGENT MATRIX (SCOPED FUNCTIONCALL KEYS)
          ======================================================================== -->
     <section id="swarm-matrix" class="space-y-4">
