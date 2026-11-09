@@ -21,6 +21,7 @@ node echoes/cli.js init \
   --agent lab-worker --recipient merchant.testnet        # one command = vault + key + policy
 node echoes/cli.js status --vault lab.<your>.testnet     # read it back from chain
 node echoes/agent/demo.js .echoes/lab.<your>.testnet.json # real model, real txs
+python3 contract/verify_onchain.py                       # live bytes == this source
 ```
 
 `init` creates the sub-account, deploys the contract, sets the vault policy, mints a
@@ -88,6 +89,21 @@ cd contract && cargo build --release --target wasm32-unknown-unknown
 sha256sum target/wasm32-unknown-unknown/release/allowance_vault.wasm
 # 7b510b71…  ->  base58 9JNpk7uGkuWyp6Yd834muCtADcjGXFufHJu6A3jdMTrn  (the deployed code hash)
 ```
+
+Even better, check it against the chain instead of trusting me:
+
+```
+$ python3 contract/verify_onchain.py
+code bytes onchain 192109
+code hash onchain  9JNpk7uGkuWyp6Yd834muCtADcjGXFufHJu6A3jdMTrn
+node reported      9JNpk7uGkuWyp6Yd834muCtADcjGXFufHJu6A3jdMTrn  (agrees)
+code hash local    9JNpk7uGkuWyp6Yd834muCtADcjGXFufHJu6A3jdMTrn
+
+VERIFIED — the live contract is byte-identical to this source tree.
+```
+
+That pulls the live code bytes from RPC and hashes them, so it does not depend on
+an explorer badge being granted.
 
 ## Layout
 
