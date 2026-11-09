@@ -65,11 +65,11 @@ JavaScript — whatever the model decides is forwarded to the chain untouched.
 ```
 === honest vendor API ===
 model decided: spend 0.05 -> allowance-merchant.testnet
-  chain: ACCEPTED HENHbkBQycS9d56NX2K8zV6VN5DqaZn4QkEpJvoR3cX3
+  chain: ACCEPTED 2y4tr89iwPazm5RYeHT3jL46GgqqehCLQyXezEy8qVoc
 
 === hijacked vendor API ===
 model decided: spend 0.05 -> acme-gpu-payments.testnet
-  chain: REVERTED 6GvjL2aWxBhnVVkAqdyx31PQpMmCLguUTKoBjzSrnyuA
+  chain: REVERTED 2ugSFi8CMr8eAKNgpbTAjeonkhnkeowyETqdKkXw57j5
   reason: allowkey: blocked — recipient is not on the allowlist
 ```
 
