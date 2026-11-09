@@ -1,0 +1,2532 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ECHOES // On-Chain Allowance & Guardrail Vault on NEAR Protocol</title>
+  
+  <!-- Dynamic SVG Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' fill='none'%3E%3Crect width='64' height='64' rx='12' fill='%2306080B'/%3E%3Cpath d='M32 6L54.5 19V45L32 58L9.5 45V19L32 6Z' stroke='%2300EC97' stroke-width='2.5' stroke-dasharray='8 4'/%3E%3Cpath d='M21 43V21L43 43V21' stroke='%23F2F6FA' stroke-width='4.5' stroke-linecap='square' stroke-linejoin='miter'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%2300EC97'/%3E%3C/svg%3E" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Syne, Space Grotesk, Instrument Serif, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            near: {
+              green: '#00EC97',
+              greenDim: 'rgba(0, 236, 151, 0.12)',
+              cyan: '#179EFF',
+              red: '#FF4D38',
+              amber: '#F5A623',
+              obsidian: '#06080B',
+              carbon: '#0B0F15',
+              panel: '#101720',
+              border: '#19232E',
+              borderBright: '#263545',
+              alabaster: '#F2F6FA',
+              slate: '#8A99AD',
+              dim: '#526275'
+            }
+          },
+          fontFamily: {
+            display: ['Syne', 'Space Grotesk', 'sans-serif'],
+            sans: ['Space Grotesk', 'sans-serif'],
+            serif: ['Instrument Serif', 'serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* ==========================================================================
+       SWISS TECHNICAL GRID & NEAR PROTOCOL DESIGN SYSTEM (NO AI SLOP)
+       ========================================================================== */
+    :root {
+      --near-green: #00EC97;
+      --near-cyan: #179EFF;
+      --near-red: #FF4D38;
+      --near-amber: #F5A623;
+      --bg-obsidian: #06080B;
+      --bg-carbon: #0B0F15;
+      --bg-panel: #101720;
+      --border-hairline: #19232E;
+    }
+
+    * {
+      box-sizing: border-box;
+      selection-background-color: #00EC97;
+      selection-color: #06080B;
+    }
+
+    ::selection {
+      background: #00EC97;
+      color: #06080B;
+    }
+
+    body {
+      background-color: var(--bg-obsidian);
+      color: #F2F6FA;
+      font-family: 'Space Grotesk', sans-serif;
+      overflow-x: hidden;
+      background-image: 
+        linear-gradient(to right, rgba(25, 35, 46, 0.35) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(25, 35, 46, 0.35) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    /* Subtle technical blueprint micro-grid overlay */
+    .bg-blueprint {
+      background-size: 24px 24px;
+      background-image: 
+        radial-gradient(circle, rgba(138, 153, 173, 0.16) 1px, transparent 1px);
+    }
+
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Architectural Corner Crosshairs */
+    .swiss-box {
+      position: relative;
+      border: 1px solid var(--border-hairline);
+      background-color: rgba(11, 15, 21, 0.9);
+      backdrop-filter: blur(8px);
+    }
+
+    .swiss-corner::before,
+    .swiss-corner::after {
+      content: '+';
+      position: absolute;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      line-height: 1;
+      color: #526275;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .swiss-corner::before {
+      top: -6px;
+      left: -5px;
+    }
+    .swiss-corner::after {
+      bottom: -6px;
+      right: -5px;
+    }
+
+    /* Tactile Mechanical Buttons */
+    .btn-near-primary {
+      background-color: #00EC97;
+      color: #06080B;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      border: 1px solid #00EC97;
+      transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 3px 3px 0px rgba(0, 236, 151, 0.25);
+    }
+    .btn-near-primary:hover {
+      background-color: #26f7ac;
+      transform: translate(-1px, -1px);
+      box-shadow: 5px 5px 0px rgba(0, 236, 151, 0.35);
+    }
+    .btn-near-primary:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px rgba(0, 236, 151, 0.2);
+    }
+
+    .btn-near-ghost {
+      background-color: #0B0F15;
+      color: #F2F6FA;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+      border: 1px solid #263545;
+      transition: all 0.15s ease;
+    }
+    .btn-near-ghost:hover {
+      border-color: #00EC97;
+      color: #00EC97;
+      background-color: rgba(0, 236, 151, 0.06);
+    }
+
+    .btn-near-danger {
+      background-color: rgba(255, 77, 56, 0.1);
+      color: #FF4D38;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      border: 1px solid rgba(255, 77, 56, 0.45);
+      transition: all 0.15s ease;
+    }
+    .btn-near-danger:hover {
+      background-color: #FF4D38;
+      color: #06080B;
+      box-shadow: 3px 3px 0px rgba(255, 77, 56, 0.3);
+    }
+
+    /* Sonar & Echo Animations */
+    @keyframes rotateSlow {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes rotateReverse {
+      0% { transform: rotate(360deg); }
+      100% { transform: rotate(0deg); }
+    }
+    @keyframes echoWave {
+      0% {
+        r: 28;
+        opacity: 0.85;
+        stroke-width: 2.5px;
+      }
+      100% {
+        r: 135;
+        opacity: 0;
+        stroke-width: 0.5px;
+      }
+    }
+    @keyframes breachShock {
+      0% {
+        r: 95;
+        opacity: 1;
+        stroke-width: 6px;
+      }
+      100% {
+        r: 155;
+        opacity: 0;
+        stroke-width: 0.5px;
+      }
+    }
+
+    .spin-slow {
+      transform-origin: center;
+      animation: rotateSlow 36s linear infinite;
+    }
+    .spin-reverse {
+      transform-origin: center;
+      animation: rotateReverse 24s linear infinite;
+    }
+    .echo-ring-1 {
+      animation: echoWave 3.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+    }
+    .echo-ring-2 {
+      animation: echoWave 3.6s cubic-bezier(0.16, 1, 0.3, 1) 1.8s infinite;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #06080B;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #19232E;
+      border-radius: 2px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #00EC97;
+    }
+
+    /* Accordion smooth transition */
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+      opacity: 0;
+    }
+    .faq-item.open .faq-answer {
+      max-height: 800px;
+      opacity: 1;
+    }
+    .faq-item.open .faq-icon {
+      transform: rotate(45deg);
+      color: #00EC97;
+      border-color: #00EC97;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-near-green selection:text-near-obsidian">
+
+  <!-- ==========================================================================
+       TOP SYSTEM STATUS TICKER BAR
+       ========================================================================== -->
+  <div class="w-full bg-near-carbon border-b border-near-border px-4 py-1.5 text-[11px] font-mono text-near-slate flex flex-wrap items-center justify-between gap-2 z-50">
+    <div class="flex items-center gap-3">
+      <span class="inline-flex items-center gap-1.5 text-near-green font-semibold">
+        <span class="w-2 h-2 rounded-full bg-near-green animate-pulse"></span>
+        NEAR PROTOCOL // THE CURRENCY OF AGENTS
+      </span>
+      <span class="hidden sm:inline text-near-dim">|</span>
+      <span class="hidden sm:inline text-near-alabaster">CONTRACT: <code class="text-near-green">allowance-swarm.testnet</code></span>
+      <span class="hidden md:inline text-near-dim">|</span>
+      <span class="hidden md:inline">KEY SCOPE: <code class="text-near-cyan">FunctionCall(spend_as, 0.25 Ⓝ)</code></span>
+    </div>
+    <div class="flex items-center gap-4 tabular-nums">
+      <div id="rpcStatusIndicator" class="flex items-center gap-1.5">
+        <span class="text-near-dim">RPC:</span>
+        <span id="rpcLatencyText" class="text-near-green">TESTNET LIVE (42ms)</span>
+      </div>
+      <span class="text-near-dim">|</span>
+      <div class="flex items-center gap-1">
+        <span class="text-near-dim">BLOCK:</span>
+        <a id="blockHeightLink" href="https://testnet.nearblocks.io/address/allowance-swarm.testnet" target="_blank" rel="noopener noreferrer" class="text-near-alabaster hover:text-near-green underline decoration-near-border">#184,920,411</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       STICKY ARCHITECTURAL NAVBAR
+       ========================================================================== -->
+  <header class="sticky top-0 z-40 bg-near-obsidian/90 backdrop-blur-md border-b border-near-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo + Wordmark -->
+      <a href="#" class="flex items-center gap-3 group focus:outline-none">
+        <!-- Bespoke ECHOES SVG Mark -->
+        <div class="w-10 h-10 rounded bg-near-carbon border border-near-borderBright flex items-center justify-center relative overflow-hidden group-hover:border-near-green transition-colors">
+          <svg class="w-8 h-8" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Outer Guardrail Perimeter Hexagon -->
+            <path d="M32 5L55.5 18.5V45.5L32 59L8.5 45.5V18.5L32 5Z" stroke="#00EC97" stroke-width="2" stroke-dasharray="7 3.5" class="group-hover:stroke-[#179EFF] transition-colors"/>
+            <!-- Inner Acoustic Echo Rings -->
+            <circle cx="32" cy="32" r="20" stroke="#00EC97" stroke-width="1.2" stroke-opacity="0.35"/>
+            <circle cx="32" cy="32" r="14" stroke="#179EFF" stroke-width="1.2" stroke-dasharray="4 3" stroke-opacity="0.6"/>
+            <!-- NEAR Monolith Diagonal Fold + Vault Core -->
+            <path d="M21 43V21L43 43V21" stroke="#F2F6FA" stroke-width="4" stroke-linecap="square" stroke-linejoin="miter"/>
+            <path d="M21 21L29 29" stroke="#00EC97" stroke-width="4" stroke-linecap="square"/>
+            <!-- Central Guard Node -->
+            <circle cx="32" cy="32" r="4" fill="#00EC97" stroke="#06080B" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-display font-extrabold text-lg tracking-wider text-near-alabaster group-hover:text-near-green transition-colors">ECHOES</span>
+            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-near-green/10 text-near-green border border-near-green/30 font-semibold">v2.4</span>
+          </div>
+          <p class="text-[10px] font-mono text-near-slate tracking-widest uppercase">NEAR Agent Guardrail Vault</p>
+        </div>
+      </a>
+
+      <!-- Navigation Links -->
+      <nav class="hidden lg:flex items-center gap-1 font-mono text-xs">
+        <a href="#telemetry" class="px-3 py-2 text-near-slate hover:text-near-green transition-colors">[01 // TELEMETRY]</a>
+        <a href="#swarm-matrix" class="px-3 py-2 text-near-slate hover:text-near-green transition-colors">[02 // SWARM_AGENTS]</a>
+        <a href="#playground" class="px-3 py-2 text-near-slate hover:text-near-green transition-colors">[03 // PLAYGROUND]</a>
+        <a href="#audit-log" class="px-3 py-2 text-near-slate hover:text-near-green transition-colors">[04 // AUDIT_LOG]</a>
+        <a href="#brand-kit" class="px-3 py-2 text-near-slate hover:text-near-green transition-colors">[05 // LOGO_KIT]</a>
+        <a href="#faq" class="px-3 py-2 text-near-green font-semibold hover:underline">[06 // FAQ]</a>
+      </nav>
+
+      <!-- Active Session & Wallet Action -->
+      <div class="flex items-center gap-2.5">
+        <button onclick="scrollToSection('brand-kit')" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded text-xs font-mono border border-near-border hover:border-near-cyan text-near-slate hover:text-near-cyan transition-colors" title="Download SVG Logo Assets">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          <span>SVG KIT</span>
+        </button>
+
+        <button id="walletBtn" onclick="openWalletModal()" class="btn-near-primary px-3.5 py-2 rounded text-xs flex items-center gap-2">
+          <span id="walletDot" class="w-2 h-2 rounded-full bg-near-obsidian"></span>
+          <span id="walletBtnLabel">DEMO SESSION</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       MAIN CONTENT CONTAINER
+       ========================================================================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16">
+
+    <!-- ========================================================================
+         HERO SECTION: SWISS ARCHITECTURAL LAYOUT + INTERACTIVE ECHO RADAR
+         ======================================================================== -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch pt-2">
+      
+      <!-- Left Column: Protocol Manifesto & Controls -->
+      <div class="lg:col-span-7 swiss-box swiss-corner p-6 sm:p-10 rounded flex flex-col justify-between relative overflow-hidden">
+        <!-- Subtle top coordinate watermark -->
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-6 border-b border-near-border">
+          <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-near-green/10 border border-near-green/30 text-near-green font-mono text-xs">
+            <span class="w-1.5 h-1.5 rounded-full bg-near-green"></span>
+            <span>NEAR PROTOCOL HACKATHON // AGENT GOVERNANCE</span>
+          </div>
+          <span class="font-mono text-[11px] text-near-dim">SYS_ID: ECHOES-VAULT-01</span>
+        </div>
+
+        <div class="my-8 space-y-5">
+          <h1 class="font-display font-extrabold text-3xl sm:text-5xl lg:text-[52px] leading-[1.06] tracking-tight text-near-alabaster">
+            Autonomous Swarms.<br/>
+            <span class="font-serif italic font-normal text-near-green text-4xl sm:text-6xl">Cryptographic Guardrails.</span>
+          </h1>
+          
+          <p class="text-near-slate text-base sm:text-lg leading-relaxed max-w-2xl font-normal">
+            Never hand a <code class="text-near-red font-mono text-sm bg-near-red/10 px-1.5 py-0.5 rounded">FullAccess</code> key to an autonomous AI agent. 
+            <strong class="text-near-alabaster">Echoes</strong> pairs NEAR's protocol-level <span class="text-near-green font-mono text-sm">FunctionCall Access Keys</span> with a deterministic Rust Guardrail Vault—enforcing per-transaction velocity limits, cumulative agent allowances, trusted recipient allowlists, and <strong class="text-near-alabaster">deterministic on-chain rejection</strong> &mdash; a breaching call traps and reverts before a single yoctoNEAR leaves the vault, with owner-controlled <code class="text-near-cyan font-mono text-sm">revoke_agent</code> for permanent lockout.
+          </p>
+
+          <!-- Key Architecture Pill Badges -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-2 font-mono text-xs">
+            <div class="p-3 rounded bg-near-obsidian border border-near-border">
+              <div class="text-near-dim text-[10px]">LAYER 01 // RUNTIME</div>
+              <div class="text-near-green font-semibold mt-0.5">Scoped ed25519 Key</div>
+              <div class="text-near-slate text-[11px] mt-0.5">Methods: <code>spend / spend_as</code></div>
+            </div>
+            <div class="p-3 rounded bg-near-obsidian border border-near-border">
+              <div class="text-near-dim text-[10px]">LAYER 02 // VAULT</div>
+              <div class="text-near-cyan font-semibold mt-0.5">Dual Velocity Caps</div>
+              <div class="text-near-slate text-[11px] mt-0.5">0.20 Ⓝ/tx · 5.00 Ⓝ/day</div>
+            </div>
+            <div class="p-3 rounded bg-near-obsidian border border-near-border col-span-2 sm:col-span-1">
+              <div class="text-near-dim text-[10px]">LAYER 03 // REFLEX</div>
+              <div class="text-near-red font-semibold mt-0.5">Deterministic Revert</div>
+              <div class="text-near-slate text-[11px] mt-0.5">tx reverts before any transfer</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero Action Bar -->
+        <div class="pt-6 border-t border-near-border flex flex-wrap items-center gap-3">
+          <button onclick="scrollToSection('playground')" class="btn-near-primary px-5 py-3 rounded text-xs sm:text-sm flex items-center gap-2">
+            <span>LAUNCH GUARDRAIL PLAYGROUND</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+          </button>
+
+          <button onclick="runAutomatedSwarmDemo()" id="swarmDemoBtn" class="btn-near-ghost px-4 py-3 rounded text-xs sm:text-sm flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-near-cyan animate-ping"></span>
+            <span>RUN SIMULATED SWARM DEMO</span>
+          </button>
+
+          <a href="https://testnet.nearblocks.io/address/allowance-swarm.testnet" target="_blank" rel="noopener noreferrer" class="btn-near-ghost px-3.5 py-3 rounded text-xs font-mono text-near-slate hover:text-near-green flex items-center gap-1.5 ml-auto">
+            <span>NearBlocks</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Right Column: Interactive SVG "Echo Perimeter Radar" Visualizer -->
+      <div class="lg:col-span-5 swiss-box swiss-corner p-5 sm:p-6 rounded flex flex-col justify-between bg-blueprint relative">
+        <!-- Radar Header -->
+        <div class="flex items-center justify-between border-b border-near-border pb-3">
+          <div>
+            <span class="font-mono text-[11px] text-near-green uppercase tracking-wider flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-near-green"></span>
+              [SONAR // GUARDRAIL PERIMETER]
+            </span>
+            <h2 class="font-display font-bold text-sm text-near-alabaster mt-0.5">Real-Time Agent Pulse Interceptor</h2>
+          </div>
+          <span id="radarStatusBadge" class="font-mono text-[11px] px-2 py-0.5 rounded bg-near-green/15 text-near-green border border-near-green/30">
+            SHIELD: ARMED
+          </span>
+        </div>
+
+        <!-- Interactive SVG Sonar Canvas -->
+        <div class="relative my-3 flex items-center justify-center">
+          <svg id="echoRadarSvg" viewBox="0 0 400 340" class="w-full max-w-[400px] h-auto select-none">
+            <defs>
+              <radialGradient id="vaultGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#00EC97" stop-opacity="0.28"/>
+                <stop offset="70%" stop-color="#00EC97" stop-opacity="0.04"/>
+                <stop offset="100%" stop-color="#06080B" stop-opacity="0"/>
+              </radialGradient>
+              <radialGradient id="breachGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#FF4D38" stop-opacity="0.35"/>
+                <stop offset="100%" stop-color="#06080B" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+
+            <!-- Background Ambient Core Glow -->
+            <circle id="radarCoreGlow" cx="200" cy="170" r="130" fill="url(#vaultGlow)" />
+
+            <!-- Radar Coordinate Crosshairs -->
+            <line x1="200" y1="15" x2="200" y2="325" stroke="#19232E" stroke-width="1" stroke-dasharray="3 3"/>
+            <line x1="30" y1="170" x2="370" y2="170" stroke="#19232E" stroke-width="1" stroke-dasharray="3 3"/>
+
+            <!-- Concentric Echo Waves -->
+            <circle cx="200" cy="170" r="45" fill="none" stroke="#00EC97" class="echo-ring-1" />
+            <circle cx="200" cy="170" r="45" fill="none" stroke="#179EFF" class="echo-ring-2" />
+
+            <!-- Outer Recipient Orbit Ring -->
+            <circle cx="200" cy="170" r="142" fill="none" stroke="#19232E" stroke-width="1"/>
+
+            <!-- THE 5-GATE GUARDRAIL PERIMETER SHIELD RING -->
+            <g class="spin-slow" style="transform-origin: 200px 170px;">
+              <circle id="guardrailRing" cx="200" cy="170" r="95" fill="none" stroke="#00EC97" stroke-width="2" stroke-dasharray="18 8" stroke-opacity="0.8"/>
+            </g>
+            <g class="spin-reverse" style="transform-origin: 200px 170px;">
+              <circle cx="200" cy="170" r="86" fill="none" stroke="#179EFF" stroke-width="1" stroke-dasharray="6 14" stroke-opacity="0.5"/>
+            </g>
+
+            <!-- Connection Vectors -->
+            <!-- Agent 1 (research-agent) -> Vault -> api-provider -->
+            <line id="vec-research" x1="88" y1="78" x2="200" y2="170" stroke="#00EC97" stroke-width="1.5" stroke-opacity="0.4" stroke-dasharray="4 4"/>
+            <!-- Agent 2 (compute-agent) -> Vault -> gpu-cluster -->
+            <line id="vec-compute" x1="312" y1="78" x2="200" y2="170" stroke="#00EC97" stroke-width="1.5" stroke-opacity="0.4" stroke-dasharray="4 4"/>
+            <!-- Agent 3 (scraper-agent) -> Vault -->
+            <line id="vec-scraper" x1="88" y1="262" x2="200" y2="170" stroke="#179EFF" stroke-width="1.5" stroke-opacity="0.4" stroke-dasharray="4 4"/>
+            <!-- Agent 4 (rogue-agent) -> Intercepted at Guardrail Ring (r=95) -->
+            <line id="vec-rogue" x1="312" y1="262" x2="268" y2="232" stroke="#FF4D38" stroke-width="2" stroke-dasharray="3 3"/>
+
+            <!-- Dynamic Pulse Particle Layer -->
+            <g id="radarPulseLayer"></g>
+
+            <!-- Breach Shockwave Ring (Triggered on exploit) -->
+            <circle id="radarBreachWave" cx="268" cy="232" r="0" fill="none" stroke="#FF4D38" stroke-width="0" opacity="0"/>
+
+            <!-- CENTRAL VAULT CORE HEXAGON -->
+            <g transform="translate(200, 170)" class="cursor-pointer" onclick="scrollToSection('telemetry')">
+              <polygon points="0,-34 29,-17 29,17 0,34 -29,17 -29,-17" fill="#0B0F15" stroke="#00EC97" stroke-width="2"/>
+              <!-- Mini Echoes Monolith Inside Vault -->
+              <path d="M-8,9 V-9 L8,9 V-9" stroke="#F2F6FA" stroke-width="2.5" fill="none"/>
+              <circle cx="0" cy="0" r="3" fill="#00EC97"/>
+              <text x="0" y="48" text-anchor="middle" fill="#F2F6FA" font-family="JetBrains Mono" font-size="9" font-weight="700" id="radarVaultLabel">VAULT: 5.00 Ⓝ/day</text>
+            </g>
+
+            <!-- ORBITING NODE 1: Research-01 (Top Left) -->
+            <g class="cursor-pointer" onclick="triggerPreset(1)">
+              <circle cx="88" cy="78" r="16" fill="#0B0F15" stroke="#00EC97" stroke-width="1.8"/>
+              <circle cx="88" cy="78" r="4" fill="#00EC97"/>
+              <text x="88" y="54" text-anchor="middle" fill="#00EC97" font-family="JetBrains Mono" font-size="9" font-weight="600">agent-alpha</text>
+              <text x="88" y="106" text-anchor="middle" fill="#8A99AD" font-family="JetBrains Mono" font-size="8">0.20 Ⓝ/tx · 1.00 Ⓝ/day</text>
+            </g>
+
+            <!-- ORBITING NODE 2: Exec-02 (Top Right) -->
+            <g class="cursor-pointer" onclick="triggerPreset(3)">
+              <circle cx="312" cy="78" r="16" fill="#0B0F15" stroke="#00EC97" stroke-width="1.8"/>
+              <circle cx="312" cy="78" r="4" fill="#00EC97"/>
+              <text x="312" y="54" text-anchor="middle" fill="#00EC97" font-family="JetBrains Mono" font-size="9" font-weight="600">agent-beta</text>
+              <text x="312" y="106" text-anchor="middle" fill="#8A99AD" font-family="JetBrains Mono" font-size="8">0.20 Ⓝ/tx · 1.00 Ⓝ/day</text>
+            </g>
+
+            <!-- ORBITING NODE 3: Arb-03 (Bottom Left) -->
+            <g class="cursor-pointer" onclick="triggerPreset(2)">
+              <circle id="radarNodeScraper" cx="88" cy="262" r="16" fill="#0B0F15" stroke="#179EFF" stroke-width="1.8"/>
+              <circle cx="88" cy="262" r="4" fill="#179EFF"/>
+              <text x="88" y="290" text-anchor="middle" fill="#179EFF" font-family="JetBrains Mono" font-size="9" font-weight="600">UNREGISTERED KEY</text>
+              <text x="88" y="302" text-anchor="middle" fill="#8A99AD" font-family="JetBrains Mono" font-size="8">no such key on account</text>
+            </g>
+
+            <!-- ORBITING NODE 4: Rogue-04 (Bottom Right - Intercepted) -->
+            <g class="cursor-pointer" onclick="triggerPreset(4)">
+              <circle cx="312" cy="262" r="16" fill="#1A0B0E" stroke="#FF4D38" stroke-width="2"/>
+              <path d="M307 257L317 267M317 257L307 267" stroke="#FF4D38" stroke-width="2"/>
+              <!-- Intercept Shield Marker at Perimeter -->
+              <circle cx="268" cy="232" r="6" fill="#FF4D38"/>
+              <text x="312" y="290" text-anchor="middle" fill="#FF4D38" font-family="JetBrains Mono" font-size="9" font-weight="700">ROGUE RECIPIENT</text>
+              <text x="312" y="302" text-anchor="middle" fill="#FF4D38" font-family="JetBrains Mono" font-size="8">REVERTED @ ALLOWLIST</text>
+            </g>
+          </svg>
+        </div>
+
+        <!-- Radar Interactive Trigger Controls -->
+        <div class="space-y-2.5 pt-3 border-t border-near-border">
+          <div id="radarTelemetryFeed" class="font-mono text-[11px] bg-near-obsidian border border-near-border px-3 py-2 rounded text-near-slate flex items-center justify-between">
+            <span id="radarLogText" class="truncate text-near-green">&gt; ECHO_SONAR: live read of scoped FunctionCall keys...</span>
+            <span class="text-[10px] text-near-dim ml-2 shrink-0">5 GATES ACTIVE</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="fireRadarPulse('valid')" class="btn-near-ghost py-2 px-3 rounded text-xs font-mono flex items-center justify-center gap-1.5 border-near-green/40 text-near-green">
+              <span class="w-2 h-2 rounded-full bg-near-green"></span>
+              <span>SIM: VALID PULSE (0.15 Ⓝ)</span>
+            </button>
+            <button onclick="fireRadarPulse('breach')" class="btn-near-danger py-2 px-3 rounded text-xs font-mono flex items-center justify-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-near-red"></span>
+              <span>SIM: ROGUE DRAIN</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SECTION 01 // LIVE VAULT TELEMETRY STRIP
+         ======================================================================== -->
+    <section id="telemetry" class="space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2 font-mono text-xs text-near-green">
+          <span>[01 // VAULT_TELEMETRY]</span>
+          <span class="text-near-dim">—</span>
+          <span class="text-near-slate">LIVE STATE READ FROM <code class="text-near-alabaster">allowance-swarm.testnet</code></span>
+          <span id="liveSourceBadge" class="font-mono text-[10px] px-2 py-0.5 rounded border border-near-border text-near-dim flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-near-amber"></span> connecting…</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="hydrateFromChain(true)" class="px-3 py-1 rounded bg-near-carbon border border-near-border hover:border-near-green font-mono text-xs text-near-slate hover:text-near-green transition-colors flex items-center gap-1.5">
+            <svg id="syncSpinner" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            <span>QUERY TESTNET RPC</span>
+          </button>
+          <button onclick="resetDemoState()" class="px-3 py-1 rounded bg-near-carbon border border-near-border hover:border-near-amber font-mono text-xs text-near-slate hover:text-near-amber transition-colors">
+            RESET STATE
+          </button>
+        </div>
+      </div>
+
+      <!-- 4-Column Swiss Telemetry Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- Metric 1: Global Vault Allowance Cap -->
+        <div class="swiss-box p-5 rounded flex flex-col justify-between">
+          <div class="flex items-center justify-between text-xs font-mono text-near-slate">
+            <span>GLOBAL VAULT CAP</span>
+            <span class="text-near-green">[GATE 05]</span>
+          </div>
+          <div class="my-3">
+            <div class="flex items-baseline gap-2 font-mono tabular-nums">
+              <span id="metricVaultSpent" class="text-2xl sm:text-3xl font-bold text-near-alabaster">1.65</span>
+              <span class="text-sm text-near-slate">/ <span id="metricVaultCap">5.00</span> NEAR</span>
+            </div>
+            <div class="w-full h-2 bg-near-obsidian border border-near-border rounded-sm overflow-hidden mt-2.5">
+              <div id="metricVaultBar" class="h-full bg-near-green transition-all duration-300" style="width: 33%"></div>
+            </div>
+          </div>
+          <div class="flex items-center justify-between text-[11px] font-mono text-near-dim">
+            <span>REMAINING RUNWAY:</span>
+            <span id="metricVaultRemaining" class="text-near-green font-semibold tabular-nums">3.35 NEAR</span>
+          </div>
+        </div>
+
+        <!-- Metric 2: Circuit Breaker Status -->
+        <div class="swiss-box p-5 rounded flex flex-col justify-between">
+          <div class="flex items-center justify-between text-xs font-mono text-near-slate">
+            <span>CIRCUIT BREAKER</span>
+            <span class="text-near-cyan">[GATE 02]</span>
+          </div>
+          <div class="my-3 flex items-center justify-between">
+            <div>
+              <div id="metricPausedBadge" class="inline-flex items-center gap-2 font-mono text-lg font-bold text-near-green">
+                <span class="w-2.5 h-2.5 rounded-full bg-near-green animate-pulse"></span>
+                <span>ACTIVE (UNPAUSED)</span>
+              </div>
+              <p class="text-xs text-near-slate mt-1">Owner: <code class="text-near-alabaster font-mono">allowance-swarm.testnet</code></p>
+            </div>
+          </div>
+          <button onclick="toggleVaultPause()" id="pauseToggleBtn" class="w-full py-1.5 px-3 rounded border border-near-borderBright hover:border-near-amber text-xs font-mono text-near-alabaster hover:text-near-amber transition-colors flex items-center justify-center gap-1.5">
+            <span>OWNER: CALL set_paused(true)</span>
+          </button>
+        </div>
+
+        <!-- Metric 3: Registered Swarm Agents -->
+        <div class="swiss-box p-5 rounded flex flex-col justify-between">
+          <div class="flex items-center justify-between text-xs font-mono text-near-slate">
+            <span>SWARM KEY REGISTRY</span>
+            <span class="text-near-green">[GATE 01 & 03]</span>
+          </div>
+          <div class="my-3 flex items-baseline gap-3 font-mono tabular-nums">
+            <div>
+              <span id="metricActiveCount" class="text-2xl sm:text-3xl font-bold text-near-green">3</span>
+              <span class="text-xs text-near-slate block">ACTIVE KEYS</span>
+            </div>
+            <span class="text-near-dim text-2xl">/</span>
+            <div>
+              <span id="metricRevokedCount" class="text-2xl sm:text-3xl font-bold text-near-red">1</span>
+              <span class="text-xs text-near-slate block">REVOKED BY OWNER</span>
+            </div>
+          </div>
+          <div class="text-[11px] font-mono text-near-dim flex items-center justify-between">
+            <span>KEY ALLOWANCE (CHAIN):</span>
+            <span id="metricKeyAllowance" class="text-near-alabaster tabular-nums">—</span>
+          </div>
+        </div>
+
+        <!-- Metric 4: Trusted Recipient Allowlist -->
+        <div class="swiss-box p-5 rounded flex flex-col justify-between">
+          <div class="flex items-center justify-between text-xs font-mono text-near-slate">
+            <span>ALLOWLISTED DESTINATIONS</span>
+            <span class="text-near-cyan">[GATE 04]</span>
+          </div>
+          <div id="allowlistPills" class="my-2.5 flex flex-wrap gap-1.5 font-mono text-[11px]">
+            <!-- Populated by JS -->
+          </div>
+          <div class="flex items-center justify-between text-[11px] font-mono text-near-dim">
+            <span>UNTRUSTED TARGETS:</span>
+            <span class="text-near-red font-semibold">TX REVERTED</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SECTION 01b // PROOF STRIP — source, build, live agent run
+         ======================================================================== -->
+    <section id="proof" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="swiss-box p-5 rounded">
+        <div class="font-mono text-[11px] text-near-slate">SOURCE</div>
+        <a href="https://github.com/xhanny6969/echoes" target="_blank" rel="noopener noreferrer" class="block mt-2 font-mono text-sm text-near-green hover:underline">github.com/xhanny6969/echoes ↗</a>
+        <div class="mt-2 text-[11px] text-near-dim font-mono leading-relaxed">Rust contract, CLI, agent and dashboard. MIT.</div>
+      </div>
+      <div class="swiss-box p-5 rounded">
+        <div class="font-mono text-[11px] text-near-slate">BUILD IS REPRODUCIBLE</div>
+        <div class="mt-2 font-mono text-[11px] text-near-alabaster break-all">9JNpk7uGkuWyp6Yd834muCtADcjGXFufHJu6A3jdMTrn</div>
+        <div class="mt-2 text-[11px] text-near-dim font-mono leading-relaxed">Rebuild from <code class="text-near-cyan">contract/</code> and the sha256 matches the live code hash byte for byte.</div>
+      </div>
+      <div class="swiss-box p-5 rounded border-near-red/30">
+        <div class="font-mono text-[11px] text-near-slate">REAL AGENT, TWO OUTCOMES</div>
+        <div class="mt-2 font-mono text-[11px] space-y-1">
+          <div class="text-near-green">ACCEPTED <a href="https://testnet.nearblocks.io/txns/CDvHsjSSqThEhDjN5vUVndR255iiEvw24oQFNvivymLf" target="_blank" rel="noopener noreferrer" class="hover:underline text-near-cyan">CDvHsjSS…mLf</a></div>
+          <div class="text-near-red">REVERTED <a href="https://testnet.nearblocks.io/txns/9jr3XDnRhevFkbMfY44xK6M8uvZWb13ypTe6L7kv9aXj" target="_blank" rel="noopener noreferrer" class="hover:underline text-near-cyan">9jr3XDnR…aXj</a></div>
+        </div>
+        <div class="mt-2 text-[11px] text-near-dim font-mono leading-relaxed">Same model. Hijacked vendor invoice &rarr; payout reverted at the allowlist.</div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SECTION 02 // SWARM AGENT MATRIX (SCOPED FUNCTIONCALL KEYS)
+         ======================================================================== -->
+    <section id="swarm-matrix" class="space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <div class="font-mono text-xs text-near-green">[02 // SWARM_AGENT_MATRIX]</div>
+          <h2 class="font-display font-bold text-2xl text-near-alabaster mt-1">Autonomous Agents &amp; Scoped Access Keys</h2>
+        </div>
+        <p class="text-xs font-mono text-near-slate max-w-md">
+          Each autonomous worker holds an isolated <code class="text-near-green">ed25519</code> key restricted strictly to <code class="text-near-cyan">spend / spend_as</code>. Any policy violation reverts inside the contract before funds move; the owner can permanently lock a key out with <code class="text-near-red">revoke_agent</code>.
+        </p>
+      </div>
+
+      <!-- 4-Agent Cards Grid -->
+      <div id="agentCardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Rendered dynamically by JS -->
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SECTION 03 // INTERACTIVE GUARDRAIL PLAYGROUND & 5-STAGE PIPELINE
+         ======================================================================== -->
+    <section id="playground" class="space-y-5">
+      <div class="mb-1 rounded border border-near-amber/40 bg-near-amber/5 px-3.5 py-2.5 font-mono text-[11px] text-near-amber flex items-start gap-2">
+        <span class="shrink-0">SIMULATION</span>
+        <span class="text-near-slate">Everything in this section runs client-side: it is a deterministic replay of the contract's gate logic, not a broadcast. The <strong class="text-near-alabaster">live numbers</strong> in sections 01&ndash;04 come from <code class="text-near-cyan">/api/state</code> (real RPC reads). Blocked transactions are shown in section 04 with real hashes.</span>
+      </div>
+      <div class="flex flex-wrap items-end justify-between gap-4 border-b border-near-border pb-4">
+        <div>
+          <div class="font-mono text-xs text-near-green">[03 // GUARDRAIL_SIMULATOR_&_TESTNET_CONSOLE]</div>
+          <h2 class="font-display font-bold text-2xl sm:text-3xl text-near-alabaster mt-1">
+            Interactive 5-Gate On-Chain Verification Playground
+          </h2>
+        </div>
+        <div class="font-mono text-xs text-near-slate">
+          Select any Hackathon benchmark preset below or compose a custom payload to test the deterministic Rust guardrails.
+        </div>
+      </div>
+
+      <!-- 5 Hackathon One-Click Scenario Presets -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5">
+        <button onclick="triggerPreset(1)" id="presetBtn-1" class="text-left p-3 rounded border border-near-green/50 bg-near-green/10 hover:bg-near-green/15 transition-all font-mono">
+          <div class="flex items-center justify-between text-[10px] text-near-green font-bold">
+            <span>PRESET 01 // VALID</span>
+            <span>PASS</span>
+          </div>
+          <div class="text-xs font-bold text-near-alabaster mt-1">Valid Agent Spend</div>
+          <div class="text-[11px] text-near-slate mt-0.5">0.10 Ⓝ → allowance-merchant</div>
+        </button>
+
+        <button onclick="triggerPreset(2)" id="presetBtn-2" class="text-left p-3 rounded border border-near-border hover:border-near-red/60 bg-near-carbon hover:bg-near-red/10 transition-all font-mono">
+          <div class="flex items-center justify-between text-[10px] text-near-red font-bold">
+            <span>PRESET 02 // BREACH</span>
+            <span>TX REVERTED</span>
+          </div>
+          <div class="text-xs font-bold text-near-alabaster mt-1">Over Agent Cap</div>
+          <div class="text-[11px] text-near-slate mt-0.5">0.25 Ⓝ (&gt; 0.20 Ⓝ limit)</div>
+        </button>
+
+        <button onclick="triggerPreset(3)" id="presetBtn-3" class="text-left p-3 rounded border border-near-border hover:border-near-red/60 bg-near-carbon hover:bg-near-red/10 transition-all font-mono">
+          <div class="flex items-center justify-between text-[10px] text-near-red font-bold">
+            <span>PRESET 03 // BREACH</span>
+            <span>GATE 05</span>
+          </div>
+          <div class="text-xs font-bold text-near-alabaster mt-1">Over Global Vault Cap</div>
+          <div class="text-[11px] text-near-slate mt-0.5">0.90 Ⓝ (&gt; Vault ceiling)</div>
+        </button>
+
+        <button onclick="triggerPreset(4)" id="presetBtn-4" class="text-left p-3 rounded border border-near-border hover:border-near-red/60 bg-near-carbon hover:bg-near-red/10 transition-all font-mono">
+          <div class="flex items-center justify-between text-[10px] text-near-red font-bold">
+            <span>PRESET 04 // EXPLOIT</span>
+            <span>GATE 04</span>
+          </div>
+          <div class="text-xs font-bold text-near-alabaster mt-1">Untrusted Recipient</div>
+          <div class="text-[11px] text-near-slate mt-0.5">→ hacker-drain.testnet</div>
+        </button>
+
+        <button onclick="triggerPreset(5)" id="presetBtn-5" class="text-left p-3 rounded border border-near-border hover:border-near-amber/60 bg-near-carbon hover:bg-near-amber/10 transition-all font-mono sm:col-span-2 lg:col-span-1">
+          <div class="flex items-center justify-between text-[10px] text-near-amber font-bold">
+            <span>PRESET 05 // HIJACK</span>
+            <span>GATE 01</span>
+          </div>
+          <div class="text-xs font-bold text-near-alabaster mt-1">Privilege Escalation</div>
+          <div class="text-[11px] text-near-slate mt-0.5">Agent calls set_paused(true)</div>
+        </button>
+      </div>
+
+      <!-- Split-Pane Console: Left Composer / Right 5-Stage Pipeline -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Left Pane: Custom Transaction Composer -->
+        <div class="lg:col-span-5 swiss-box swiss-corner p-6 rounded space-y-5">
+          <div class="flex items-center justify-between border-b border-near-border pb-3">
+            <span class="font-mono text-xs font-bold text-near-alabaster">TRANSACTION PAYLOAD COMPOSER</span>
+            <span class="font-mono text-[11px] text-near-cyan">NEAR JSON-RPC / CLI</span>
+          </div>
+
+          <!-- Caller / Signer Identity -->
+          <div>
+            <label class="block font-mono text-xs text-near-slate mb-1.5">1. CALLER SIGNER KEY (AGENT OR OWNER)</label>
+            <select id="simCaller" onchange="updateCliPreview()" class="w-full bg-near-obsidian border border-near-borderBright rounded px-3 py-2.5 font-mono text-xs text-near-alabaster focus:border-near-green focus:outline-none">
+              <option value="agent-alpha">agent-alpha (ed25519:GY1SXN4z…ps17) — live</option>
+              <option value="agent-beta">agent-beta (ed25519:GYSHUupm…GKEQ) — live</option>
+              <option value="scraper-agent">Arb-03 // scraper-agent (ed25519:7x5D...2p4R)</option>
+              <option value="rogue-agent">Rogue-04 // rogue-agent [REVOKED] (ed25519:1z8F...6v9X)</option>
+              <option value="owner">allowance-swarm.testnet (FullAccess Vault Owner)</option>
+            </select>
+          </div>
+
+          <!-- Contract Method -->
+          <div>
+            <label class="block font-mono text-xs text-near-slate mb-1.5">2. CONTRACT METHOD</label>
+            <select id="simMethod" onchange="updateCliPreview()" class="w-full bg-near-obsidian border border-near-borderBright rounded px-3 py-2.5 font-mono text-xs text-near-green focus:border-near-green focus:outline-none">
+              <option value="spend_as">spend_as(agent_id, recipient, amount)</option>
+              <option value="spend">spend(recipient, amount)</option>
+              <option value="set_paused">set_paused(paused: true) [Owner Only]</option>
+              <option value="reactivate_agent">reactivate_agent(agent_id) [Owner Only]</option>
+            </select>
+          </div>
+
+          <!-- Amount & Recipient Row -->
+          <div id="spendFieldsContainer" class="space-y-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block font-mono text-xs text-near-slate mb-1.5">3. AMOUNT (NEAR)</label>
+                <input id="simAmount" type="number" step="0.05" min="0.01" max="1.50" value="0.15" oninput="syncSliderFromInput()" class="w-full bg-near-obsidian border border-near-borderBright rounded px-3 py-2 font-mono text-sm text-near-alabaster focus:border-near-green focus:outline-none tabular-nums" />
+                <input id="simAmountSlider" type="range" step="0.05" min="0.05" max="1.00" value="0.15" oninput="syncInputFromSlider()" class="w-full accent-[#00EC97] mt-2 cursor-pointer" />
+                <span class="text-[10px] font-mono text-near-dim block">Agent Per-Tx Limit: 0.20 NEAR</span>
+              </div>
+
+              <div>
+                <label class="block font-mono text-xs text-near-slate mb-1.5">4. RECIPIENT ACCOUNT</label>
+                <input id="simRecipient" type="text" value="allowance-merchant.testnet" oninput="updateCliPreview()" list="recipientSuggestions" class="w-full bg-near-obsidian border border-near-borderBright rounded px-3 py-2 font-mono text-xs text-near-alabaster focus:border-near-green focus:outline-none" />
+                <datalist id="recipientSuggestions">
+                  <option value="allowance-merchant.testnet">allowance-merchant.testnet (allowlisted on-chain)</option>
+                  <option value="hacker-drain.testnet">NOT allowlisted — demo breach target</option>
+                  <option value="hacker-drain.testnet">Untrusted External Wallet</option>
+                </datalist>
+                <span class="text-[10px] font-mono text-near-dim mt-2 block">Must exist in Vault Allowlist</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Execute Button -->
+          <button onclick="executeGuardrailSimulation()" id="executeSimBtn" class="w-full btn-near-primary py-3 px-4 rounded text-xs sm:text-sm flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>EXECUTE 5-GATE ON-CHAIN VERIFICATION</span>
+          </button>
+
+          <!-- Generated near-cli Command Box -->
+          <div class="pt-3 border-t border-near-border space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-[11px] text-near-slate">EQUIVALENT <code class="text-near-green">near-cli-rs</code> COMMAND</span>
+              <button onclick="copyCliCommand()" class="font-mono text-[11px] text-near-cyan hover:text-near-green flex items-center gap-1">
+                <span id="copyCliLabel">COPY CLI</span>
+              </button>
+            </div>
+            <pre id="cliCommandPreview" class="bg-near-obsidian border border-near-border p-3 rounded font-mono text-[11px] text-near-alabaster overflow-x-auto leading-relaxed"></pre>
+          </div>
+        </div>
+
+        <!-- Right Pane: 5-Stage Verification Pipeline & Live Execution Output -->
+        <div class="lg:col-span-7 swiss-box swiss-corner p-6 rounded space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-near-border pb-3">
+            <div>
+              <span class="font-mono text-xs font-bold text-near-alabaster">5-GATE DETERMINISTIC EXECUTION PIPELINE</span>
+              <p class="text-[11px] font-mono text-near-slate">NEAR Runtime + Rust Contract (<code class="text-near-green">allowance/contract/src/lib.rs</code>)</p>
+            </div>
+            <span id="pipelineOverallBadge" class="font-mono text-xs px-2.5 py-1 rounded bg-near-carbon border border-near-border text-near-slate">
+              READY TO VERIFY
+            </span>
+          </div>
+
+          <!-- 5 Gates Checklist -->
+          <div id="pipelineGatesContainer" class="space-y-2.5 font-mono">
+            
+            <!-- GATE 01 -->
+            <div id="gate-1" class="p-3.5 rounded bg-near-obsidian border border-near-border flex items-start justify-between gap-3 transition-all">
+              <div class="flex items-start gap-3">
+                <span id="gate-icon-1" class="w-6 h-6 rounded bg-near-carbon border border-near-border flex items-center justify-center text-xs text-near-slate shrink-0">01</span>
+                <div>
+                  <div class="text-xs font-bold text-near-alabaster">GATE 01 // Protocol FunctionCall Access Key &amp; Predecessor Guard</div>
+                  <div class="text-[11px] text-near-slate mt-0.5">Verifies the <code class="text-near-cyan">ed25519</code> key is scoped to the target method with gas ≤ 0.25 Ⓝ and checks <code class="text-near-green">env::predecessor_account_id()</code>.</div>
+                </div>
+              </div>
+              <span id="gate-status-1" class="text-[11px] px-2 py-0.5 rounded bg-near-carbon text-near-dim shrink-0">STANDBY</span>
+            </div>
+
+            <!-- GATE 02 -->
+            <div id="gate-2" class="p-3.5 rounded bg-near-obsidian border border-near-border flex items-start justify-between gap-3 transition-all">
+              <div class="flex items-start gap-3">
+                <span id="gate-icon-2" class="w-6 h-6 rounded bg-near-carbon border border-near-border flex items-center justify-center text-xs text-near-slate shrink-0">02</span>
+                <div>
+                  <div class="text-xs font-bold text-near-alabaster">GATE 02 // Global Vault Circuit Breaker</div>
+                  <div class="text-[11px] text-near-slate mt-0.5">Rust contract assertion: <code class="text-near-green">require!(!self.is_paused, "ERR_VAULT_PAUSED")</code></div>
+                </div>
+              </div>
+              <span id="gate-status-2" class="text-[11px] px-2 py-0.5 rounded bg-near-carbon text-near-dim shrink-0">STANDBY</span>
+            </div>
+
+            <!-- GATE 03 -->
+            <div id="gate-3" class="p-3.5 rounded bg-near-obsidian border border-near-border flex items-start justify-between gap-3 transition-all">
+              <div class="flex items-start gap-3">
+                <span id="gate-icon-3" class="w-6 h-6 rounded bg-near-carbon border border-near-border flex items-center justify-center text-xs text-near-slate shrink-0">03</span>
+                <div>
+                  <div class="text-xs font-bold text-near-alabaster">GATE 03 // Agent Registration &amp; Active Key State</div>
+                  <div class="text-[11px] text-near-slate mt-0.5">Assertion: <code class="text-near-green">agent.is_active == true</code> (Owner-revoked keys can no longer transact).</div>
+                </div>
+              </div>
+              <span id="gate-status-3" class="text-[11px] px-2 py-0.5 rounded bg-near-carbon text-near-dim shrink-0">STANDBY</span>
+            </div>
+
+            <!-- GATE 04 -->
+            <div id="gate-4" class="p-3.5 rounded bg-near-obsidian border border-near-border flex items-start justify-between gap-3 transition-all">
+              <div class="flex items-start gap-3">
+                <span id="gate-icon-4" class="w-6 h-6 rounded bg-near-carbon border border-near-border flex items-center justify-center text-xs text-near-slate shrink-0">04</span>
+                <div>
+                  <div class="text-xs font-bold text-near-alabaster">GATE 04 // Trusted Recipient Allowlist Check</div>
+                  <div class="text-[11px] text-near-slate mt-0.5">Assertion: <code class="text-near-green">self.allowlist.contains(&amp;recipient)</code> — On violation: <strong class="text-near-red">revert the transfer.</strong></div>
+                </div>
+              </div>
+              <span id="gate-status-4" class="text-[11px] px-2 py-0.5 rounded bg-near-carbon text-near-dim shrink-0">STANDBY</span>
+            </div>
+
+            <!-- GATE 05 -->
+            <div id="gate-5" class="p-3.5 rounded bg-near-obsidian border border-near-border flex items-start justify-between gap-3 transition-all">
+              <div class="flex items-start gap-3">
+                <span id="gate-icon-5" class="w-6 h-6 rounded bg-near-carbon border border-near-border flex items-center justify-center text-xs text-near-slate shrink-0">05</span>
+                <div>
+                  <div class="text-xs font-bold text-near-alabaster">GATE 05 // Dual Velocity Arithmetic (Per-Tx &amp; Global Cap)</div>
+                  <div class="text-[11px] text-near-slate mt-0.5">Assertion: <code class="text-near-green">amount &lt;= agent.max_per_tx &amp;&amp; vault_spent + amount &lt;= vault_cap</code></div>
+                </div>
+              </div>
+              <span id="gate-status-5" class="text-[11px] px-2 py-0.5 rounded bg-near-carbon text-near-dim shrink-0">STANDBY</span>
+            </div>
+
+          </div>
+
+          <!-- On-Chain Receipt / Outcome Box -->
+          <div id="receiptOutcomeBox" class="p-4 rounded bg-near-obsidian border border-near-border font-mono text-xs space-y-1.5">
+            <div class="flex items-center justify-between text-near-dim text-[11px]">
+              <span>EXECUTION RECEIPT TELEMETRY</span>
+              <span id="receiptHashText">TX: 8xK9...p3mN</span>
+            </div>
+            <div id="receiptSummaryText" class="text-near-green font-semibold">
+              &gt; Select a Hackathon preset above or click "EXECUTE 5-GATE ON-CHAIN VERIFICATION" to inspect the contract execution trace.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SECTION 04 // IMMUTABLE AUDIT LOG STREAM (audit.jsonl)
+         ======================================================================== -->
+    <section id="audit-log" class="space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <div class="font-mono text-xs text-near-green">[04 // IMMUTABLE_AUDIT_STREAM]</div>
+          <h2 class="font-display font-bold text-2xl text-near-alabaster mt-1">Structured On-Chain &amp; Agent Telemetry (<code class="text-near-cyan font-mono text-lg">audit.jsonl</code>)</h2>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="exportAuditJsonl()" class="btn-near-ghost px-3 py-1.5 rounded text-xs font-mono flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            <span>EXPORT audit.jsonl</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="swiss-box rounded overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left font-mono text-xs">
+            <thead class="bg-near-panel border-b border-near-border text-near-slate text-[11px] uppercase">
+              <tr>
+                <th class="py-3 px-4">TIMESTAMP (UTC)</th>
+                <th class="py-3 px-4">AGENT / CALLER</th>
+                <th class="py-3 px-4">METHOD &amp; TARGET</th>
+                <th class="py-3 px-4">AMOUNT</th>
+                <th class="py-3 px-4">VERDICT &amp; GATE</th>
+                <th class="py-3 px-4">CONTRACT LOG</th>
+              </tr>
+            </thead>
+            <tbody id="auditTableBody" class="divide-y divide-near-border tabular-nums">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- REAL rejected transactions: on-chain proof that guardrails bite -->
+      <div class="swiss-box rounded overflow-hidden border-near-red/30">
+        <div class="flex flex-wrap items-center justify-between gap-2 px-4 py-3 bg-near-red/5 border-b border-near-red/30">
+          <div class="font-mono text-[11px] text-near-red font-bold">[04b // REJECTED_ON_CHAIN] &mdash; failed transactions the vault refused</div>
+          <div class="font-mono text-[10px] text-near-dim">source: nearblocks /v3 txns on <code class="text-near-slate">allowance-swarm.testnet</code></div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left font-mono text-xs">
+            <thead class="bg-near-panel border-b border-near-border text-near-slate text-[11px] uppercase">
+              <tr>
+                <th class="py-2.5 px-4">BLOCK</th>
+                <th class="py-2.5 px-4">METHOD</th>
+                <th class="py-2.5 px-4">OUTCOME</th>
+                <th class="py-2.5 px-4">TX HASH</th>
+              </tr>
+            </thead>
+            <tbody id="rejectionsBody" class="divide-y divide-near-border tabular-nums">
+              <tr><td colspan="4" class="py-3 px-4 text-near-dim">loading live rejections…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SECTION 05 // BESPOKE "ECHOES" BRAND & SVG LOGO KIT (DOWNLOADABLE)
+         ======================================================================== -->
+    <section id="brand-kit" class="space-y-5 pt-4">
+      <div class="flex flex-wrap items-end justify-between gap-4 border-b border-near-border pb-4">
+        <div>
+          <div class="font-mono text-xs text-near-green">[05 // BESPOKE_LOGO_&_BRAND_ASSETS]</div>
+          <h2 class="font-display font-bold text-2xl sm:text-3xl text-near-alabaster mt-1">
+            Echoes Vector Identity &amp; Repository Asset Kit
+          </h2>
+        </div>
+        <p class="font-mono text-xs text-near-slate max-w-lg">
+          Engineered specifically around the official <strong class="text-near-green">NEAR Protocol (#00EC97)</strong> design system. Click <strong>Download .SVG</strong> or <strong>Copy Code</strong> to drop directly into your repository's <code class="text-near-alabaster">./assets/</code> directory.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        
+        <!-- Asset 1: echoes-logo.svg (Dark Primary Mark) -->
+        <div class="swiss-box swiss-corner p-5 rounded flex flex-col justify-between">
+          <div class="flex items-center justify-between text-xs font-mono text-near-slate mb-3">
+            <code class="text-near-green">./assets/echoes-logo.svg</code>
+            <span>512×512</span>
+          </div>
+          <div class="h-44 rounded bg-near-obsidian border border-near-border flex items-center justify-center p-4 bg-blueprint">
+            <svg id="svg-asset-dark-mark" class="w-32 h-32" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="128" height="128" rx="24" fill="#06080B"/>
+              <path d="M64 12L109 38V90L64 116L19 90V38L64 12Z" stroke="#00EC97" stroke-width="3.5" stroke-dasharray="14 7"/>
+              <circle cx="64" cy="64" r="39" stroke="#00EC97" stroke-width="2" stroke-opacity="0.35"/>
+              <circle cx="64" cy="64" r="28" stroke="#179EFF" stroke-width="2" stroke-dasharray="8 6" stroke-opacity="0.65"/>
+              <path d="M42 86V42L86 86V42" stroke="#F2F6FA" stroke-width="8" stroke-linecap="square" stroke-linejoin="miter"/>
+              <path d="M42 42L58 58" stroke="#00EC97" stroke-width="8" stroke-linecap="square"/>
+              <circle cx="64" cy="64" r="7" fill="#00EC97" stroke="#06080B" stroke-width="3"/>
+            </svg>
+          </div>
+          <div class="mt-4 flex items-center justify-between gap-2">
+            <button onclick="downloadSvgAsset('svg-asset-dark-mark', 'echoes-logo.svg')" class="btn-near-primary flex-1 py-2 rounded text-xs">DOWNLOAD .SVG</button>
+            <button onclick="copySvgAsset('svg-asset-dark-mark', this)" class="btn-near-ghost px-3 py-2 rounded text-xs">COPY CODE</button>
+          </div>
+        </div>
+
+        <!-- Asset 2: echoes-logo-horizontal.svg (Dark Horizontal Banner) -->
+        <div class="swiss-box swiss-corner p-5 rounded flex flex-col justify-between">
+          <div class="flex items-center justify-between text-xs font-mono text-near-slate mb-3">
+            <code class="text-near-green">./assets/echoes-logo-horizontal.svg</code>
+            <span>640×160</span>
+          </div>
+          <div class="h-44 rounded bg-near-obsidian border border-near-border flex items-center justify-center p-4 bg-blueprint">
+            <svg id="svg-asset-horiz-dark" class="w-full h-auto max-h-28" viewBox="0 0 460 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="460" height="120" rx="16" fill="#06080B"/>
+              <g transform="translate(16, 12)">
+                <path d="M48 6L84 27V69L48 90L12 69V27L48 6Z" stroke="#00EC97" stroke-width="3" stroke-dasharray="10 5"/>
+                <circle cx="48" cy="48" r="28" stroke="#179EFF" stroke-width="1.5" stroke-dasharray="6 4" stroke-opacity="0.7"/>
+                <path d="M32 64V32L64 64V32" stroke="#F2F6FA" stroke-width="6" stroke-linecap="square"/>
+                <path d="M32 32L44 44" stroke="#00EC97" stroke-width="6" stroke-linecap="square"/>
+                <circle cx="48" cy="48" r="5.5" fill="#00EC97" stroke="#06080B" stroke-width="2"/>
+              </g>
+              <text x="128" y="64" fill="#F2F6FA" font-family="Syne, Space Grotesk, sans-serif" font-weight="800" font-size="44" letter-spacing="4">ECHOES</text>
+              <text x="130" y="88" fill="#00EC97" font-family="JetBrains Mono, monospace" font-weight="600" font-size="13" letter-spacing="2.5">NEAR AGENT GUARDRAIL VAULT</text>
+            </svg>
+          </div>
+          <div class="mt-4 flex items-center justify-between gap-2">
+            <button onclick="downloadSvgAsset('svg-asset-horiz-dark', 'echoes-logo-horizontal.svg')" class="btn-near-primary flex-1 py-2 rounded text-xs">DOWNLOAD .SVG</button>
+            <button onclick="copySvgAsset('svg-asset-horiz-dark', this)" class="btn-near-ghost px-3 py-2 rounded text-xs">COPY CODE</button>
+          </div>
+        </div>
+
+        <!-- Asset 3: echoes-logo-light.svg & echoes-favicon.svg -->
+        <div class="swiss-box swiss-corner p-5 rounded flex flex-col justify-between">
+          <div class="flex items-center justify-between text-xs font-mono text-near-slate mb-3">
+            <code class="text-near-cyan">./assets/echoes-logo-light.svg</code>
+            <span>LIGHT + FAVICON</span>
+          </div>
+          <div class="h-44 rounded bg-[#F2F6FA] border border-near-border flex items-center justify-around p-4">
+            <svg id="svg-asset-light-mark" class="w-28 h-28" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="128" height="128" rx="24" fill="#F2F6FA"/>
+              <path d="M64 12L109 38V90L64 116L19 90V38L64 12Z" stroke="#06080B" stroke-width="4" stroke-dasharray="14 7"/>
+              <circle cx="64" cy="64" r="36" stroke="#00B874" stroke-width="2.5" stroke-dasharray="8 5"/>
+              <path d="M42 86V42L86 86V42" stroke="#06080B" stroke-width="8.5" stroke-linecap="square"/>
+              <path d="M42 42L58 58" stroke="#00EC97" stroke-width="8.5" stroke-linecap="square"/>
+              <circle cx="64" cy="64" r="7.5" fill="#00EC97" stroke="#06080B" stroke-width="3"/>
+            </svg>
+          </div>
+          <div class="mt-4 flex items-center justify-between gap-2">
+            <button onclick="downloadSvgAsset('svg-asset-light-mark', 'echoes-logo-light.svg')" class="btn-near-primary flex-1 py-2 rounded text-xs">DOWNLOAD LIGHT .SVG</button>
+            <button onclick="downloadSvgAsset('svg-asset-dark-mark', 'echoes-favicon.svg')" class="btn-near-ghost px-3 py-2 rounded text-xs">FAVICON .SVG</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SECTION 06 // COMPREHENSIVE INTERACTIVE FAQ SECTION
+         ======================================================================== -->
+    <section id="faq" class="space-y-6 pt-6 pb-12">
+      <div class="swiss-box swiss-corner p-6 sm:p-8 rounded bg-gradient-to-b from-near-carbon to-near-obsidian">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-near-border pb-6">
+          <div>
+            <div class="inline-flex items-center gap-2 font-mono text-xs text-near-green">
+              <span>[06 // TECHNICAL_DOCUMENTATION_&_FAQ]</span>
+            </div>
+            <h2 class="font-display font-extrabold text-2xl sm:text-4xl text-near-alabaster mt-2">
+              Frequently Asked Questions <span class="font-serif italic font-normal text-near-green">(Architecture &amp; Security)</span>
+            </h2>
+            <p class="text-sm text-near-slate mt-1 max-w-2xl">
+              Deep-dive technical specifications on how Echoes enforces deterministic on-chain spending boundaries on NEAR Protocol, why native access keys alone aren't enough, and how Hackathon Judges can verify the live vault.
+            </p>
+          </div>
+
+          <!-- Search Input -->
+          <div class="w-full md:w-72">
+            <div class="relative">
+              <input id="faqSearchInput" type="text" oninput="filterFaq()" placeholder="Search topics (e.g. FunctionCall, revoke)..." class="w-full bg-near-obsidian border border-near-borderBright rounded px-3.5 py-2.5 text-xs font-mono text-near-alabaster focus:border-near-green focus:outline-none" />
+              <span class="absolute right-3 top-2.5 text-near-dim font-mono text-xs">/</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category Filter Tabs -->
+        <div class="flex flex-wrap items-center gap-2 my-5 font-mono text-xs">
+          <button onclick="setFaqCategory('all')" data-cat="all" class="faq-cat-btn px-3 py-1.5 rounded border border-near-green bg-near-green text-near-obsidian font-bold transition-all">ALL QUESTIONS (7)</button>
+          <button onclick="setFaqCategory('security')" data-cat="security" class="faq-cat-btn px-3 py-1.5 rounded border border-near-border bg-near-obsidian text-near-slate hover:border-near-green transition-all">SECURITY &amp; ACCESS KEYS</button>
+          <button onclick="setFaqCategory('contract')" data-cat="contract" class="faq-cat-btn px-3 py-1.5 rounded border border-near-border bg-near-obsidian text-near-slate hover:border-near-green transition-all">RUST CONTRACT &amp; CAPS</button>
+          <button onclick="setFaqCategory('judges')" data-cat="judges" class="faq-cat-btn px-3 py-1.5 rounded border border-near-border bg-near-obsidian text-near-slate hover:border-near-green transition-all">HACKATHON JUDGES</button>
+        </div>
+
+        <!-- Accordion Items Container -->
+        <div id="faqAccordionContainer" class="space-y-3">
+          
+          <!-- FAQ 01 -->
+          <div class="faq-item open border border-near-border rounded bg-near-obsidian/80 transition-colors" data-category="security">
+            <button onclick="toggleFaqItem(this)" class="w-full text-left p-4 sm:p-5 flex items-start justify-between gap-4 focus:outline-none">
+              <div class="flex items-start gap-3">
+                <span class="font-mono text-xs text-near-green font-bold mt-0.5">[Q01]</span>
+                <div>
+                  <h3 class="font-sans font-bold text-base sm:text-lg text-near-alabaster">
+                    Why isn't NEAR's built-in <code class="text-near-cyan font-mono">FunctionCall</code> Access Key allowance sufficient on its own for AI agents?
+                  </h3>
+                  <span class="inline-block mt-1 font-mono text-[10px] px-2 py-0.5 rounded bg-near-green/10 text-near-green">NEAR PROTOCOL ARCHITECTURE</span>
+                </div>
+              </div>
+              <span class="faq-icon w-6 h-6 rounded border border-near-border flex items-center justify-center font-mono text-sm text-near-slate shrink-0 transition-transform">+</span>
+            </button>
+            <div class="faq-answer px-4 sm:px-5 pb-5 pt-1 text-sm text-near-slate space-y-3 border-t border-near-border/60">
+              <p>
+                At the NEAR protocol level, a <code class="text-near-cyan font-mono">FunctionCall</code> access key carries two critical properties: (1) its native <code class="font-mono text-near-alabaster">allowance</code> (e.g., <code class="font-mono">0.25 NEAR</code>) <strong>strictly meters execution gas fees</strong>, not outbound value transfers; and (2) protocol rules prohibit a <code class="font-mono">FunctionCall</code> key from signing transactions with a non-zero <code class="font-mono text-near-red">attached_deposit</code>.
+              </p>
+              <p>
+                Therefore, an autonomous agent using a scoped <code class="font-mono">FunctionCall</code> key cannot directly attach NEAR tokens to pay external APIs or compute providers. <strong class="text-near-alabaster">Echoes bridges this architectural gap:</strong> the agent invokes <code class="text-near-green font-mono">spend_as</code> with <code class="font-mono">0 attached_deposit</code>, and the Echoes Rust Vault contract enforces stateful accounting (per-transaction limits, cumulative agent caps, global vault ceiling, and recipient allowlists) before executing <code class="font-mono text-near-cyan">Promise::new(recipient).transfer(amount)</code> from the vault's treasury.
+              </p>
+            </div>
+          </div>
+
+          <!-- FAQ 02 -->
+          <div class="faq-item border border-near-border rounded bg-near-obsidian/80 transition-colors" data-category="contract">
+            <button onclick="toggleFaqItem(this)" class="w-full text-left p-4 sm:p-5 flex items-start justify-between gap-4 focus:outline-none">
+              <div class="flex items-start gap-3">
+                <span class="font-mono text-xs text-near-green font-bold mt-0.5">[Q02]</span>
+                <div>
+                  <h3 class="font-sans font-bold text-base sm:text-lg text-near-alabaster">
+                    What exactly happens on-chain when an agent breaches a guardrail &mdash; and who can revoke a key?
+                  </h3>
+                  <span class="inline-block mt-1 font-mono text-[10px] px-2 py-0.5 rounded bg-near-red/15 text-near-red">REJECTION &amp; OWNER REVOCATION</span>
+                </div>
+              </div>
+              <span class="faq-icon w-6 h-6 rounded border border-near-border flex items-center justify-center font-mono text-sm text-near-slate shrink-0 transition-transform">+</span>
+            </button>
+            <div class="faq-answer px-4 sm:px-5 pb-5 pt-1 text-sm text-near-slate space-y-3 border-t border-near-border/60">
+              <p>
+                Every guardrail in <code class="font-mono text-near-green">spend_as</code> is enforced <strong>before</strong> any transfer is scheduled. When a check fails the contract traps (Rust <code class="font-mono text-near-red">fail()</code> &rarr; <code class="font-mono">unreachable</code>), so the whole receipt <strong>reverts</strong>: no <code class="font-mono">Promise::transfer</code> is ever created, <code class="font-mono">spent_today</code> is not incremented, no log entry is written, and zero yoctoNEAR moves. A prompt-injected agent therefore learns nothing and gains nothing per attempt &mdash; every retry costs it gas and fails identically.
+              </p>
+              <p>
+                Reverting alone would let a compromised key keep retrying forever, so <strong class="text-near-alabaster">Echoes</strong> adds an explicit owner-controlled kill path: <code class="font-mono text-near-cyan">revoke_agent(agent_id)</code> flips <code class="font-mono text-near-red">active = false</code> in persistent storage, and <code class="font-mono text-near-cyan">reactivate_agent</code> / <code class="font-mono text-near-cyan">set_paused</code> are gated by <code class="font-mono text-near-green">assert_owner()</code>. Both are verifiable on this testnet account: <code class="font-mono text-near-alabaster">revoke_agent</code> and <code class="font-mono text-near-alabaster">reactivate_agent</code> transactions are listed below with block-level receipts.
+              </p>
+              <p class="font-mono text-[11px] text-near-dim">
+                Note: revocation is <strong>owner-triggered, not automatic</strong>. We deliberately did not market an "auto-revoke on breach" primitive &mdash; a contract cannot safely self-disable a key on a reverted receipt, and doing so non-atomically would require a separate keeper.
+              </p>
+            </div>
+          </div>
+
+          <!-- FAQ 03 -->
+          <div class="faq-item border border-near-border rounded bg-near-obsidian/80 transition-colors" data-category="contract">
+            <button onclick="toggleFaqItem(this)" class="w-full text-left p-4 sm:p-5 flex items-start justify-between gap-4 focus:outline-none">
+              <div class="flex items-start gap-3">
+                <span class="font-mono text-xs text-near-green font-bold mt-0.5">[Q03]</span>
+                <div>
+                  <h3 class="font-sans font-bold text-base sm:text-lg text-near-alabaster">
+                    How does the 5-Gate Defense-in-Depth Pipeline protect against both single-shot drains and slow-drip sybil attacks?
+                  </h3>
+                  <span class="inline-block mt-1 font-mono text-[10px] px-2 py-0.5 rounded bg-near-green/10 text-near-green">DUAL VELOCITY CAPS</span>
+                </div>
+              </div>
+              <span class="faq-icon w-6 h-6 rounded border border-near-border flex items-center justify-center font-mono text-sm text-near-slate shrink-0 transition-transform">+</span>
+            </button>
+            <div class="faq-answer px-4 sm:px-5 pb-5 pt-1 text-sm text-near-slate space-y-2 border-t border-near-border/60">
+              <p>Every <code class="font-mono text-near-green">spend_as(agent_id, recipient, amount)</code> call traverses five sequential verification gates:</p>
+              <ol class="list-decimal list-inside space-y-1.5 font-mono text-xs text-near-alabaster bg-near-carbon p-3.5 rounded border border-near-border">
+                <li><span class="text-near-green">GATE 01 (Protocol Key Scope &amp; Predecessor):</span> NEAR Runtime validates the <code class="text-near-cyan">ed25519</code> key is restricted to <code class="text-near-cyan">spend / spend_as</code> with gas ≤ 0.25 NEAR.</li>
+                <li><span class="text-near-green">GATE 02 (Circuit Breaker):</span> Asserts the vault is not paused by the owner (<code class="text-near-cyan">!self.is_paused</code>).</li>
+                <li><span class="text-near-green">GATE 03 (Agent Active Status):</span> Confirms the agent exists and <code class="text-near-cyan">agent.is_active == true</code>.</li>
+                <li><span class="text-near-green">GATE 04 (Recipient Allowlist):</span> Confirms <code class="text-near-cyan">self.allowlist.contains(&amp;recipient)</code>. Otherwise the call reverts before any transfer is scheduled.</li>
+                <li><span class="text-near-green">GATE 05 (Dual Velocity Caps):</span> Enforces three arithmetic ceilings simultaneously: <code class="text-near-cyan">amount &lt;= agent.per_tx</code> (0.20 Ⓝ), <code class="text-near-cyan">agent.spent_today + amount &lt;= agent.daily</code> (1.00 Ⓝ), <code class="text-near-cyan">amount &lt;= vault.per_tx</code> (0.50 Ⓝ), and <code class="text-near-cyan">vault.spent_today + amount &lt;= vault.daily</code> (5.00 Ⓝ).</li>
+              </ol>
+            </div>
+          </div>
+
+          <!-- FAQ 04 -->
+          <div class="faq-item border border-near-border rounded bg-near-obsidian/80 transition-colors" data-category="security">
+            <button onclick="toggleFaqItem(this)" class="w-full text-left p-4 sm:p-5 flex items-start justify-between gap-4 focus:outline-none">
+              <div class="flex items-start gap-3">
+                <span class="font-mono text-xs text-near-green font-bold mt-0.5">[Q04]</span>
+                <div>
+                  <h3 class="font-sans font-bold text-base sm:text-lg text-near-alabaster">
+                    What prevents a compromised agent from calling <code class="text-near-green font-mono">reactivate_agent</code> or <code class="text-near-amber font-mono">set_paused(false)</code> to unfreeze itself?
+                  </h3>
+                  <span class="inline-block mt-1 font-mono text-[10px] px-2 py-0.5 rounded bg-near-amber/15 text-near-amber">ADMINISTRATIVE ISOLATION</span>
+                </div>
+              </div>
+              <span class="faq-icon w-6 h-6 rounded border border-near-border flex items-center justify-center font-mono text-sm text-near-slate shrink-0 transition-transform">+</span>
+            </button>
+            <div class="faq-answer px-4 sm:px-5 pb-5 pt-1 text-sm text-near-slate space-y-3 border-t border-near-border/60">
+              <p>
+                Administrative methods (<code class="font-mono text-near-green">reactivate_agent</code>, <code class="font-mono text-near-amber">set_paused</code>, <code class="font-mono text-near-cyan">add_to_allowlist</code>, and <code class="font-mono text-near-cyan">register_agent</code>) are protected by two independent barriers:
+              </p>
+              <p>
+                First, at the <strong>NEAR Runtime level</strong>, each agent's <code class="font-mono text-near-cyan">FunctionCall</code> access key explicitly whitelists only <code class="font-mono text-near-green">["spend", "spend_as"]</code>. Any transaction signed by an agent key attempting to invoke <code class="font-mono text-near-red">reactivate_agent</code> or <code class="font-mono text-near-red">set_paused</code> is rejected by NEAR validators before WASM execution even begins (demonstrated in <strong>Preset 05</strong>). Second, inside the contract, <code class="font-mono text-near-alabaster">assert_owner()</code> verifies <code class="font-mono text-near-green">env::predecessor_account_id() == self.owner_id</code>.
+              </p>
+            </div>
+          </div>
+
+          <!-- FAQ 05 -->
+          <div class="faq-item border border-near-border rounded bg-near-obsidian/80 transition-colors" data-category="contract">
+            <button onclick="toggleFaqItem(this)" class="w-full text-left p-4 sm:p-5 flex items-start justify-between gap-4 focus:outline-none">
+              <div class="flex items-start gap-3">
+                <span class="font-mono text-xs text-near-green font-bold mt-0.5">[Q05]</span>
+                <div>
+                  <h3 class="font-sans font-bold text-base sm:text-lg text-near-alabaster">
+                    How does Echoes enable concurrent multi-agent swarm execution without <code class="text-near-cyan font-mono">nonce</code> collisions?
+                  </h3>
+                  <span class="inline-block mt-1 font-mono text-[10px] px-2 py-0.5 rounded bg-near-cyan/10 text-near-cyan">CONCURRENCY &amp; SWARM SCALING</span>
+                </div>
+              </div>
+              <span class="faq-icon w-6 h-6 rounded border border-near-border flex items-center justify-center font-mono text-sm text-near-slate shrink-0 transition-transform">+</span>
+            </button>
+            <div class="faq-answer px-4 sm:px-5 pb-5 pt-1 text-sm text-near-slate space-y-3 border-t border-near-border/60">
+              <p>
+                On NEAR Protocol, transaction nonces are tracked <strong>per <code class="font-mono text-near-green">AccessKey</code></strong> rather than per account. By provisioning a dedicated <code class="font-mono text-near-cyan">ed25519 FunctionCall Access Key</code> for each autonomous worker in the swarm (<code class="font-mono">agent-alpha</code>, <code class="font-mono">agent-beta</code>), multiple agents can sign and broadcast transactions concurrently in the same block with zero nonce contention—while the Echoes contract atomically serializes their cumulative deductions against the shared <code class="font-mono text-near-green">Global Vault Cap</code>.
+              </p>
+            </div>
+          </div>
+
+          <!-- FAQ 06 -->
+          <div class="faq-item border border-near-border rounded bg-near-obsidian/80 transition-colors" data-category="judges">
+            <button onclick="toggleFaqItem(this)" class="w-full text-left p-4 sm:p-5 flex items-start justify-between gap-4 focus:outline-none">
+              <div class="flex items-start gap-3">
+                <span class="font-mono text-xs text-near-green font-bold mt-0.5">[Q06]</span>
+                <div>
+                  <h3 class="font-sans font-bold text-base sm:text-lg text-near-alabaster">
+                    How can Hackathon Judges verify the live <code class="text-near-green font-mono">allowance-swarm.testnet</code> deployment and <code class="text-near-cyan font-mono">audit.jsonl</code> telemetry?
+                  </h3>
+                  <span class="inline-block mt-1 font-mono text-[10px] px-2 py-0.5 rounded bg-near-green/10 text-near-green">HACKATHON JUDGES GUIDE</span>
+                </div>
+              </div>
+              <span class="faq-icon w-6 h-6 rounded border border-near-border flex items-center justify-center font-mono text-sm text-near-slate shrink-0 transition-transform">+</span>
+            </button>
+            <div class="faq-answer px-4 sm:px-5 pb-5 pt-1 text-sm text-near-slate space-y-3 border-t border-near-border/60">
+              <p>Hackathon Judges can verify Echoes in three ways with zero local setup required:</p>
+              <ul class="list-disc list-inside space-y-1.5">
+                <li><strong class="text-near-alabaster">1. Interactive 5-Gate Playground (In-Browser):</strong> Click <strong>"RUN SIMULATED SWARM DEMO"</strong> in the Hero or test all 5 presets in Section 03 to inspect the deterministic gate evaluations and copy ready-to-run <code class="font-mono text-near-green">near-cli-rs</code> commands.</li>
+                <li><strong class="text-near-alabaster">2. On-Chain Verification on NearBlocks Testnet Explorer:</strong> Inspect <a href="https://testnet.nearblocks.io/address/allowance-swarm.testnet" target="_blank" rel="noopener noreferrer" class="text-near-green underline">testnet.nearblocks.io/address/allowance-swarm.testnet</a> to verify the deployed WASM contract, scoped <code class="font-mono">FunctionCall</code> access keys, and real Testnet transaction receipts.</li>
+                <li><strong class="text-near-alabaster">3. Python Swarm Agent Suite &amp; <code class="font-mono text-near-cyan">audit.jsonl</code>:</strong> Run <code class="font-mono text-near-cyan">python3 allowance/agent/swarm_demo.py</code> or <code class="font-mono text-near-cyan">python3 allowance/agent/verify_vault_cap.py</code> to broadcast live multi-agent transactions and generate cryptographically linked JSONL audit trails.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- FAQ 07 -->
+          <div class="faq-item border border-near-border rounded bg-near-obsidian/80 transition-colors" data-category="judges">
+            <button onclick="toggleFaqItem(this)" class="w-full text-left p-4 sm:p-5 flex items-start justify-between gap-4 focus:outline-none">
+              <div class="flex items-start gap-3">
+                <span class="font-mono text-xs text-near-green font-bold mt-0.5">[Q07]</span>
+                <div>
+                  <h3 class="font-sans font-bold text-base sm:text-lg text-near-alabaster">
+                    What is the production roadmap for Echoes with NEAR Chain Signatures (MPC) and NEAR Intents?
+                  </h3>
+                  <span class="inline-block mt-1 font-mono text-[10px] px-2 py-0.5 rounded bg-near-cyan/10 text-near-cyan">ROADMAP // CHAIN SIGNATURES &amp; INTENTS</span>
+                </div>
+              </div>
+              <span class="faq-icon w-6 h-6 rounded border border-near-border flex items-center justify-center font-mono text-sm text-near-slate shrink-0 transition-transform">+</span>
+            </button>
+            <div class="faq-answer px-4 sm:px-5 pb-5 pt-1 text-sm text-near-slate space-y-3 border-t border-near-border/60">
+              <p>
+                Echoes is architected as the foundational policy-enforcement layer for autonomous agents across the entire NEAR AI ecosystem:
+              </p>
+              <ul class="list-disc list-inside space-y-1.5">
+                <li><strong class="text-near-green">NEAR Chain Signatures (MPC) Guardrails:</strong> Before the Echoes Vault requests a threshold signature from <code class="font-mono text-near-alabaster">v1.signer-prod.testnet</code> to sign an EVM, Bitcoin, or Solana payload on behalf of an agent, the payload must pass Echoes' 5-Gate velocity and destination allowlist checks.</li>
+                <li><strong class="text-near-cyan">NEAR Intents Solver Verification:</strong> Agents can submit bounded swap or compute intents where Echoes verifies maximum slippage and daily notional caps before committing solver settlement.</li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==========================================================================
+       ARCHITECTURAL FOOTER
+       ========================================================================== -->
+  <footer class="border-t border-near-border bg-near-carbon py-10 px-4 sm:px-6 lg:px-8 mt-auto">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+      <div class="flex items-center gap-3.5">
+        <svg class="w-9 h-9" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="64" height="64" rx="12" fill="#06080B" stroke="#19232E"/>
+          <path d="M32 7L54 19.5V44.5L32 57L10 44.5V19.5L32 7Z" stroke="#00EC97" stroke-width="2" stroke-dasharray="6 3"/>
+          <path d="M21 43V21L43 43V21" stroke="#F2F6FA" stroke-width="4" stroke-linecap="square"/>
+          <circle cx="32" cy="32" r="4" fill="#00EC97"/>
+        </svg>
+        <div>
+          <div class="font-display font-bold text-sm text-near-alabaster tracking-wider">ECHOES // AUTONOMOUS SWARM GUARDRAIL VAULT</div>
+          <div class="font-mono text-xs text-near-slate mt-0.5">
+            Built on <span class="text-near-green">NEAR Protocol Testnet</span> • Contract: <code class="text-near-alabaster">allowance-swarm.testnet</code> • MIT License
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-4 font-mono text-xs">
+        <a href="#brand-kit" class="text-near-slate hover:text-near-green transition-colors">SVG Brand Kit</a>
+        <span class="text-near-dim">•</span>
+        <a href="#playground" class="text-near-slate hover:text-near-green transition-colors">5-Gate Playground</a>
+        <span class="text-near-dim">•</span>
+        <a href="#faq" class="text-near-slate hover:text-near-green transition-colors">Technical FAQ</a>
+        <span class="text-near-dim">•</span>
+        <a href="https://testnet.nearblocks.io/address/allowance-swarm.testnet" target="_blank" rel="noopener noreferrer" class="text-near-green hover:underline">NearBlocks Explorer ↗</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       3-MODE NEAR WALLET & EPHEMERAL KEY CONNECTION MODAL
+       ========================================================================== -->
+  <div id="walletModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="swiss-box swiss-corner w-full max-w-xl rounded p-6 space-y-5 border-near-borderBright shadow-2xl">
+      <div class="flex items-center justify-between border-b border-near-border pb-3">
+        <div>
+          <span class="font-mono text-[11px] text-near-green">[NEAR TESTNET AUTHENTICATION]</span>
+          <h3 class="font-display font-bold text-xl text-near-alabaster">Connect Wallet or Scoped Agent Key</h3>
+        </div>
+        <button onclick="closeWalletModal()" class="w-8 h-8 rounded border border-near-border text-near-slate hover:text-near-alabaster hover:border-near-green font-mono">✕</button>
+      </div>
+
+      <!-- 3 Mode Tabs -->
+      <div class="grid grid-cols-3 gap-2 font-mono text-xs">
+        <button onclick="switchWalletTab('mynear')" id="wtab-mynear" class="py-2 px-2 rounded border border-near-green bg-near-green/15 text-near-green font-bold">1. MyNearWallet</button>
+        <button onclick="switchWalletTab('agentkey')" id="wtab-agentkey" class="py-2 px-2 rounded border border-near-border bg-near-obsidian text-near-slate">2. Ephemeral Key</button>
+        <button onclick="switchWalletTab('inspect')" id="wtab-inspect" class="py-2 px-2 rounded border border-near-border bg-near-obsidian text-near-slate">3. Inspect Vault</button>
+      </div>
+
+      <!-- Tab 1: MyNearWallet Testnet -->
+      <div id="wpanel-mynear" class="space-y-4">
+        <p class="text-xs text-near-slate">
+          Open a <strong>simulated</strong> owner session (no wallet signature is requested) to walk through administrative controls (<code class="font-mono">reactivate_agent</code> &amp; <code class="font-mono">set_paused</code>), or launch MyNearWallet Testnet directly.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <button onclick="activateSession('allowance-swarm.testnet', 'OWNER (FullAccess)')" class="btn-near-primary py-3 px-4 rounded text-xs text-left flex flex-col justify-between">
+            <span class="text-[10px] opacity-80">INSTANT DEMO SESSION</span>
+            <span class="font-bold mt-1">Sign in as Owner (allowance-swarm.testnet)</span>
+          </button>
+          <button onclick="activateSession('judge.testnet', 'HACKATHON JUDGE')" class="btn-near-ghost py-3 px-4 rounded text-xs text-left flex flex-col justify-between">
+            <span class="text-[10px] text-near-cyan">AUDITOR MODE</span>
+            <span class="font-bold mt-1">Sign in as Judge (judge.testnet)</span>
+          </button>
+        </div>
+        <div class="pt-2 border-t border-near-border flex items-center justify-between text-xs font-mono">
+          <span class="text-near-dim">Official Testnet Web Wallet:</span>
+          <a href="https://testnet.mynearwallet.com" target="_blank" rel="noopener noreferrer" class="text-near-green hover:underline">Open testnet.mynearwallet.com ↗</a>
+        </div>
+      </div>
+
+      <!-- Tab 2: Ephemeral Scoped Agent Key Signer -->
+      <div id="wpanel-agentkey" class="hidden space-y-4">
+        <p class="text-xs text-near-slate">
+          Simulate signing transactions using a scoped <code class="text-near-cyan font-mono">FunctionCall Access Key</code> restricted strictly to <code class="font-mono">spend / spend_as</code> with a <code class="font-mono">0.25 NEAR</code> gas allowance.
+        </p>
+        <div>
+          <label class="block font-mono text-xs text-near-slate mb-1">SCOPED ED25519 PRIVATE / PUBLIC KEY</label>
+          <input id="ephemeralKeyInput" type="text" value="ed25519:5G9kL2xP8vQ3mN7rT1wZ4cB6yH9jF2dV8sA3eK1pQ7u" class="w-full bg-near-obsidian border border-near-borderBright rounded px-3 py-2 font-mono text-xs text-near-green" />
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="generateNewEphemeralKey()" class="btn-near-ghost px-3 py-2 rounded text-xs font-mono">GENERATE ROGUE / EPHEMERAL KEY</button>
+          <button onclick="activateSession('research-agent', 'SCOPED KEY (spend_as)')" class="btn-near-primary px-4 py-2 rounded text-xs font-mono ml-auto">ACTIVATE AGENT SIGNER</button>
+        </div>
+      </div>
+
+      <!-- Tab 3: Inspect Custom Deployed Vault -->
+      <div id="wpanel-inspect" class="hidden space-y-4">
+        <p class="text-xs text-near-slate">
+          Enter any deployed NEAR Testnet vault contract ID to query live network status directly from <code class="text-near-alabaster font-mono">https://rpc.testnet.near.org</code>.
+        </p>
+        <div>
+          <label class="block font-mono text-xs text-near-slate mb-1">TARGET VAULT CONTRACT ID</label>
+          <input id="customVaultInput" type="text" value="allowance-swarm.testnet" class="w-full bg-near-obsidian border border-near-borderBright rounded px-3 py-2 font-mono text-xs text-near-alabaster" />
+        </div>
+        <button onclick="inspectCustomVault()" class="btn-near-primary w-full py-2.5 rounded text-xs font-mono">CONNECT &amp; QUERY TESTNET RPC</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       TOAST NOTIFICATION BANNER
+       ========================================================================== -->
+  <div id="toastBanner" class="fixed bottom-5 right-5 z-50 hidden swiss-box border-near-green px-4 py-3 rounded shadow-2xl max-w-sm font-mono text-xs flex items-center gap-3">
+    <span id="toastDot" class="w-2.5 h-2.5 rounded-full bg-near-green shrink-0"></span>
+    <span id="toastMessage" class="text-near-alabaster">Action executed.</span>
+  </div>
+
+  <!-- ==========================================================================
+       APPLICATION LOGIC & NEAR TESTNET RPC INTEGRATION
+       ========================================================================== -->
+  <script>
+    // ==========================================================================
+    // 1. DETERMINISTIC VAULT & SWARM AGENT STATE
+    // ==========================================================================
+    const INITIAL_STATE = {
+      // Placeholder only: hydrateFromChain() overwrites every field below from
+      // /api/state on load. Values mirror the live testnet policy so the page
+      // never renders fiction, even for the first paint.
+      contractId: 'allowance-swarm.testnet',
+      ownerId: 'allowance-swarm.testnet',
+      globalCap: 5.00,
+      totalSpent: 1.65,
+      perTxCap: 0.50,
+      vaultBalance: 5.57,
+      isPaused: false,
+      activeSession: {
+        accountId: 'allowance-swarm.testnet',
+        role: 'OWNER (FullAccess)',
+        connected: false
+      },
+      allowlist: ['allowance-merchant.testnet'],
+      agents: [
+        {
+          id: 'agent-alpha',
+          alias: 'AGENT-ALPHA',
+          role: 'Scoped FunctionCall key · spend_as',
+          pubKey: 'ed25519:GY1SXN4z…ps17',
+          maxPerTx: 0.20,
+          allowance: 1.00,
+          spent: 0.10,
+          isActive: true,
+          lastAction: 'loading from chain…'
+        },
+        {
+          id: 'agent-beta',
+          alias: 'AGENT-BETA',
+          role: 'Scoped FunctionCall key · spend_as',
+          pubKey: 'ed25519:GYSHUupm…GKEQ',
+          maxPerTx: 0.20,
+          allowance: 1.00,
+          spent: 0.15,
+          isActive: true,
+          lastAction: 'loading from chain…'
+        }
+      ],
+      scopedKeys: [],
+      auditLog: [
+        {
+          timestamp: '—',
+          caller: 'hydrating…',
+          method: 'reading /api/state',
+          amount: '—',
+          verdict: 'LIVE READ PENDING',
+          statusType: 'gov',
+          hash: 'see nearblocks'
+        }
+      ]
+    };
+
+    let vaultState = JSON.parse(JSON.stringify(INITIAL_STATE));
+
+    // ==========================================================================
+    // 2. RENDER TELEMETRY, SWARM CARDS & AUDIT LOG
+    // ==========================================================================
+    function renderAll() {
+      renderTelemetryStrip();
+      renderAgentCards();
+      renderAuditTable();
+      updateCliPreview();
+    }
+
+    function renderTelemetryStrip() {
+      const spentEl = document.getElementById('metricVaultSpent');
+      const capEl = document.getElementById('metricVaultCap');
+      const remEl = document.getElementById('metricVaultRemaining');
+      const barEl = document.getElementById('metricVaultBar');
+
+      const spent = vaultState.totalSpent;
+      const cap = vaultState.globalCap;
+      const remaining = Math.max(0, cap - spent);
+      const pct = Math.min(100, (spent / cap) * 100);
+
+      spentEl.textContent = spent.toFixed(2);
+      capEl.textContent = cap.toFixed(2);
+      remEl.textContent = `${remaining.toFixed(2)} NEAR`;
+      barEl.style.width = `${pct}%`;
+
+      if (pct >= 85) {
+        barEl.className = 'h-full bg-near-amber transition-all duration-300';
+      } else {
+        barEl.className = 'h-full bg-near-green transition-all duration-300';
+      }
+
+      // Circuit breaker badge
+      const pausedBadge = document.getElementById('metricPausedBadge');
+      const pauseBtn = document.getElementById('pauseToggleBtn');
+      if (vaultState.isPaused) {
+        pausedBadge.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-near-red animate-ping"></span><span class="text-near-red">PAUSED (LOCKED)</span>`;
+        pauseBtn.textContent = 'OWNER: CALL set_paused(false)';
+      } else {
+        pausedBadge.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-near-green animate-pulse"></span><span class="text-near-green">ACTIVE (UNPAUSED)</span>`;
+        pauseBtn.textContent = 'OWNER: CALL set_paused(true)';
+      }
+
+      // Active vs Revoked counts
+      const activeCount = vaultState.agents.filter(a => a.isActive).length;
+      const revokedCount = vaultState.agents.length - activeCount;
+      document.getElementById('metricActiveCount').textContent = activeCount;
+      document.getElementById('metricRevokedCount').textContent = revokedCount;
+
+      // Key allowance straight from the account's access keys
+      const keyEl = document.getElementById('metricKeyAllowance');
+      if (keyEl && vaultState.scopedKeys && vaultState.scopedKeys.length) {
+        const allowances = vaultState.scopedKeys.map(k => Number(k.allowance_near));
+        keyEl.textContent = allowances.map(a => a.toFixed(3)).join(' / ') + ' NEAR';
+      }
+
+      const radarLabel = document.getElementById('radarVaultLabel');
+      if (radarLabel) radarLabel.textContent = `VAULT: ${cap.toFixed(2)} Ⓝ/day`;
+
+      // Allowlist pills
+      const allowlistContainer = document.getElementById('allowlistPills');
+      allowlistContainer.innerHTML = vaultState.allowlist.map(rec => `
+        <span class="px-2 py-0.5 rounded bg-near-obsidian border border-near-borderBright text-near-green flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-near-green"></span>
+          ${rec}
+        </span>
+      `).join('');
+    }
+
+    function renderAgentCards() {
+      const grid = document.getElementById('agentCardsGrid');
+      grid.innerHTML = vaultState.agents.map(agent => {
+        const pct = Math.min(100, (agent.spent / agent.allowance) * 100);
+        const statusBadge = agent.isActive
+          ? `<span class="px-2 py-0.5 rounded bg-near-green/15 text-near-green border border-near-green/40 font-mono text-[10px] font-bold">ACTIVE KEY</span>`
+          : `<span class="px-2 py-0.5 rounded bg-near-red/15 text-near-red border border-near-red/40 font-mono text-[10px] font-bold">REVOKED</span>`;
+
+        const borderClass = agent.isActive ? 'border-near-border hover:border-near-green/60' : 'border-near-red/50 bg-near-red/5';
+
+        return `
+          <div class="swiss-box p-5 rounded flex flex-col justify-between transition-all ${borderClass}">
+            <div>
+              <div class="flex items-center justify-between gap-2">
+                <div>
+                  <span class="font-mono text-[10px] text-near-green block">${agent.alias || 'SWARM NODE'}</span>
+                  <span class="font-mono font-bold text-sm text-near-alabaster">${agent.id}</span>
+                </div>
+                ${statusBadge}
+              </div>
+              <p class="text-xs text-near-slate mt-1">${agent.role}</p>
+
+              <div class="mt-3 p-2.5 rounded bg-near-obsidian border border-near-border font-mono text-[11px] space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-near-dim">SCOPED KEY:</span>
+                  <span class="text-near-cyan">${agent.pubKey}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-near-dim">MAX / TX CAP:</span>
+                  <span class="text-near-alabaster">${agent.maxPerTx.toFixed(2)} NEAR</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-near-dim">METHOD SCOPE:</span>
+                  <span class="text-near-green">["spend", "spend_as"]</span>
+                </div>
+              </div>
+
+              <div class="mt-3">
+                <div class="flex items-center justify-between font-mono text-xs tabular-nums">
+                  <span class="text-near-slate">CUMULATIVE SPENT</span>
+                  <span class="text-near-alabaster font-semibold">${agent.spent.toFixed(2)} / ${agent.allowance.toFixed(2)} Ⓝ</span>
+                </div>
+                <div class="w-full h-1.5 bg-near-obsidian border border-near-border rounded-sm overflow-hidden mt-1.5">
+                  <div class="h-full ${agent.isActive ? 'bg-near-green' : 'bg-near-red'}" style="width: ${pct}%"></div>
+                </div>
+              </div>
+
+              <div class="mt-2.5 font-mono text-[10px] text-near-dim truncate" title="${agent.lastAction}">
+                LAST: ${agent.lastAction}
+              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-near-border grid grid-cols-2 gap-2">
+              ${agent.isActive ? `
+                <button onclick="quickAgentSpend('${agent.id}', 0.05)" class="btn-near-ghost py-1.5 px-2 rounded text-[11px] font-mono">
+                  SPEND 0.05 Ⓝ
+                </button>
+                <button onclick="quickAgentBreach('${agent.id}')" class="btn-near-danger py-1.5 px-2 rounded text-[11px] font-mono">
+                  TEST BREACH
+                </button>
+              ` : `
+                <button onclick="ownerReactivateAgent('${agent.id}')" class="col-span-2 btn-near-primary py-1.5 px-2 rounded text-[11px] font-mono">
+                  OWNER: reactivate_agent("${agent.id}")
+                </button>
+              `}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderAuditTable() {
+      const tbody = document.getElementById('auditTableBody');
+      tbody.innerHTML = vaultState.auditLog.map(entry => {
+        const badgeClass = entry.statusType === 'pass'
+          ? 'bg-near-green/15 text-near-green border-near-green/30'
+          : entry.statusType === 'gov'
+          ? 'bg-near-cyan/15 text-near-cyan border-near-cyan/30'
+          : 'bg-near-red/15 text-near-red border-near-red/30';
+
+        return `
+          <tr class="hover:bg-near-panel/60 transition-colors">
+            <td class="py-2.5 px-4 text-near-dim">${entry.timestamp}</td>
+            <td class="py-2.5 px-4 text-near-alabaster font-semibold">${entry.caller}</td>
+            <td class="py-2.5 px-4 text-near-slate">${entry.method}</td>
+            <td class="py-2.5 px-4 text-near-alabaster">${entry.amount}</td>
+            <td class="py-2.5 px-4">
+              <span class="px-2 py-0.5 rounded border text-[10px] font-bold ${badgeClass}">${entry.verdict}</span>
+            </td>
+            <td class="py-2.5 px-4">
+              <a href="https://testnet.nearblocks.io/address/allowance-swarm.testnet" target="_blank" rel="noopener noreferrer" class="text-near-cyan hover:underline">${entry.hash}</a>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ==========================================================================
+    // 3. INTERACTIVE SONAR / ECHO GUARDRAIL RADAR PULSES
+    // ==========================================================================
+    function fireRadarPulse(mode) {
+      const pulseLayer = document.getElementById('radarPulseLayer');
+      const logText = document.getElementById('radarLogText');
+      const badge = document.getElementById('radarStatusBadge');
+      const breachWave = document.getElementById('radarBreachWave');
+
+      if (mode === 'valid') {
+        logText.className = 'truncate text-near-green';
+        logText.textContent = '> VALID PULSE: research-agent -> spend_as(0.15 Ⓝ) -> PASSED 5 GATES';
+        badge.className = 'font-mono text-[11px] px-2 py-0.5 rounded bg-near-green/15 text-near-green border border-near-green/30';
+        badge.textContent = 'PULSE: APPROVED';
+
+        const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        dot.setAttribute('r', '5');
+        dot.setAttribute('fill', '#00EC97');
+        pulseLayer.appendChild(dot);
+
+        // Animate from research-agent (88,78) to Vault Center (200,170)
+        const start = performance.now();
+        const duration = 750;
+        function step(now) {
+          const t = Math.min(1, (now - start) / duration);
+          const x = 88 + (200 - 88) * t;
+          const y = 78 + (170 - 78) * t;
+          dot.setAttribute('cx', x);
+          dot.setAttribute('cy', y);
+          if (t < 1) {
+            requestAnimationFrame(step);
+          } else {
+            dot.remove();
+          }
+        }
+        requestAnimationFrame(step);
+      } else {
+        logText.className = 'truncate text-near-red font-semibold';
+        logText.textContent = '> BREACH BLOCKED: rogue-agent -> hacker-drain.testnet INTERCEPTED @ GATE 04!';
+        badge.className = 'font-mono text-[11px] px-2 py-0.5 rounded bg-near-red/20 text-near-red border border-near-red/40';
+        badge.textContent = 'BREACH INTERCEPTED!';
+
+        const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        dot.setAttribute('r', '6');
+        dot.setAttribute('fill', '#FF4D38');
+        pulseLayer.appendChild(dot);
+
+        // Animate from rogue-agent (312,262) to Perimeter Intercept (268,232)
+        const start = performance.now();
+        const duration = 420;
+        function step(now) {
+          const t = Math.min(1, (now - start) / duration);
+          const x = 312 + (268 - 312) * t;
+          const y = 262 + (232 - 262) * t;
+          dot.setAttribute('cx', x);
+          dot.setAttribute('cy', y);
+          if (t < 1) {
+            requestAnimationFrame(step);
+          } else {
+            dot.remove();
+            // Trigger shockwave at (268, 232)
+            breachWave.style.animation = 'none';
+            void breachWave.offsetWidth;
+            breachWave.style.animation = 'breachShock 0.8s ease-out forwards';
+          }
+        }
+        requestAnimationFrame(step);
+      }
+    }
+
+    // ==========================================================================
+    // 4. PLAYGROUND PRESETS & 5-GATE DETERMINISTIC PIPELINE
+    // ==========================================================================
+    function triggerPreset(presetId) {
+      const callerEl = document.getElementById('simCaller');
+      const methodEl = document.getElementById('simMethod');
+      const amountEl = document.getElementById('simAmount');
+      const recipientEl = document.getElementById('simRecipient');
+
+      // Highlight preset button
+      for (let i = 1; i <= 5; i++) {
+        const btn = document.getElementById(`presetBtn-${i}`);
+        if (btn) {
+          btn.classList.remove('ring-2', 'ring-near-green', 'ring-near-red', 'ring-near-amber');
+        }
+      }
+      const activeBtn = document.getElementById(`presetBtn-${presetId}`);
+      if (activeBtn) {
+        activeBtn.classList.add('ring-2', presetId === 1 ? 'ring-near-green' : presetId === 5 ? 'ring-near-amber' : 'ring-near-red');
+      }
+
+      if (presetId === 1) {
+        // Ensure research-agent is active for demo clarity
+        const ag = vaultState.agents.find(a => a.id === 'research-agent');
+        if (ag) ag.isActive = true;
+        vaultState.isPaused = false;
+        callerEl.value = 'research-agent';
+        methodEl.value = 'spend_as';
+        amountEl.value = '0.15';
+        recipientEl.value = 'allowance-merchant.testnet';
+      } else if (presetId === 2) {
+        const ag = vaultState.agents.find(a => a.id === 'scraper-agent');
+        if (ag) ag.isActive = true;
+        vaultState.isPaused = false;
+        callerEl.value = 'scraper-agent';
+        methodEl.value = 'spend_as';
+        amountEl.value = '0.25'; // Over 0.20 per-tx cap
+        recipientEl.value = 'hacker-drain.testnet';
+      } else if (presetId === 3) {
+        const ag = vaultState.agents.find(a => a.id === 'agent-beta');
+        if (ag) ag.isActive = true;
+        vaultState.isPaused = false;
+        callerEl.value = 'agent-beta';
+        methodEl.value = 'spend_as';
+        amountEl.value = '0.90'; // Exceeds 1.00 global cap
+        recipientEl.value = 'hacker-drain.testnet';
+      } else if (presetId === 4) {
+        const ag = vaultState.agents.find(a => a.id === 'rogue-agent');
+        if (ag) ag.isActive = true; // demo only: contract would reject the tx, agent state is untouched
+        vaultState.isPaused = false;
+        callerEl.value = 'rogue-agent';
+        methodEl.value = 'spend_as';
+        amountEl.value = '0.15';
+        recipientEl.value = 'hacker-drain.testnet';
+      } else if (presetId === 5) {
+        callerEl.value = 'research-agent';
+        methodEl.value = 'set_paused';
+        amountEl.value = '0.00';
+        recipientEl.value = 'allowance-swarm.testnet';
+      }
+
+      const sliderEl = document.getElementById('simAmountSlider');
+      if (sliderEl) sliderEl.value = amountEl.value;
+
+      renderAll();
+      scrollToSection('playground');
+      executeGuardrailSimulation();
+    }
+
+    function syncSliderFromInput() {
+      const val = document.getElementById('simAmount').value;
+      const slider = document.getElementById('simAmountSlider');
+      if (slider) slider.value = val;
+      updateCliPreview();
+    }
+
+    function syncInputFromSlider() {
+      const val = parseFloat(document.getElementById('simAmountSlider').value || '0.15').toFixed(2);
+      document.getElementById('simAmount').value = val;
+      updateCliPreview();
+    }
+
+    function updateCliPreview() {
+      const caller = document.getElementById('simCaller').value;
+      const method = document.getElementById('simMethod').value;
+      const amount = parseFloat(document.getElementById('simAmount').value || '0').toFixed(2);
+      const recipient = document.getElementById('simRecipient').value.trim();
+
+      const spendContainer = document.getElementById('spendFieldsContainer');
+      if (method === 'spend_as' || method === 'spend') {
+        spendContainer.classList.remove('opacity-40', 'pointer-events-none');
+      } else {
+        spendContainer.classList.add('opacity-40', 'pointer-events-none');
+      }
+
+      const yoctoAmount = BigInt(Math.round(parseFloat(amount || '0') * 10000)) * BigInt("100000000000000000000");
+      let argsJson = '';
+      if (method === 'spend_as') {
+        argsJson = JSON.stringify({
+          agent_id: caller === 'owner' ? 'research-agent' : caller,
+          recipient: recipient,
+          amount: yoctoAmount.toString()
+        });
+      } else if (method === 'spend') {
+        argsJson = JSON.stringify({
+          recipient: recipient,
+          amount: yoctoAmount.toString()
+        });
+      } else if (method === 'set_paused') {
+        argsJson = JSON.stringify({ paused: true });
+      } else {
+        argsJson = JSON.stringify({ agent_id: caller === 'owner' ? 'rogue-agent' : caller });
+      }
+
+      const cliText = `near contract call-function as-transaction ${vaultState.contractId} ${method} \\\n  json-args '${argsJson}' \\\n  prepaid-gas '30.0 Tgas' attached-deposit '0 NEAR' \\\n  sign-as ${vaultState.contractId} network-config testnet`;
+
+      document.getElementById('cliCommandPreview').textContent = cliText;
+    }
+
+    function setGateVisual(gateNum, state, labelText) {
+      const row = document.getElementById(`gate-${gateNum}`);
+      const icon = document.getElementById(`gate-icon-${gateNum}`);
+      const status = document.getElementById(`gate-status-${gateNum}`);
+
+      if (state === 'pass') {
+        row.className = 'p-3.5 rounded bg-near-green/5 border border-near-green/50 flex items-start justify-between gap-3 transition-all';
+        icon.className = 'w-6 h-6 rounded bg-near-green text-near-obsidian font-bold flex items-center justify-center text-xs shrink-0';
+        icon.textContent = '✓';
+        status.className = 'text-[11px] px-2 py-0.5 rounded bg-near-green/20 text-near-green font-bold shrink-0';
+        status.textContent = labelText || 'PASSED';
+      } else if (state === 'fail') {
+        row.className = 'p-3.5 rounded bg-near-red/10 border border-near-red flex items-start justify-between gap-3 transition-all';
+        icon.className = 'w-6 h-6 rounded bg-near-red text-near-obsidian font-bold flex items-center justify-center text-xs shrink-0';
+        icon.textContent = '✕';
+        status.className = 'text-[11px] px-2 py-0.5 rounded bg-near-red text-near-obsidian font-bold shrink-0';
+        status.textContent = labelText || 'BLOCKED';
+      } else {
+        row.className = 'p-3.5 rounded bg-near-obsidian border border-near-border flex items-start justify-between gap-3 transition-all opacity-60';
+        icon.className = 'w-6 h-6 rounded bg-near-carbon border border-near-border flex items-center justify-center text-xs text-near-slate shrink-0';
+        icon.textContent = `0${gateNum}`;
+        status.className = 'text-[11px] px-2 py-0.5 rounded bg-near-carbon text-near-dim shrink-0';
+        status.textContent = labelText || 'SKIPPED';
+      }
+    }
+
+    function executeGuardrailSimulation() {
+      const caller = document.getElementById('simCaller').value;
+      const method = document.getElementById('simMethod').value;
+      const amount = parseFloat(document.getElementById('simAmount').value || '0');
+      const recipient = document.getElementById('simRecipient').value.trim();
+
+      const overallBadge = document.getElementById('pipelineOverallBadge');
+      const summaryText = document.getElementById('receiptSummaryText');
+      const hashText = document.getElementById('receiptHashText');
+      const randomHash = generateMockReceiptHash();
+      hashText.textContent = `TX: ${randomHash}`;
+
+      // Reset all gates first
+      for (let i = 1; i <= 5; i++) setGateVisual(i, 'standby', 'CHECKING...');
+
+      // Owner governance calls
+      if (caller === 'owner' && (method === 'set_paused' || method === 'reactivate_agent')) {
+        setGateVisual(1, 'pass', 'FULL_ACCESS KEY');
+        setGateVisual(2, 'pass', 'OWNER OVERRIDE');
+        setGateVisual(3, 'pass', 'VALIDATED');
+        setGateVisual(4, 'pass', 'N/A (GOV)');
+        setGateVisual(5, 'pass', 'N/A (GOV)');
+
+        if (method === 'set_paused') {
+          vaultState.isPaused = true;
+          overallBadge.className = 'font-mono text-xs px-2.5 py-1 rounded bg-near-amber/20 border border-near-amber text-near-amber font-bold';
+          overallBadge.textContent = 'VAULT PAUSED BY OWNER';
+          summaryText.className = 'text-near-amber font-semibold';
+          summaryText.textContent = `> SUCCESS: Vault Owner executed set_paused(true). All autonomous agent spending is now frozen.`;
+        } else {
+          vaultState.agents.forEach(a => a.isActive = true);
+          overallBadge.className = 'font-mono text-xs px-2.5 py-1 rounded bg-near-green/20 border border-near-green text-near-green font-bold';
+          overallBadge.textContent = 'AGENTS REACTIVATED';
+          summaryText.className = 'text-near-green font-semibold';
+          summaryText.textContent = `> SUCCESS: Vault Owner restored active status for revoked agent keys on-chain.`;
+        }
+        pushAuditLog(caller, `${method}()`, '0.00 NEAR', 'OWNER GOVERNANCE', 'gov', randomHash);
+        renderAll();
+        return;
+      }
+
+      // GATE 1: Scoped Key Method Permission & Predecessor check
+      if (caller !== 'owner' && method !== 'spend_as' && method !== 'spend') {
+        setGateVisual(1, 'fail', 'KEY SCOPE REJECTED');
+        for (let i = 2; i <= 5; i++) setGateVisual(i, 'standby', 'HALTED');
+        overallBadge.className = 'font-mono text-xs px-2.5 py-1 rounded bg-near-red/20 border border-near-red text-near-red font-bold';
+        overallBadge.textContent = 'BLOCKED @ GATE 01';
+        summaryText.className = 'text-near-red font-semibold';
+        summaryText.textContent = `> RUNTIME & PREDECESSOR REJECT: Scoped FunctionCall key for '${caller}' is restricted strictly to ["spend", "spend_as"]. Privilege escalation call to '${method}' was blocked at Gate 01!`;
+        fireRadarPulse('breach');
+        pushAuditLog(caller, `${method}() [HIJACK]`, '0.00 NEAR', 'BLOCKED @ GATE 01 (KEY SCOPE)', 'breach', randomHash);
+        showToast(`Blocked privilege escalation attempt by ${caller}!`, 'danger');
+        renderAll();
+        return;
+      }
+      setGateVisual(1, 'pass', 'SCOPED KEY OK');
+
+      // GATE 2: Global Vault Circuit Breaker
+      if (vaultState.isPaused) {
+        setGateVisual(2, 'fail', 'VAULT IS PAUSED');
+        for (let i = 3; i <= 5; i++) setGateVisual(i, 'standby', 'HALTED');
+        overallBadge.className = 'font-mono text-xs px-2.5 py-1 rounded bg-near-red/20 border border-near-red text-near-red font-bold';
+        overallBadge.textContent = 'BLOCKED @ GATE 02';
+        summaryText.className = 'text-near-red font-semibold';
+        summaryText.textContent = `> CIRCUIT BREAKER HALT: Vault is currently PAUSED by Owner. All spend_as invocations are rejected.`;
+        pushAuditLog(caller, `${method} → ${recipient}`, `${amount.toFixed(2)} NEAR`, 'BLOCKED @ GATE 02 (PAUSED)', 'breach', randomHash);
+        renderAll();
+        return;
+      }
+      setGateVisual(2, 'pass', 'UNPAUSED');
+
+      // GATE 3: Agent Registration & Active State
+      const agentObj = vaultState.agents.find(a => a.id === caller) || vaultState.agents[0];
+      if (!agentObj.isActive) {
+        setGateVisual(3, 'fail', 'AGENT REVOKED');
+        setGateVisual(4, 'standby', 'HALTED');
+        setGateVisual(5, 'standby', 'HALTED');
+        overallBadge.className = 'font-mono text-xs px-2.5 py-1 rounded bg-near-red/20 border border-near-red text-near-red font-bold';
+        overallBadge.textContent = 'BLOCKED @ GATE 03';
+        summaryText.className = 'text-near-red font-semibold';
+        summaryText.textContent = `> REJECTED: Agent '${agentObj.id}' is marked inactive (active = false) in contract storage. Only the Vault Owner can call reactivate_agent().`;
+        fireRadarPulse('breach');
+        pushAuditLog(agentObj.id, `${method} → ${recipient}`, `${amount.toFixed(2)} NEAR`, 'BLOCKED @ GATE 03 (REVOKED KEY)', 'breach', randomHash);
+        renderAll();
+        return;
+      }
+      setGateVisual(3, 'pass', 'AGENT ACTIVE');
+
+      // GATE 4: Recipient Allowlist Check
+      if (!vaultState.allowlist.includes(recipient)) {
+        setGateVisual(4, 'fail', 'UNTRUSTED TARGET + REVOKED');
+        setGateVisual(5, 'standby', 'HALTED');
+        agentObj.isActive = false;
+        agentObj.lastAction = `REVOKED: Untrusted target (${recipient})`;
+
+        overallBadge.className = 'font-mono text-xs px-2.5 py-1 rounded bg-near-red/20 border border-near-red text-near-red font-bold';
+        overallBadge.textContent = 'REVERTED @ ALLOWLIST (GATE 04)';
+        summaryText.className = 'text-near-red font-semibold';
+        summaryText.textContent = `> GUARDRAIL REFLEX: Recipient '${recipient}' is NOT in the Vault Allowlist. The real contract traps here — 0 NEAR transferred, receipt reverts, agent state untouched. Owner can then call revoke_agent('${agentObj.id}').`;
+        fireRadarPulse('breach');
+        pushAuditLog(agentObj.id, `${method} → ${recipient}`, `${amount.toFixed(2)} NEAR`, 'REVERTED @ ALLOWLIST', 'breach', randomHash);
+        showToast(`Guardrail breach: transfer reverted at Gate 04 (allowlist).`, 'danger');
+        renderAll();
+        return;
+      }
+      setGateVisual(4, 'pass', 'ALLOWLISTED');
+
+      // GATE 5: Per-Tx Cap, Agent Allowance & Global Vault Cap Arithmetic
+      const exceedsPerTx = amount > agentObj.maxPerTx + 1e-6;
+      const exceedsAgentAllowance = (agentObj.spent + amount) > agentObj.allowance + 1e-6;
+      const exceedsGlobalCap = (vaultState.totalSpent + amount) > vaultState.globalCap + 1e-6;
+
+      if (exceedsPerTx || exceedsAgentAllowance || exceedsGlobalCap) {
+        let reason = exceedsPerTx
+          ? `OVER PER-TX CAP (${amount.toFixed(2)} > ${agentObj.maxPerTx.toFixed(2)} Ⓝ)`
+          : exceedsGlobalCap
+          ? `OVER GLOBAL VAULT CAP (${(vaultState.totalSpent + amount).toFixed(2)} > ${vaultState.globalCap.toFixed(2)} Ⓝ)`
+          : `OVER AGENT ALLOWANCE`;
+
+        setGateVisual(5, 'fail', 'CAP BREACH + REVOKED');
+        agentObj.isActive = false;
+        agentObj.lastAction = `REVOKED: ${reason}`;
+
+        overallBadge.className = 'font-mono text-xs px-2.5 py-1 rounded bg-near-red/20 border border-near-red text-near-red font-bold';
+        overallBadge.textContent = 'REVERTED @ VELOCITY CAP (GATE 05)';
+        summaryText.className = 'text-near-red font-semibold';
+        summaryText.textContent = `> VELOCITY CAP BREACH: ${reason}. Contract reverts before scheduling any transfer — nothing is spent and no state is written.`;
+        fireRadarPulse('breach');
+        pushAuditLog(agentObj.id, `${method} → ${recipient}`, `${amount.toFixed(2)} NEAR`, `BLOCKED @ GATE 05 (${reason})`, 'breach', randomHash);
+        showToast(`Cap exceeded: transfer reverted at Gate 05.`, 'danger');
+        renderAll();
+        return;
+      }
+
+      // ALL 5 GATES PASSED!
+      setGateVisual(5, 'pass', 'CAPS VERIFIED');
+      agentObj.spent = parseFloat((agentObj.spent + amount).toFixed(2));
+      vaultState.totalSpent = parseFloat((vaultState.totalSpent + amount).toFixed(2));
+      agentObj.lastAction = `${amount.toFixed(2)} Ⓝ → ${recipient}`;
+
+      overallBadge.className = 'font-mono text-xs px-2.5 py-1 rounded bg-near-green/20 border border-near-green text-near-green font-bold';
+      overallBadge.textContent = 'APPROVED // ALL 5 GATES PASSED';
+      summaryText.className = 'text-near-green font-semibold';
+      summaryText.textContent = `> TRANSACTION EXECUTED: ${agentObj.id} transferred ${amount.toFixed(2)} NEAR to ${recipient}. Remaining global vault runway: ${(vaultState.globalCap - vaultState.totalSpent).toFixed(2)} NEAR.`;
+
+      fireRadarPulse('valid');
+      pushAuditLog(agentObj.id, `${method} → ${recipient}`, `${amount.toFixed(2)} NEAR`, 'APPROVED (ALL 5 GATES)', 'pass', randomHash);
+      showToast(`Approved: ${amount.toFixed(2)} NEAR sent to ${recipient}`, 'success');
+      renderAll();
+    }
+
+    // Quick card actions
+    function quickAgentSpend(agentId, amount) {
+      document.getElementById('simCaller').value = agentId;
+      document.getElementById('simMethod').value = 'spend_as';
+      document.getElementById('simAmount').value = amount.toFixed(2);
+      document.getElementById('simRecipient').value = 'allowance-merchant.testnet';
+      executeGuardrailSimulation();
+    }
+
+    function quickAgentBreach(agentId) {
+      document.getElementById('simCaller').value = agentId;
+      document.getElementById('simMethod').value = 'spend_as';
+      document.getElementById('simAmount').value = '0.35';
+      document.getElementById('simRecipient').value = 'hacker-drain.testnet';
+      executeGuardrailSimulation();
+    }
+
+    function ownerReactivateAgent(agentId) {
+      const ag = vaultState.agents.find(a => a.id === agentId);
+      if (ag) {
+        ag.isActive = true;
+        ag.lastAction = 'Reactivated by Vault Owner (allowance-swarm.testnet)';
+        pushAuditLog('allowance-swarm.testnet', `reactivate_agent("${agentId}")`, '0.00 NEAR', 'AGENT REACTIVATED BY OWNER', 'gov', generateMockReceiptHash());
+        showToast(`Owner reactivated ${agentId}`, 'success');
+        renderAll();
+      }
+    }
+
+    function toggleVaultPause() {
+      vaultState.isPaused = !vaultState.isPaused;
+      const stateStr = vaultState.isPaused ? 'PAUSED' : 'UNPAUSED';
+      pushAuditLog('allowance-swarm.testnet', `set_paused(${vaultState.isPaused})`, '0.00 NEAR', `VAULT ${stateStr} BY OWNER`, 'gov', generateMockReceiptHash());
+      showToast(`Vault circuit breaker is now ${stateStr}`, vaultState.isPaused ? 'danger' : 'success');
+      renderAll();
+    }
+
+    function resetDemoState() {
+      vaultState = JSON.parse(JSON.stringify(INITIAL_STATE));
+      renderAll();
+      showToast('Vault state reset to initial Hackathon benchmark.', 'success');
+    }
+
+    // Automated Multi-Step Live Swarm Demo
+    let demoRunning = false;
+    async function runAutomatedSwarmDemo() {
+      if (demoRunning) return;
+      demoRunning = true;
+      const btn = document.getElementById('swarmDemoBtn');
+      const originalHtml = btn.innerHTML;
+      btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-near-green animate-ping"></span><span>RUNNING SWARM SEQUENCE...</span>`;
+
+      resetDemoState();
+      scrollToSection('playground');
+
+      const delay = ms => new Promise(res => setTimeout(res, ms));
+      await delay(500);
+      triggerPreset(1); // Valid spend
+      await delay(1400);
+      triggerPreset(2); // Over Per-Tx cap breach
+      await delay(1400);
+      triggerPreset(4); // Untrusted recipient breach
+
+      btn.innerHTML = originalHtml;
+      demoRunning = false;
+    }
+
+    // ==========================================================================
+    // 5. LIVE NEAR TESTNET RPC INTEGRATION
+    // ==========================================================================
+    async function syncLiveTestnetState() {
+      const spinner = document.getElementById('syncSpinner');
+      const latencyText = document.getElementById('rpcLatencyText');
+      const blockLink = document.getElementById('blockHeightLink');
+      spinner.classList.add('animate-spin');
+
+      const startTime = performance.now();
+      try {
+        const response = await fetch('https://rpc.testnet.near.org', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            id: 'echoes-status',
+            method: 'status',
+            params: []
+          })
+        });
+        const data = await response.json();
+        const elapsed = Math.round(performance.now() - startTime);
+
+        if (data && data.result && data.result.sync_info) {
+          const height = data.result.sync_info.latest_block_height;
+          latencyText.textContent = `TESTNET LIVE (${elapsed}ms)`;
+          blockLink.textContent = `#${Number(height).toLocaleString()}`;
+          showToast(`Synced with NEAR Testnet Block #${height} (${elapsed}ms)`, 'success');
+        }
+      } catch (err) {
+        latencyText.textContent = `SIMULATED RPC (38ms)`;
+        showToast(`Connected to deterministic fallback state for ${vaultState.contractId}`, 'success');
+      } finally {
+        setTimeout(() => spinner.classList.remove('animate-spin'), 400);
+      }
+    }
+
+    // ==========================================================================
+    // 6. BRAND KIT SVG DOWNLOAD & COPY UTILITIES
+    // ==========================================================================
+    function getCleanSvgString(svgId) {
+      const svgEl = document.getElementById(svgId);
+      if (!svgEl) return '';
+      const clone = svgEl.cloneNode(true);
+      clone.removeAttribute('id');
+      clone.removeAttribute('class');
+      clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      return `<?xml version="1.0" encoding="UTF-8"?>\n` + clone.outerHTML;
+    }
+
+    function downloadSvgAsset(svgId, filename) {
+      const svgContent = getCleanSvgString(svgId);
+      const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast(`Downloaded ${filename} ready for ./assets/`, 'success');
+    }
+
+    function copySvgAsset(svgId, btnEl) {
+      const svgContent = getCleanSvgString(svgId);
+      copyTextToClipboard(svgContent);
+      const prev = btnEl.textContent;
+      btnEl.textContent = 'COPIED!';
+      setTimeout(() => { btnEl.textContent = prev; }, 1500);
+      showToast('SVG vector code copied to clipboard!', 'success');
+    }
+
+    // ==========================================================================
+    // 7. FAQ SEARCH, FILTER & ACCORDION LOGIC
+    // ==========================================================================
+    let activeFaqCategory = 'all';
+
+    function toggleFaqItem(buttonEl) {
+      const item = buttonEl.closest('.faq-item');
+      item.classList.toggle('open');
+    }
+
+    function setFaqCategory(cat) {
+      activeFaqCategory = cat;
+      document.querySelectorAll('.faq-cat-btn').forEach(btn => {
+        if (btn.getAttribute('data-cat') === cat) {
+          btn.className = 'faq-cat-btn px-3 py-1.5 rounded border border-near-green bg-near-green text-near-obsidian font-bold transition-all';
+        } else {
+          btn.className = 'faq-cat-btn px-3 py-1.5 rounded border border-near-border bg-near-obsidian text-near-slate hover:border-near-green transition-all';
+        }
+      });
+      filterFaq();
+    }
+
+    function filterFaq() {
+      const query = (document.getElementById('faqSearchInput').value || '').toLowerCase();
+      document.querySelectorAll('.faq-item').forEach(item => {
+        const cat = item.getAttribute('data-category');
+        const text = item.textContent.toLowerCase();
+        const matchesCat = activeFaqCategory === 'all' || cat === activeFaqCategory;
+        const matchesQuery = !query || text.includes(query);
+
+        if (matchesCat && matchesQuery) {
+          item.classList.remove('hidden');
+          if (query.length > 1) item.classList.add('open');
+        } else {
+          item.classList.add('hidden');
+        }
+      });
+    }
+
+    // ==========================================================================
+    // 8. WALLET MODAL & UTILITIES
+    // ==========================================================================
+    function openWalletModal() {
+      document.getElementById('walletModal').classList.remove('hidden');
+    }
+    function closeWalletModal() {
+      document.getElementById('walletModal').classList.add('hidden');
+    }
+
+    function switchWalletTab(tab) {
+      ['mynear', 'agentkey', 'inspect'].forEach(t => {
+        const btn = document.getElementById(`wtab-${t}`);
+        const panel = document.getElementById(`wpanel-${t}`);
+        if (t === tab) {
+          btn.className = 'py-2 px-2 rounded border border-near-green bg-near-green/15 text-near-green font-bold';
+          panel.classList.remove('hidden');
+        } else {
+          btn.className = 'py-2 px-2 rounded border border-near-border bg-near-obsidian text-near-slate';
+          panel.classList.add('hidden');
+        }
+      });
+    }
+
+    function activateSession(accountId, role) {
+      vaultState.activeSession = { accountId, role, connected: true };
+      document.getElementById('walletBtnLabel').textContent = `${accountId} [${role.split(' ')[0]}]`;
+      closeWalletModal();
+      showToast(`Connected as ${accountId} (${role})`, 'success');
+    }
+
+    function generateNewEphemeralKey() {
+      const chars = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+      let key = 'ed25519:';
+      for (let i = 0; i < 44; i++) {
+        key += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      document.getElementById('ephemeralKeyInput').value = key;
+    }
+
+    function inspectCustomVault() {
+      const customId = document.getElementById('customVaultInput').value.trim() || 'allowance-swarm.testnet';
+      vaultState.contractId = customId;
+      closeWalletModal();
+      syncLiveTestnetState();
+      renderAll();
+    }
+
+    function pushAuditLog(caller, method, amount, verdict, statusType, hash) {
+      const nowIso = new Date().toISOString().split('.')[0] + 'Z';
+      vaultState.auditLog.unshift({
+        timestamp: nowIso,
+        caller,
+        method,
+        amount,
+        verdict,
+        statusType,
+        hash
+      });
+    }
+
+    function exportAuditJsonl() {
+      const jsonl = vaultState.auditLog.map(row => JSON.stringify(row)).join('\n');
+      const blob = new Blob([jsonl], { type: 'application/jsonl' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'audit.jsonl';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Exported audit.jsonl log file!', 'success');
+    }
+
+    function copyCliCommand() {
+      const text = document.getElementById('cliCommandPreview').textContent;
+      copyTextToClipboard(text);
+      const label = document.getElementById('copyCliLabel');
+      label.textContent = 'COPIED TO CLIPBOARD!';
+      setTimeout(() => { label.textContent = 'COPY CLI'; }, 1500);
+      showToast('near-cli command copied!', 'success');
+    }
+
+    function copyTextToClipboard(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+      } catch (e) {}
+      document.body.removeChild(ta);
+    }
+
+    function generateMockReceiptHash() {
+      const chars = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+      let a = '', b = '';
+      for (let i = 0; i < 6; i++) a += chars.charAt(Math.floor(Math.random() * chars.length));
+      for (let i = 0; i < 4; i++) b += chars.charAt(Math.floor(Math.random() * chars.length));
+      return `${a}...${b}`;
+    }
+
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    let toastTimeout = null;
+    function showToast(message, type) {
+      const banner = document.getElementById('toastBanner');
+      const dot = document.getElementById('toastDot');
+      const msg = document.getElementById('toastMessage');
+
+      msg.textContent = message;
+      if (type === 'danger') {
+        banner.className = 'fixed bottom-5 right-5 z-50 swiss-box border-near-red px-4 py-3 rounded shadow-2xl max-w-sm font-mono text-xs flex items-center gap-3';
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-near-red shrink-0 animate-ping';
+      } else {
+        banner.className = 'fixed bottom-5 right-5 z-50 swiss-box border-near-green px-4 py-3 rounded shadow-2xl max-w-sm font-mono text-xs flex items-center gap-3';
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-near-green shrink-0';
+      }
+
+      banner.classList.remove('hidden');
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        banner.classList.add('hidden');
+      }, 3600);
+    }
+
+    // ==========================================================================
+    // 7. LIVE CHAIN HYDRATION (/api/state) -> real testnet policy, agents, log
+    // ==========================================================================
+    const YOCTO = 1e24;
+    let LIVE_SYNCED_AT = null;
+
+    function shortKeyHex(k) {
+      if (!k) return '—';
+      const parts = String(k).split(':');
+      const body = parts.length > 1 ? parts[1] : parts[0];
+      const prefix = parts.length > 1 ? parts[0] + ':' : '';
+      return prefix + body.slice(0, 12) + '…' + body.slice(-4);
+    }
+
+    function mapChainState(s) {
+      const p = s.policy || {};
+      const yocto = v => Number(v || 0) / YOCTO;
+      const near = v => Number(v || 0);
+      const log = (s.log || []).slice().sort((a, b) => (b.id || 0) - (a.id || 0));
+      const agents = (s.agents || []).map(a => {
+        const mine = log.find(e => e.agent === a.agent_id);
+        return {
+          id: a.agent_id,
+          alias: String(a.agent_id || '').toUpperCase(),
+          role: 'Scoped FunctionCall key · ' + ((a.key_methods || []).join(' / ') || 'spend_as'),
+          pubKey: shortKeyHex(a.public_key),
+          maxPerTx: near(a.per_tx_near),
+          allowance: near(a.daily_near),
+          spent: near(a.spent_near),
+          isActive: !!a.active,
+          lastAction: mine ? `${yocto(mine.amount).toFixed(2)} Ⓝ → ${mine.recipient}` : 'no spend recorded today'
+        };
+      });
+      return {
+        contractId: s.vault,
+        ownerId: p.owner || s.vault,
+        globalCap: near(s.daily_near),
+        totalSpent: near(s.spent_today_near),
+        perTxCap: near(s.per_tx_near),
+        vaultBalance: near(s.balance_near),
+        isPaused: !!p.paused,
+        allowlist: p.recipients || [],
+        agents: agents,
+        scopedKeys: s.scoped_keys || [],
+        chainLog: log,
+        auditLog: log.slice(0, 20).map(e => ({
+          timestamp: new Date(Number(e.timestamp) / 1e6).toISOString().replace('T', ' ').slice(0, 19) + 'Z',
+          caller: e.agent,
+          method: 'spend_as → ' + e.recipient,
+          amount: yocto(e.amount).toFixed(2) + ' NEAR',
+          verdict: 'APPROVED · LOG ' + e.id,
+          statusType: 'pass',
+          hash: 'log #' + e.id
+        }))
+      };
+    }
+
+    const VAULT_ID = 'allowance-swarm.testnet';
+    const RPC_URL = 'https://rpc.testnet.fastnear.com';
+
+    async function rpcQuery(params) {
+      const res = await fetch(RPC_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', id: 'echoes', method: 'query', params })
+      });
+      const j = await res.json();
+      if (j.error) throw new Error(JSON.stringify(j.error));
+      return j.result;
+    }
+
+    const fmtYocto = (y) => (Number(y || 0) / 1e24).toFixed(6).replace(/0+$/, '').replace(/\.$/, '');
+
+    /**
+     * Read the vault straight from the chain in the browser.
+     * Used when the page is hosted as a static site (no /api backend).
+     * The RPC returns Access-Control-Allow-Origin: *, so this needs no server.
+     */
+    async function directRpcState() {
+      const viewCall = async (method_name) => {
+        const r = await rpcQuery({
+          request_type: 'call_function', account_id: VAULT_ID, method_name,
+          args_base64: 'e30=', finality: 'final'
+        });
+        return JSON.parse(new TextDecoder().decode(new Uint8Array(r.result || [])));
+      };
+      const [policy, balance, log, agents, keyRes] = await Promise.all([
+        viewCall('get_policy'),
+        viewCall('get_balance'),
+        viewCall('get_log'),
+        viewCall('get_agents'),
+        rpcQuery({ request_type: 'view_access_key_list', account_id: VAULT_ID, finality: 'final' })
+      ]);
+      const keys = (keyRes.keys || []).filter(k => k.access_key && k.access_key.permission && k.access_key.permission.FunctionCall).map(k => {
+        const fc = k.access_key.permission.FunctionCall;
+        return {
+          public_key: k.public_key,
+          receiver_id: fc.receiver_id,
+          method_names: fc.method_names,
+          allowance_near: fc.allowance ? fmtYocto(fc.allowance) : 'unlimited',
+          nonce: k.access_key.nonce
+        };
+      });
+      const byPk = Object.fromEntries(keys.map(k => [k.public_key, k]));
+      (agents || []).forEach(a => {
+        const k = byPk[a.public_key];
+        a.key_methods = k ? k.method_names : null;
+        a.per_tx_near = fmtYocto(a.per_tx);
+        a.daily_near = fmtYocto(a.daily);
+        a.spent_near = fmtYocto(a.spent_today);
+      });
+      const spentBig = BigInt(policy.spent_today || '0');
+      return {
+        vault: VAULT_ID,
+        policy,
+        balance,
+        balance_near: fmtYocto(balance),
+        per_tx_near: fmtYocto(policy.per_tx),
+        daily_near: fmtYocto(policy.daily),
+        spent_today_near: fmtYocto(spentBig.toString()),
+        agents: agents || [],
+        agent_count: (agents || []).length,
+        scoped_keys: keys,
+        log: log || [],
+        fetched_at: new Date().toISOString().slice(0, 19) + 'Z',
+        source: 'direct-rpc'
+      };
+    }
+
+    async function hydrateFromChain(announce) {
+      try {
+        let s;
+        try {
+          const res = await fetch('/api/state', { cache: 'no-store' });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          s = await res.json();
+        } catch (_) {
+          // static hosting: no backend, read the chain ourselves
+          s = await directRpcState();
+        }
+        vaultState = Object.assign({}, vaultState, mapChainState(s));
+        LIVE_SYNCED_AT = new Date();
+        renderAll();
+        renderLiveBadge();
+        if (announce) showToast(`Live state: ${s.vault} · ${s.agent_count} agents · ${s.spent_today_near}/${s.daily_near} NEAR today`, 'success');
+        return s;
+      } catch (err) {
+        renderLiveBadge(err.message);
+        if (announce) showToast('Live read failed: ' + err.message, 'danger');
+        return null;
+      }
+    }
+
+    function renderLiveBadge(error) {
+      const el = document.getElementById('liveSourceBadge');
+      if (!el) return;
+      if (error) {
+        el.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-near-amber"></span> LIVE READ FAILED — stale snapshot';
+        el.className = 'font-mono text-[10px] px-2 py-0.5 rounded border border-near-amber/40 text-near-amber flex items-center gap-1.5';
+        return;
+      }
+      const t = LIVE_SYNCED_AT ? LIVE_SYNCED_AT.toISOString().slice(11, 19) + 'Z' : '—';
+      el.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-near-green animate-pulse"></span> LIVE · /api/state · ${t}`;
+      el.className = 'font-mono text-[10px] px-2 py-0.5 rounded border border-near-green/40 text-near-green flex items-center gap-1.5';
+    }
+
+    async function loadRejections() {
+      const tbody = document.getElementById('rejectionsBody');
+      if (!tbody) return;
+      try {
+        let rows;
+        try {
+          const res = await fetch('/api/rejections', { cache: 'no-store' });
+          rows = await res.json();
+        } catch (_) {
+          const r = await fetch('https://api-testnet.nearblocks.io/v3/accounts/' + VAULT_ID + '/txns?limit=100');
+          const payload = await r.json();
+          rows = (payload.data || [])
+            .filter(t => !(t.outcomes && t.outcomes.status))
+            .map(t => ({
+              hash: t.transaction_hash,
+              method: ((t.actions || [{}])[0] || {}).method || 'unknown',
+              block: (t.block || {}).block_height
+            }));
+        }
+        if (!Array.isArray(rows) || !rows.length) {
+          tbody.innerHTML = '<tr><td colspan="4" class="py-3 px-4 text-near-dim">no failed transactions returned</td></tr>';
+          return;
+        }
+        tbody.innerHTML = rows.slice(0, 12).map(r => `
+          <tr class="hover:bg-near-panel/60 transition-colors">
+            <td class="py-2.5 px-4 text-near-dim">${r.block ? '#' + Number(r.block).toLocaleString() : '—'}</td>
+            <td class="py-2.5 px-4 text-near-alabaster">${r.method}</td>
+            <td class="py-2.5 px-4"><span class="px-2 py-0.5 rounded border text-[10px] font-bold bg-near-red/15 text-near-red border-near-red/30">REVERTED</span></td>
+            <td class="py-2.5 px-4"><a href="https://testnet.nearblocks.io/txns/${r.hash}" target="_blank" rel="noopener noreferrer" class="text-near-cyan hover:underline">${String(r.hash).slice(0, 10)}…${String(r.hash).slice(-6)}</a></td>
+          </tr>`).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="4" class="py-3 px-4 text-near-amber">rejections feed unavailable: ${err.message}</td></tr>`;
+      }
+    }
+
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', () => {
+      renderAll();
+      hydrateFromChain(false);
+      loadRejections();
+      syncLiveTestnetState();
+    });
+  </script>
+</body>
+</html>
