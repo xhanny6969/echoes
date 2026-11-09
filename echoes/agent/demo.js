@@ -56,7 +56,7 @@ const HIJACKED_PAGE = JSON.stringify(
 );
 
 (async () => {
-  const cfgPath = process.argv[2] || path.join(__dirname, '..', '.echoes', 'vault.json');
+  const cfgPath = process.argv[2] || path.join(__dirname, '..', '..', '.echoes', 'vault.json');
   const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
   const agent = cfg.agents[0];
 
