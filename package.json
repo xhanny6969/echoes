@@ -1,0 +1,20 @@
+{
+  "name": "echoes",
+  "version": "0.1.0",
+  "description": "On-chain spending vault and guardrail layer for autonomous AI agents on NEAR",
+  "license": "MIT",
+  "bin": {
+    "echoes": "./echoes/cli.js"
+  },
+  "scripts": {
+    "build:contract": "cd contract && cargo build --release --target wasm32-unknown-unknown",
+    "status": "node echoes/cli.js status",
+    "demo": "node echoes/agent/demo.js"
+  },
+  "dependencies": {
+    "near-api-js": "^3.0.4"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

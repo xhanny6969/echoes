@@ -1,0 +1,3 @@
+near-api-py==0.1.0
+requests>=2.31
+base58>=2.1
