@@ -6,7 +6,8 @@ Give an agent a wallet without giving it the keys to everything.
 `Track 06 — AI Security & Defense` · NEAR Hackathon 2026
 
 - Repo: https://github.com/xhanny6969/echoes
-- Live demo: https://shell-vacancies-out-larry.trycloudflare.com/landing
+- Live showcase: https://xhanny6969.github.io/echoes/
+- Live console: https://xhanny6969.github.io/echoes/console.html
 - Contract: [`allowance-swarm.testnet`](https://testnet.nearblocks.io/address/allowance-swarm.testnet)
 - Deployed code hash: `9JNpk7uGkuWyp6Yd834muCtADcjGXFufHJu6A3jdMTrn`
 
@@ -105,6 +106,17 @@ VERIFIED — the live contract is byte-identical to this source tree.
 
 That pulls the live code bytes from RPC and hashes them, so it does not depend on
 an explorer badge being granted.
+
+## Hosting
+
+The showcase and console are fully static: they read the vault over NEAR RPC from the
+browser (`Access-Control-Allow-Origin: *`), so no server, no tunnel, nothing to keep
+alive. `site/` holds the built pages; `vercel.json` points Vercel at it.
+
+```bash
+# GitHub Pages: push site/ to the gh-pages branch (already live)
+# Vercel: import the repo, it reads vercel.json (outputDirectory: site)
+```
 
 ## Layout
 

@@ -2324,6 +2324,7 @@
     // ==========================================================================
     const YOCTO = 1e24;
     let LIVE_SYNCED_AT = null;
+    let LIVE_SOURCE = '/api/state';
 
     function shortKeyHex(k) {
       if (!k) return '—';
@@ -2376,11 +2377,90 @@
       };
     }
 
+    const VAULT_ID = 'allowance-swarm.testnet';
+    const RPC_URL = 'https://rpc.testnet.fastnear.com';
+
+    async function rpcQuery(params) {
+      const res = await fetch(RPC_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', id: 'echoes', method: 'query', params })
+      });
+      const j = await res.json();
+      if (j.error) throw new Error(JSON.stringify(j.error));
+      return j.result;
+    }
+
+    const fmtYocto = (y) => (Number(y || 0) / 1e24).toFixed(6).replace(/0+$/, '').replace(/\.$/, '');
+
+    /**
+     * Read the vault straight from the chain in the browser.
+     * Used when the page is hosted as a static site (no /api backend).
+     * The RPC returns Access-Control-Allow-Origin: *, so this needs no server.
+     */
+    async function directRpcState() {
+      const viewCall = async (method_name) => {
+        const r = await rpcQuery({
+          request_type: 'call_function', account_id: VAULT_ID, method_name,
+          args_base64: 'e30=', finality: 'final'
+        });
+        return JSON.parse(new TextDecoder().decode(new Uint8Array(r.result || [])));
+      };
+      const [policy, balance, log, agents, keyRes] = await Promise.all([
+        viewCall('get_policy'),
+        viewCall('get_balance'),
+        viewCall('get_log'),
+        viewCall('get_agents'),
+        rpcQuery({ request_type: 'view_access_key_list', account_id: VAULT_ID, finality: 'final' })
+      ]);
+      const keys = (keyRes.keys || []).filter(k => k.access_key && k.access_key.permission && k.access_key.permission.FunctionCall).map(k => {
+        const fc = k.access_key.permission.FunctionCall;
+        return {
+          public_key: k.public_key,
+          receiver_id: fc.receiver_id,
+          method_names: fc.method_names,
+          allowance_near: fc.allowance ? fmtYocto(fc.allowance) : 'unlimited',
+          nonce: k.access_key.nonce
+        };
+      });
+      const byPk = Object.fromEntries(keys.map(k => [k.public_key, k]));
+      (agents || []).forEach(a => {
+        const k = byPk[a.public_key];
+        a.key_methods = k ? k.method_names : null;
+        a.per_tx_near = fmtYocto(a.per_tx);
+        a.daily_near = fmtYocto(a.daily);
+        a.spent_near = fmtYocto(a.spent_today);
+      });
+      const spentBig = BigInt(policy.spent_today || '0');
+      return {
+        vault: VAULT_ID,
+        policy,
+        balance,
+        balance_near: fmtYocto(balance),
+        per_tx_near: fmtYocto(policy.per_tx),
+        daily_near: fmtYocto(policy.daily),
+        spent_today_near: fmtYocto(spentBig.toString()),
+        agents: agents || [],
+        agent_count: (agents || []).length,
+        scoped_keys: keys,
+        log: log || [],
+        fetched_at: new Date().toISOString().slice(0, 19) + 'Z',
+        source: 'direct-rpc'
+      };
+    }
+
     async function hydrateFromChain(announce) {
       try {
-        const res = await fetch('/api/state', { cache: 'no-store' });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const s = await res.json();
+        let s;
+        try {
+          const res = await fetch('/api/state', { cache: 'no-store' });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          s = await res.json();
+        } catch (_) {
+          // static hosting: no backend, read the chain ourselves
+          s = await directRpcState();
+        }
+        if (s.source === 'direct-rpc') LIVE_SOURCE = 'NEAR RPC';
         vaultState = Object.assign({}, vaultState, mapChainState(s));
         LIVE_SYNCED_AT = new Date();
         renderAll();
@@ -2403,7 +2483,7 @@
         return;
       }
       const t = LIVE_SYNCED_AT ? LIVE_SYNCED_AT.toISOString().slice(11, 19) + 'Z' : '—';
-      el.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-near-green animate-pulse"></span> LIVE · /api/state · ${t}`;
+      el.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-near-green animate-pulse"></span> LIVE · ${LIVE_SOURCE} · ${t}`;
       el.className = 'font-mono text-[10px] px-2 py-0.5 rounded border border-near-green/40 text-near-green flex items-center gap-1.5';
     }
 
@@ -2411,8 +2491,21 @@
       const tbody = document.getElementById('rejectionsBody');
       if (!tbody) return;
       try {
-        const res = await fetch('/api/rejections', { cache: 'no-store' });
-        const rows = await res.json();
+        let rows;
+        try {
+          const res = await fetch('/api/rejections', { cache: 'no-store' });
+          rows = await res.json();
+        } catch (_) {
+          const r = await fetch('https://api-testnet.nearblocks.io/v3/accounts/' + VAULT_ID + '/txns?limit=100');
+          const payload = await r.json();
+          rows = (payload.data || [])
+            .filter(t => !(t.outcomes && t.outcomes.status))
+            .map(t => ({
+              hash: t.transaction_hash,
+              method: ((t.actions || [{}])[0] || {}).method || 'unknown',
+              block: (t.block || {}).block_height
+            }));
+        }
         if (!Array.isArray(rows) || !rows.length) {
           tbody.innerHTML = '<tr><td colspan="4" class="py-3 px-4 text-near-dim">no failed transactions returned</td></tr>';
           return;
