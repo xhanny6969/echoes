@@ -957,7 +957,7 @@
               It clones the repo, runs the sandbox self-test against a <strong class="text-near-alabaster">live testnet vault</strong>,
               and must come back with two on-chain outcomes: one payout <span class="text-near-green">accepted</span>,
               one payout <span class="text-near-red">reverted at the allowlist</span>.
-              No wallet, no private key of yours, no account creation.
+              No wallet, no private key of yours, no account creation. This is a shared, rate-limited testnet sandbox—not unlimited concurrent capacity.
             </p>
           </div>
           <button onclick="copyAgentPrompt()" id="copyPromptBtn" class="btn-near-primary px-4 py-2.5 rounded text-xs flex items-center gap-2 shrink-0">
@@ -982,16 +982,26 @@ Expected: exactly two PASS lines —
 Then verify both transactions yourself over NEAR RPC (method "tx", sender_account_id
 = the vault printed by the script) and show me the two statuses: SuccessValue and Failure.
 
+This is a shared, rate-limited testnet sandbox; it is intended for sequential demos, not unlimited concurrent runs. Each successful test costs 0.05 N from the shared vault and consumes gas allowance. If a line says FAIL or shows cap/allowance exhaustion, stop and report it—don't loop or retry repeatedly.
+
 Rules: do not modify the repo, do not create accounts, do not touch any key other than
-the public sandbox key already in echoes/sandbox.json. If a line says FAIL, stop and
-paste the full output instead of retrying.</pre>
+the public sandbox key already in echoes/sandbox.json.</pre>
           </div>
 
           <div class="lg:col-span-5 space-y-3 font-mono text-xs">
+            <div class="p-3 rounded bg-near-obsidian border border-near-amber/40">
+              <div class="text-near-amber text-[10px] font-bold">SHARED TESTNET · CAPACITY LIMIT</div>
+              <div class="text-near-slate text-[11px] mt-1 leading-relaxed">
+                Everyone runs against the same vault. It's for sequential demos, not unlimited concurrent users.
+                Each run spends 0.05 N; agent policy cap is 5 N/day, while the scoped key's separate gas allowance can also run out.
+                If the test says FAIL or reports a cap/allowance error, the shared sandbox is busy or depleted—not proof the guardrail failed.
+                Try later; do not keep retrying.
+              </div>
+            </div>
             <div class="p-3 rounded bg-near-obsidian border border-near-border">
               <div class="text-near-dim text-[10px]">SANDBOX VAULT</div>
               <div class="text-near-green mt-0.5 break-all">demo.allowance-merchant.testnet</div>
-              <div class="text-near-slate text-[11px] mt-1">agent <span class="text-near-alabaster">sandbox-worker</span> · 0.05 N/tx · 5 N/day</div>
+              <div class="text-near-slate text-[11px] mt-1">agent <span class="text-near-alabaster">sandbox-worker</span> · 0.05 N/test · 5 N/day shared cap</div>
             </div>
             <div class="p-3 rounded bg-near-obsidian border border-near-border">
               <div class="text-near-dim text-[10px]">WHY THE KEY CAN BE PUBLIC</div>

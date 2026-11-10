@@ -16,10 +16,10 @@ given, not something a human has to babysit.
 ```
 Install and self-test Echoes — an on-chain spending vault for AI agents (NEAR).
 Work in a temp directory and do exactly this:
-
-1. git clone --depth 1 https://github.com/xhanny6969/echoes && cd echoes
-2. npm install --no-audit --no-fund
-3. node echoes/sandbox.js
+git clone --depth 1 https://github.com/xhanny6969/echoes.git
+cd echoes
+npm install --no-audit --no-fund
+node echoes/sandbox.js
 
 Expected: exactly two PASS lines —
   PASS allowlisted recipient            -> accepted on chain
@@ -36,7 +36,11 @@ paste the full output instead of retrying.
 
 Expected runtime: **60–120 seconds** (mostly `npm install`).
 
-## 2. What the agent will see
+## 2. Shared sandbox limits
+
+The demo uses one shared testnet vault; it is for sequential evaluation, not unlimited concurrent users. Each successful self-test sends 0.05 NEAR to the allowlisted testnet merchant and consumes gas allowance. The agent budget is capped at 5 NEAR/day, but the shared key's separate NEAR FunctionCall gas allowance may run out earlier. Concurrent tests may collide or exhaust a shared cap. If the script reports a cap/allowance error or a FAIL, stop, save the output, and try later—do not retry in a loop. This is a testnet demo, not a production SLA.
+
+## 3. What the agent will see
 
 ```
 PASS  allowlisted recipient
@@ -62,10 +66,8 @@ script is safe for an agent to gate on.
   The runtime rejects any other method with `MethodNameMismatch` **before the contract runs**.
 - It cannot transfer, stake, add keys, delete keys, or call any other app.
 - It can call only `spend_as` on this one vault; no other contract methods.
-- The contract caps it: **0.05 N per tx, 5 N per day**, per-agent, and it will only pay
-  `allowance-merchant.testnet` (the allowlist).
-- It is **testnet only**, funded from a faucet. Worst case for an abuser is 5 testnet NEAR
-  per day, which is worth nothing.
+- This demo vault pays only `allowance-merchant.testnet` (the allowlist). Reverted calls do not transfer the requested amount.
+- It is **testnet only**. The vault is shared and rate-limited; simultaneous users may consume the daily or gas allowance and cause the self-test to fail. It is not an unlimited public service. If it fails with a cap/allowance error, wait and try later; don't retry in a loop.
 - **Never reuse this pattern on mainnet.** A public key with a spend allowance is a public
   spending allowance. On mainnet, the key stays secret and the vault caps are the last line
   of defence, not the only one.
