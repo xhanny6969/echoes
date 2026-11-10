@@ -210,56 +210,56 @@ HTML = r"""<!doctype html>
 <style>
 /* --- Professional Developer & Infra Palette (No AI Slop / No Neon Gradients) --- */
 :root, [data-theme="dark"] {
-  --bg: #090a0f;
-  --panel: #11131a;
-  --panel-hover: #151821;
-  --panel-muted: #171a24;
-  --border: #202430;
-  --border-focus: #374151;
-  --border-subtle: #171a22;
-  --text: #f3f4f6;
-  --text-muted: #9ca3af;
-  --text-dim: #64748b;
+  --bg: #000000;
+  --panel: #141414;
+  --panel-hover: #262626;
+  --panel-muted: #141414;
+  --border: #262626;
+  --border-focus: #525252;
+  --border-subtle: #262626;
+  --text: #F2F1E9;
+  --text-muted: #858585;
+  --text-dim: #525252;
   --near-green: #00ec97;
   --near-green-subtle: rgba(0, 236, 151, 0.1);
   --near-green-border: rgba(0, 236, 151, 0.28);
-  --blue: #38bdf8;
+  --blue: #0091FD;
   --blue-subtle: rgba(56, 189, 248, 0.1);
   --blue-border: rgba(56, 189, 248, 0.25);
-  --amber: #f59e0b;
+  --amber: #9797FF;
   --amber-subtle: rgba(245, 158, 11, 0.1);
   --amber-border: rgba(245, 158, 11, 0.25);
-  --red: #f43f5e;
+  --red: #FF7966;
   --red-subtle: rgba(244, 63, 94, 0.1);
   --red-border: rgba(244, 63, 94, 0.25);
-  --purple: #a855f7;
+  --purple: #9797FF;
   --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 10px 24px -8px rgba(0,0,0,0.6);
 }
 
 [data-theme="light"] {
-  --bg: #f8fafc;
+  --bg: #F2F1E9;
   --panel: #ffffff;
-  --panel-hover: #fcfdfe;
-  --panel-muted: #f1f5f9;
-  --border: #e2e8f0;
-  --border-focus: #cbd5e1;
-  --border-subtle: #edf2f7;
-  --text: #0f172a;
-  --text-muted: #475569;
-  --text-dim: #94a3b8;
-  --near-green: #059669;
+  --panel-hover: #FFFFFF;
+  --panel-muted: #E6E6E6;
+  --border: #E6E6E6;
+  --border-focus: #858585;
+  --border-subtle: #E6E6E6;
+  --text: #141414;
+  --text-muted: #525252;
+  --text-dim: #858585;
+  --near-green: #00EC97;
   --near-green-subtle: rgba(5, 150, 105, 0.08);
   --near-green-border: rgba(5, 150, 105, 0.25);
-  --blue: #0284c7;
+  --blue: #0091FD;
   --blue-subtle: rgba(2, 132, 199, 0.08);
   --blue-border: rgba(2, 132, 199, 0.25);
-  --amber: #d97706;
+  --amber: #9797FF;
   --amber-subtle: rgba(217, 119, 6, 0.08);
   --amber-border: rgba(217, 119, 6, 0.25);
-  --red: #e11d48;
+  --red: #FF7966;
   --red-subtle: rgba(225, 29, 72, 0.08);
   --red-border: rgba(225, 29, 72, 0.25);
-  --purple: #7c3aed;
+  --purple: #9797FF;
   --shadow: 0 1px 3px rgba(15,23,42,0.06), 0 8px 20px -6px rgba(15,23,42,0.08);
 }
 
@@ -330,7 +330,7 @@ a:hover { text-decoration: underline; }
   display: grid;
   place-items: center;
 }
-.brand-icon svg { width: 18px; height: 18px; fill: #090a0f; }
+.brand-icon svg { width: 18px; height: 18px; fill: #000000; }
 
 .brand-title {
   display: flex;
@@ -412,13 +412,13 @@ a:hover { text-decoration: underline; }
 
 .btn-primary {
   background: var(--near-green);
-  color: #090a0f;
+  color: #000000;
   border-color: var(--near-green);
 }
 .btn-primary:hover {
-  background: #00df8e;
-  border-color: #00df8e;
-  color: #090a0f;
+  background: #00EC97;
+  border-color: #00EC97;
+  color: #000000;
 }
 
 /* --- Main Layout --- */
@@ -952,7 +952,7 @@ footer {
 <header class="topbar">
   <div class="topbar-inner">
     <div class="brand">
-      <div class="brand-icon" style="background:#000000;border:1px solid #222222;border-radius:7px;display:flex;align-items:center;justify-content:center;padding:2px">
+      <div class="brand-icon" style="background:#000000;border:1px solid #262626;border-radius:7px;display:flex;align-items:center;justify-content:center;padding:2px">
         <svg viewBox="0 0 64 64" width="22" height="22" fill="none">
           <circle cx="20" cy="32" r="3.2" fill="#FFFFFF"/>
           <path d="M 26.68 39.81 A 9.24 9.24 0 0 0 26.68 24.19" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round"/>
