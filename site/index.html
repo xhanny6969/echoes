@@ -559,10 +559,16 @@
 
             <!-- CENTRAL VAULT CORE HEXAGON -->
             <g transform="translate(200, 170)" class="cursor-pointer" onclick="scrollToSection('telemetry')">
-              <polygon points="0,-34 29,-17 29,17 0,34 -29,17 -29,-17" fill="#141414" stroke="#00EC97" stroke-width="2"/>
-              <!-- Mini Echoes Monolith Inside Vault -->
-              <path d="M-8,9 V-9 L8,9 V-9" stroke="#F2F1E9" stroke-width="2.5" fill="none"/>
-              <circle cx="0" cy="0" r="3" fill="#00EC97"/>
+              <rect x="-34" y="-34" width="68" height="68" rx="16" fill="#141414" stroke="#00EC97" stroke-width="2"/>
+              <!-- Brand mark at icon scale: signal dot -> echo waves -> guardrail gate bar.
+                   Same geometry as assets/echoes-logo.svg, scaled from its trimmed 260x392 box. -->
+              <g transform="scale(0.1378) translate(-238, -256)">
+                <circle cx="136" cy="256" r="28" fill="#00EC97"/>
+                <path d="M 197.13 192.70 A 88 88 0 0 1 197.13 319.30" stroke="#F2F1E9" stroke-width="32" stroke-linecap="round"/>
+                <path d="M 231.66 137.87 A 152 152 0 0 1 279.54 206.00 M 279.54 306.00 A 152 152 0 0 1 231.66 374.13" stroke="#F2F1E9" stroke-opacity="0.52" stroke-width="32" stroke-linecap="round"/>
+                <path d="M 256.79 76.93 A 216 216 0 0 1 346.13 206.00 M 346.13 306.00 A 216 216 0 0 1 256.79 435.07" stroke="#00EC97" stroke-width="32" stroke-linecap="round"/>
+                <line x1="288" y1="256" x2="352" y2="256" stroke="#00EC97" stroke-width="32" stroke-linecap="round"/>
+              </g>
               <text x="0" y="48" text-anchor="middle" fill="#F2F1E9" font-family="JetBrains Mono" font-size="9" font-weight="700" id="radarVaultLabel">VAULT: 5.00 Ⓝ/day</text>
             </g>
 
