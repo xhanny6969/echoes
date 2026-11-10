@@ -25,17 +25,17 @@
             near: {
               green: '#00EC97',
               greenDim: 'rgba(0, 236, 151, 0.12)',
-              cyan: '#179EFF',
-              red: '#FF4D38',
-              amber: '#F5A623',
-              obsidian: '#06080B',
-              carbon: '#0B0F15',
-              panel: '#101720',
-              border: '#19232E',
-              borderBright: '#263545',
-              alabaster: '#F2F6FA',
-              slate: '#8A99AD',
-              dim: '#526275'
+              cyan: '#0091FD',
+              red: '#FF7966',
+              amber: '#9797FF',
+              obsidian: '#000000',
+              carbon: '#141414',
+              panel: '#262626',
+              border: '#262626',
+              borderBright: '#525252',
+              alabaster: '#F2F1E9',
+              slate: '#858585',
+              dim: '#525252'
             }
           },
           fontFamily: {
@@ -55,34 +55,34 @@
        ========================================================================== */
     :root {
       --near-green: #00EC97;
-      --near-cyan: #179EFF;
-      --near-red: #FF4D38;
-      --near-amber: #F5A623;
-      --bg-obsidian: #06080B;
-      --bg-carbon: #0B0F15;
-      --bg-panel: #101720;
-      --border-hairline: #19232E;
+      --near-cyan: #0091FD;
+      --near-red: #FF7966;
+      --near-amber: #9797FF;
+      --bg-obsidian: #000000;
+      --bg-carbon: #141414;
+      --bg-panel: #262626;
+      --border-hairline: #262626;
     }
 
     * {
       box-sizing: border-box;
       selection-background-color: #00EC97;
-      selection-color: #06080B;
+      selection-color: #000000;
     }
 
     ::selection {
       background: #00EC97;
-      color: #06080B;
+      color: #000000;
     }
 
     body {
       background-color: var(--bg-obsidian);
-      color: #F2F6FA;
+      color: #F2F1E9;
       font-family: 'Space Grotesk', sans-serif;
       overflow-x: hidden;
       background-image: 
-        linear-gradient(to right, rgba(25, 35, 46, 0.35) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(25, 35, 46, 0.35) 1px, transparent 1px);
+        linear-gradient(to right, rgba(38, 38, 38, 0.35) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(38, 38, 38, 0.35) 1px, transparent 1px);
       background-size: 48px 48px;
     }
 
@@ -90,7 +90,7 @@
     .bg-blueprint {
       background-size: 24px 24px;
       background-image: 
-        radial-gradient(circle, rgba(138, 153, 173, 0.16) 1px, transparent 1px);
+        radial-gradient(circle, rgba(133, 133, 133, 0.16) 1px, transparent 1px);
     }
 
     .tabular-nums {
@@ -101,7 +101,7 @@
     .swiss-box {
       position: relative;
       border: 1px solid var(--border-hairline);
-      background-color: rgba(11, 15, 21, 0.9);
+      background-color: rgba(0, 0, 0, 0.9);
       backdrop-filter: blur(8px);
     }
 
@@ -112,7 +112,7 @@
       font-family: 'JetBrains Mono', monospace;
       font-size: 12px;
       line-height: 1;
-      color: #526275;
+      color: #525252;
       pointer-events: none;
       z-index: 10;
     }
@@ -128,7 +128,7 @@
     /* Tactile Mechanical Buttons */
     .btn-near-primary {
       background-color: #00EC97;
-      color: #06080B;
+      color: #000000;
       font-family: 'JetBrains Mono', monospace;
       font-weight: 700;
       letter-spacing: 0.03em;
@@ -137,7 +137,7 @@
       box-shadow: 3px 3px 0px rgba(0, 236, 151, 0.25);
     }
     .btn-near-primary:hover {
-      background-color: #26f7ac;
+      background-color: #17D9D4;
       transform: translate(-1px, -1px);
       box-shadow: 5px 5px 0px rgba(0, 236, 151, 0.35);
     }
@@ -147,11 +147,11 @@
     }
 
     .btn-near-ghost {
-      background-color: #0B0F15;
-      color: #F2F6FA;
+      background-color: #141414;
+      color: #F2F1E9;
       font-family: 'JetBrains Mono', monospace;
       font-weight: 500;
-      border: 1px solid #263545;
+      border: 1px solid #525252;
       transition: all 0.15s ease;
     }
     .btn-near-ghost:hover {
@@ -161,17 +161,17 @@
     }
 
     .btn-near-danger {
-      background-color: rgba(255, 77, 56, 0.1);
-      color: #FF4D38;
+      background-color: rgba(255, 121, 102, 0.1);
+      color: #FF7966;
       font-family: 'JetBrains Mono', monospace;
       font-weight: 600;
-      border: 1px solid rgba(255, 77, 56, 0.45);
+      border: 1px solid rgba(255, 121, 102, 0.45);
       transition: all 0.15s ease;
     }
     .btn-near-danger:hover {
-      background-color: #FF4D38;
-      color: #06080B;
-      box-shadow: 3px 3px 0px rgba(255, 77, 56, 0.3);
+      background-color: #FF7966;
+      color: #000000;
+      box-shadow: 3px 3px 0px rgba(255, 121, 102, 0.3);
     }
 
     /* Sonar & Echo Animations */
@@ -229,10 +229,10 @@
       height: 6px;
     }
     ::-webkit-scrollbar-track {
-      background: #06080B;
+      background: #000000;
     }
     ::-webkit-scrollbar-thumb {
-      background: #19232E;
+      background: #262626;
       border-radius: 2px;
     }
     ::-webkit-scrollbar-thumb:hover {
@@ -265,7 +265,7 @@
 
     #scrollProgress {
       position: fixed; top: 0; left: 0; height: 2px; width: 0%; z-index: 70;
-      background: linear-gradient(90deg, #00EC97 0%, #179EFF 55%, #00EC97 100%);
+      background: linear-gradient(90deg, #00EC97 0%, #0091FD 55%, #00EC97 100%);
       box-shadow: 0 0 12px rgba(0, 236, 151, 0.55);
       pointer-events: none;
     }
@@ -368,15 +368,15 @@
         <div class="w-10 h-10 rounded bg-near-carbon border border-near-borderBright flex items-center justify-center relative overflow-hidden group-hover:border-near-green transition-colors">
           <svg class="w-8 h-8" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
             <!-- Outer Guardrail Perimeter Hexagon -->
-            <path d="M32 5L55.5 18.5V45.5L32 59L8.5 45.5V18.5L32 5Z" stroke="#00EC97" stroke-width="2" stroke-dasharray="7 3.5" class="group-hover:stroke-[#179EFF] transition-colors"/>
+            <path d="M32 5L55.5 18.5V45.5L32 59L8.5 45.5V18.5L32 5Z" stroke="#00EC97" stroke-width="2" stroke-dasharray="7 3.5" class="group-hover:stroke-[#0091FD] transition-colors"/>
             <!-- Inner Acoustic Echo Rings -->
             <circle cx="32" cy="32" r="20" stroke="#00EC97" stroke-width="1.2" stroke-opacity="0.35"/>
-            <circle cx="32" cy="32" r="14" stroke="#179EFF" stroke-width="1.2" stroke-dasharray="4 3" stroke-opacity="0.6"/>
+            <circle cx="32" cy="32" r="14" stroke="#0091FD" stroke-width="1.2" stroke-dasharray="4 3" stroke-opacity="0.6"/>
             <!-- NEAR Monolith Diagonal Fold + Vault Core -->
-            <path d="M21 43V21L43 43V21" stroke="#F2F6FA" stroke-width="4" stroke-linecap="square" stroke-linejoin="miter"/>
+            <path d="M21 43V21L43 43V21" stroke="#F2F1E9" stroke-width="4" stroke-linecap="square" stroke-linejoin="miter"/>
             <path d="M21 21L29 29" stroke="#00EC97" stroke-width="4" stroke-linecap="square"/>
             <!-- Central Guard Node -->
-            <circle cx="32" cy="32" r="4" fill="#00EC97" stroke="#06080B" stroke-width="1.5"/>
+            <circle cx="32" cy="32" r="4" fill="#00EC97" stroke="#000000" stroke-width="1.5"/>
           </svg>
         </div>
         <div>
@@ -513,11 +513,11 @@
               <radialGradient id="vaultGlow" cx="50%" cy="50%" r="50%">
                 <stop offset="0%" stop-color="#00EC97" stop-opacity="0.28"/>
                 <stop offset="70%" stop-color="#00EC97" stop-opacity="0.04"/>
-                <stop offset="100%" stop-color="#06080B" stop-opacity="0"/>
+                <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
               </radialGradient>
               <radialGradient id="breachGlow" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="#FF4D38" stop-opacity="0.35"/>
-                <stop offset="100%" stop-color="#06080B" stop-opacity="0"/>
+                <stop offset="0%" stop-color="#FF7966" stop-opacity="0.35"/>
+                <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
               </radialGradient>
             </defs>
 
@@ -525,22 +525,22 @@
             <circle id="radarCoreGlow" cx="200" cy="170" r="130" fill="url(#vaultGlow)" />
 
             <!-- Radar Coordinate Crosshairs -->
-            <line x1="200" y1="15" x2="200" y2="325" stroke="#19232E" stroke-width="1" stroke-dasharray="3 3"/>
-            <line x1="30" y1="170" x2="370" y2="170" stroke="#19232E" stroke-width="1" stroke-dasharray="3 3"/>
+            <line x1="200" y1="15" x2="200" y2="325" stroke="#262626" stroke-width="1" stroke-dasharray="3 3"/>
+            <line x1="30" y1="170" x2="370" y2="170" stroke="#262626" stroke-width="1" stroke-dasharray="3 3"/>
 
             <!-- Concentric Echo Waves -->
             <circle cx="200" cy="170" r="45" fill="none" stroke="#00EC97" class="echo-ring-1" />
-            <circle cx="200" cy="170" r="45" fill="none" stroke="#179EFF" class="echo-ring-2" />
+            <circle cx="200" cy="170" r="45" fill="none" stroke="#0091FD" class="echo-ring-2" />
 
             <!-- Outer Recipient Orbit Ring -->
-            <circle cx="200" cy="170" r="142" fill="none" stroke="#19232E" stroke-width="1"/>
+            <circle cx="200" cy="170" r="142" fill="none" stroke="#262626" stroke-width="1"/>
 
             <!-- THE 5-GATE GUARDRAIL PERIMETER SHIELD RING -->
             <g class="spin-slow" style="transform-origin: 200px 170px;">
               <circle id="guardrailRing" cx="200" cy="170" r="95" fill="none" stroke="#00EC97" stroke-width="2" stroke-dasharray="18 8" stroke-opacity="0.8"/>
             </g>
             <g class="spin-reverse" style="transform-origin: 200px 170px;">
-              <circle cx="200" cy="170" r="86" fill="none" stroke="#179EFF" stroke-width="1" stroke-dasharray="6 14" stroke-opacity="0.5"/>
+              <circle cx="200" cy="170" r="86" fill="none" stroke="#0091FD" stroke-width="1" stroke-dasharray="6 14" stroke-opacity="0.5"/>
             </g>
 
             <!-- Connection Vectors -->
@@ -549,57 +549,57 @@
             <!-- Agent 2 (compute-agent) -> Vault -> gpu-cluster -->
             <line id="vec-compute" x1="312" y1="78" x2="200" y2="170" stroke="#00EC97" stroke-width="1.5" stroke-opacity="0.4" stroke-dasharray="4 4"/>
             <!-- Agent 3 (scraper-agent) -> Vault -->
-            <line id="vec-scraper" x1="88" y1="262" x2="200" y2="170" stroke="#179EFF" stroke-width="1.5" stroke-opacity="0.4" stroke-dasharray="4 4"/>
+            <line id="vec-scraper" x1="88" y1="262" x2="200" y2="170" stroke="#0091FD" stroke-width="1.5" stroke-opacity="0.4" stroke-dasharray="4 4"/>
             <!-- Agent 4 (rogue-agent) -> Intercepted at Guardrail Ring (r=95) -->
-            <line id="vec-rogue" x1="312" y1="262" x2="268" y2="232" stroke="#FF4D38" stroke-width="2" stroke-dasharray="3 3"/>
+            <line id="vec-rogue" x1="312" y1="262" x2="268" y2="232" stroke="#FF7966" stroke-width="2" stroke-dasharray="3 3"/>
 
             <!-- Dynamic Pulse Particle Layer -->
             <g id="radarPulseLayer"></g>
 
             <!-- Breach Shockwave Ring (Triggered on exploit) -->
-            <circle id="radarBreachWave" cx="268" cy="232" r="0" fill="none" stroke="#FF4D38" stroke-width="0" opacity="0"/>
+            <circle id="radarBreachWave" cx="268" cy="232" r="0" fill="none" stroke="#FF7966" stroke-width="0" opacity="0"/>
 
             <!-- CENTRAL VAULT CORE HEXAGON -->
             <g transform="translate(200, 170)" class="cursor-pointer" onclick="scrollToSection('telemetry')">
-              <polygon points="0,-34 29,-17 29,17 0,34 -29,17 -29,-17" fill="#0B0F15" stroke="#00EC97" stroke-width="2"/>
+              <polygon points="0,-34 29,-17 29,17 0,34 -29,17 -29,-17" fill="#141414" stroke="#00EC97" stroke-width="2"/>
               <!-- Mini Echoes Monolith Inside Vault -->
-              <path d="M-8,9 V-9 L8,9 V-9" stroke="#F2F6FA" stroke-width="2.5" fill="none"/>
+              <path d="M-8,9 V-9 L8,9 V-9" stroke="#F2F1E9" stroke-width="2.5" fill="none"/>
               <circle cx="0" cy="0" r="3" fill="#00EC97"/>
-              <text x="0" y="48" text-anchor="middle" fill="#F2F6FA" font-family="JetBrains Mono" font-size="9" font-weight="700" id="radarVaultLabel">VAULT: 5.00 Ⓝ/day</text>
+              <text x="0" y="48" text-anchor="middle" fill="#F2F1E9" font-family="JetBrains Mono" font-size="9" font-weight="700" id="radarVaultLabel">VAULT: 5.00 Ⓝ/day</text>
             </g>
 
             <!-- ORBITING NODE 1: Research-01 (Top Left) -->
             <g class="cursor-pointer" onclick="triggerPreset(1)">
-              <circle cx="88" cy="78" r="16" fill="#0B0F15" stroke="#00EC97" stroke-width="1.8"/>
+              <circle cx="88" cy="78" r="16" fill="#141414" stroke="#00EC97" stroke-width="1.8"/>
               <circle cx="88" cy="78" r="4" fill="#00EC97"/>
               <text x="88" y="54" text-anchor="middle" fill="#00EC97" font-family="JetBrains Mono" font-size="9" font-weight="600">agent-alpha</text>
-              <text x="88" y="106" text-anchor="middle" fill="#8A99AD" font-family="JetBrains Mono" font-size="8">0.20 Ⓝ/tx · 1.00 Ⓝ/day</text>
+              <text x="88" y="106" text-anchor="middle" fill="#858585" font-family="JetBrains Mono" font-size="8">0.20 Ⓝ/tx · 1.00 Ⓝ/day</text>
             </g>
 
             <!-- ORBITING NODE 2: Exec-02 (Top Right) -->
             <g class="cursor-pointer" onclick="triggerPreset(3)">
-              <circle cx="312" cy="78" r="16" fill="#0B0F15" stroke="#00EC97" stroke-width="1.8"/>
+              <circle cx="312" cy="78" r="16" fill="#141414" stroke="#00EC97" stroke-width="1.8"/>
               <circle cx="312" cy="78" r="4" fill="#00EC97"/>
               <text x="312" y="54" text-anchor="middle" fill="#00EC97" font-family="JetBrains Mono" font-size="9" font-weight="600">agent-beta</text>
-              <text x="312" y="106" text-anchor="middle" fill="#8A99AD" font-family="JetBrains Mono" font-size="8">0.20 Ⓝ/tx · 1.00 Ⓝ/day</text>
+              <text x="312" y="106" text-anchor="middle" fill="#858585" font-family="JetBrains Mono" font-size="8">0.20 Ⓝ/tx · 1.00 Ⓝ/day</text>
             </g>
 
             <!-- ORBITING NODE 3: Arb-03 (Bottom Left) -->
             <g class="cursor-pointer" onclick="triggerPreset(2)">
-              <circle id="radarNodeScraper" cx="88" cy="262" r="16" fill="#0B0F15" stroke="#179EFF" stroke-width="1.8"/>
-              <circle cx="88" cy="262" r="4" fill="#179EFF"/>
-              <text x="88" y="290" text-anchor="middle" fill="#179EFF" font-family="JetBrains Mono" font-size="9" font-weight="600">UNREGISTERED KEY</text>
-              <text x="88" y="302" text-anchor="middle" fill="#8A99AD" font-family="JetBrains Mono" font-size="8">no such key on account</text>
+              <circle id="radarNodeScraper" cx="88" cy="262" r="16" fill="#141414" stroke="#0091FD" stroke-width="1.8"/>
+              <circle cx="88" cy="262" r="4" fill="#0091FD"/>
+              <text x="88" y="290" text-anchor="middle" fill="#0091FD" font-family="JetBrains Mono" font-size="9" font-weight="600">UNREGISTERED KEY</text>
+              <text x="88" y="302" text-anchor="middle" fill="#858585" font-family="JetBrains Mono" font-size="8">no such key on account</text>
             </g>
 
             <!-- ORBITING NODE 4: Rogue-04 (Bottom Right - Intercepted) -->
             <g class="cursor-pointer" onclick="triggerPreset(4)">
-              <circle cx="312" cy="262" r="16" fill="#1A0B0E" stroke="#FF4D38" stroke-width="2"/>
-              <path d="M307 257L317 267M317 257L307 267" stroke="#FF4D38" stroke-width="2"/>
+              <circle cx="312" cy="262" r="16" fill="#262626" stroke="#FF7966" stroke-width="2"/>
+              <path d="M307 257L317 267M317 257L307 267" stroke="#FF7966" stroke-width="2"/>
               <!-- Intercept Shield Marker at Perimeter -->
-              <circle cx="268" cy="232" r="6" fill="#FF4D38"/>
-              <text x="312" y="290" text-anchor="middle" fill="#FF4D38" font-family="JetBrains Mono" font-size="9" font-weight="700">ROGUE RECIPIENT</text>
-              <text x="312" y="302" text-anchor="middle" fill="#FF4D38" font-family="JetBrains Mono" font-size="8">REVERTED @ ALLOWLIST</text>
+              <circle cx="268" cy="232" r="6" fill="#FF7966"/>
+              <text x="312" y="290" text-anchor="middle" fill="#FF7966" font-family="JetBrains Mono" font-size="9" font-weight="700">ROGUE RECIPIENT</text>
+              <text x="312" y="302" text-anchor="middle" fill="#FF7966" font-family="JetBrains Mono" font-size="8">REVERTED @ ALLOWLIST</text>
             </g>
           </svg>
         </div>
@@ -1204,13 +1204,13 @@ the public sandbox key already in echoes/sandbox.json.</pre>
           </div>
           <div class="h-44 rounded bg-near-obsidian border border-near-border flex items-center justify-center p-4 bg-blueprint">
             <svg id="svg-asset-dark-mark" class="w-32 h-32" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="128" height="128" rx="24" fill="#06080B"/>
+              <rect width="128" height="128" rx="24" fill="#000000"/>
               <path d="M64 12L109 38V90L64 116L19 90V38L64 12Z" stroke="#00EC97" stroke-width="3.5" stroke-dasharray="14 7"/>
               <circle cx="64" cy="64" r="39" stroke="#00EC97" stroke-width="2" stroke-opacity="0.35"/>
-              <circle cx="64" cy="64" r="28" stroke="#179EFF" stroke-width="2" stroke-dasharray="8 6" stroke-opacity="0.65"/>
-              <path d="M42 86V42L86 86V42" stroke="#F2F6FA" stroke-width="8" stroke-linecap="square" stroke-linejoin="miter"/>
+              <circle cx="64" cy="64" r="28" stroke="#0091FD" stroke-width="2" stroke-dasharray="8 6" stroke-opacity="0.65"/>
+              <path d="M42 86V42L86 86V42" stroke="#F2F1E9" stroke-width="8" stroke-linecap="square" stroke-linejoin="miter"/>
               <path d="M42 42L58 58" stroke="#00EC97" stroke-width="8" stroke-linecap="square"/>
-              <circle cx="64" cy="64" r="7" fill="#00EC97" stroke="#06080B" stroke-width="3"/>
+              <circle cx="64" cy="64" r="7" fill="#00EC97" stroke="#000000" stroke-width="3"/>
             </svg>
           </div>
           <div class="mt-4 flex items-center justify-between gap-2">
@@ -1227,15 +1227,15 @@ the public sandbox key already in echoes/sandbox.json.</pre>
           </div>
           <div class="h-44 rounded bg-near-obsidian border border-near-border flex items-center justify-center p-4 bg-blueprint">
             <svg id="svg-asset-horiz-dark" class="w-full h-auto max-h-28" viewBox="0 0 460 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="460" height="120" rx="16" fill="#06080B"/>
+              <rect width="460" height="120" rx="16" fill="#000000"/>
               <g transform="translate(16, 12)">
                 <path d="M48 6L84 27V69L48 90L12 69V27L48 6Z" stroke="#00EC97" stroke-width="3" stroke-dasharray="10 5"/>
-                <circle cx="48" cy="48" r="28" stroke="#179EFF" stroke-width="1.5" stroke-dasharray="6 4" stroke-opacity="0.7"/>
-                <path d="M32 64V32L64 64V32" stroke="#F2F6FA" stroke-width="6" stroke-linecap="square"/>
+                <circle cx="48" cy="48" r="28" stroke="#0091FD" stroke-width="1.5" stroke-dasharray="6 4" stroke-opacity="0.7"/>
+                <path d="M32 64V32L64 64V32" stroke="#F2F1E9" stroke-width="6" stroke-linecap="square"/>
                 <path d="M32 32L44 44" stroke="#00EC97" stroke-width="6" stroke-linecap="square"/>
-                <circle cx="48" cy="48" r="5.5" fill="#00EC97" stroke="#06080B" stroke-width="2"/>
+                <circle cx="48" cy="48" r="5.5" fill="#00EC97" stroke="#000000" stroke-width="2"/>
               </g>
-              <text x="128" y="64" fill="#F2F6FA" font-family="Syne, Space Grotesk, sans-serif" font-weight="800" font-size="44" letter-spacing="4">ECHOES</text>
+              <text x="128" y="64" fill="#F2F1E9" font-family="Syne, Space Grotesk, sans-serif" font-weight="800" font-size="44" letter-spacing="4">ECHOES</text>
               <text x="130" y="88" fill="#00EC97" font-family="JetBrains Mono, monospace" font-weight="600" font-size="13" letter-spacing="2.5">NEAR AGENT GUARDRAIL VAULT</text>
             </svg>
           </div>
@@ -1251,14 +1251,14 @@ the public sandbox key already in echoes/sandbox.json.</pre>
             <code class="text-near-cyan">./assets/echoes-logo-light.svg</code>
             <span>LIGHT + FAVICON</span>
           </div>
-          <div class="h-44 rounded bg-[#F2F6FA] border border-near-border flex items-center justify-around p-4">
+          <div class="h-44 rounded bg-[#F2F1E9] border border-near-border flex items-center justify-around p-4">
             <svg id="svg-asset-light-mark" class="w-28 h-28" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="128" height="128" rx="24" fill="#F2F6FA"/>
-              <path d="M64 12L109 38V90L64 116L19 90V38L64 12Z" stroke="#06080B" stroke-width="4" stroke-dasharray="14 7"/>
-              <circle cx="64" cy="64" r="36" stroke="#00B874" stroke-width="2.5" stroke-dasharray="8 5"/>
-              <path d="M42 86V42L86 86V42" stroke="#06080B" stroke-width="8.5" stroke-linecap="square"/>
+              <rect width="128" height="128" rx="24" fill="#F2F1E9"/>
+              <path d="M64 12L109 38V90L64 116L19 90V38L64 12Z" stroke="#000000" stroke-width="4" stroke-dasharray="14 7"/>
+              <circle cx="64" cy="64" r="36" stroke="#00EC97" stroke-width="2.5" stroke-dasharray="8 5"/>
+              <path d="M42 86V42L86 86V42" stroke="#000000" stroke-width="8.5" stroke-linecap="square"/>
               <path d="M42 42L58 58" stroke="#00EC97" stroke-width="8.5" stroke-linecap="square"/>
-              <circle cx="64" cy="64" r="7.5" fill="#00EC97" stroke="#06080B" stroke-width="3"/>
+              <circle cx="64" cy="64" r="7.5" fill="#00EC97" stroke="#000000" stroke-width="3"/>
             </svg>
           </div>
           <div class="mt-4 flex items-center justify-between gap-2">
@@ -1492,9 +1492,9 @@ the public sandbox key already in echoes/sandbox.json.</pre>
     <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
       <div class="flex items-center gap-3.5">
         <svg class="w-9 h-9" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="64" height="64" rx="12" fill="#06080B" stroke="#19232E"/>
+          <rect width="64" height="64" rx="12" fill="#000000" stroke="#262626"/>
           <path d="M32 7L54 19.5V44.5L32 57L10 44.5V19.5L32 7Z" stroke="#00EC97" stroke-width="2" stroke-dasharray="6 3"/>
-          <path d="M21 43V21L43 43V21" stroke="#F2F6FA" stroke-width="4" stroke-linecap="square"/>
+          <path d="M21 43V21L43 43V21" stroke="#F2F1E9" stroke-width="4" stroke-linecap="square"/>
           <circle cx="32" cy="32" r="4" fill="#00EC97"/>
         </svg>
         <div>
@@ -1877,7 +1877,7 @@ the public sandbox key already in echoes/sandbox.json.</pre>
 
         const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         dot.setAttribute('r', '6');
-        dot.setAttribute('fill', '#FF4D38');
+        dot.setAttribute('fill', '#FF7966');
         pulseLayer.appendChild(dot);
 
         // Animate from rogue-agent (312,262) to Perimeter Intercept (268,232)
