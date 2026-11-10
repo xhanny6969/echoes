@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none">
+  <!-- Background: NEAR Black (#000000) -->
+  <rect width="512" height="512" rx="112" fill="#000000"/>
+  <rect x="2" y="2" width="508" height="508" rx="110" stroke="#F2F1E9" stroke-opacity="0.08" stroke-width="2"/>
+
+  <!-- Agent Origin Node: NEAR Green (#00EC97) -->
+  <circle cx="136" cy="256" r="28" fill="#00EC97"/>
+
+  <!-- Wave 1 (Inner Allowance Pulse): NEAR Sand / Off-White (#F2F1E9) -->
+  <path d="M 197.13 192.70 A 88 88 0 0 1 197.13 319.30"
+        stroke="#F2F1E9"
+        stroke-width="32"
+        stroke-linecap="round"/>
+
+  <!-- Wave 2 (Daily Quota - Parallel Corridor Split): NEAR Sand (#F2F1E9, 52% opacity) -->
+  <path d="M 231.66 137.87 A 152 152 0 0 1 279.54 206.00 M 279.54 306.00 A 152 152 0 0 1 231.66 374.13"
+        stroke="#F2F1E9"
+        stroke-opacity="0.52"
+        stroke-width="32"
+        stroke-linecap="round"/>
+
+  <!-- Wave 3 (Hard On-Chain Guardrail Gate): NEAR Green (#00EC97) -->
+  <path d="M 256.79 76.93 A 216 216 0 0 1 346.13 206.00 M 346.13 306.00 A 216 216 0 0 1 256.79 435.07"
+        stroke="#00EC97"
+        stroke-width="32"
+        stroke-linecap="round"/>
+
+  <!-- Central Vault Gate Lock / 'E' Crossbar: NEAR Green (#00EC97) -->
+  <line x1="288" y1="256" x2="352" y2="256"
+        stroke="#00EC97"
+        stroke-width="32"
+        stroke-linecap="round"/>
+</svg>
