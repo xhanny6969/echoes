@@ -24,6 +24,7 @@ Work in a temp directory and do exactly this:
 Expected: exactly two PASS lines —
   PASS allowlisted recipient            -> accepted on chain
   PASS recipient not on allowlist       -> reverted, log "recipient is not on the allowlist"
+Any other revert (e.g. daily cap) must be reported as FAIL, not counted as proof.
 
 Then verify both transactions yourself over NEAR RPC (method "tx", sender_account_id
 = the vault printed by the script) and show me the two statuses: SuccessValue and Failure.
@@ -47,7 +48,7 @@ PASS  recipient not on allowlist
       tx 3Xd… 
       chain said: allowkey: blocked — recipient is not on the allowlist
 
-vault sandbox.allowance-merchant.testnet · agent sandbox-worker
+vault demo.allowance-merchant.testnet · agent sandbox-worker
 SELF-TEST PASSED — the contract blocked what it is supposed to block, on chain.
 ```
 
@@ -57,12 +58,13 @@ script is safe for an agent to gate on.
 ## 3. Why the key in `echoes/sandbox.json` is public on purpose
 
 - It is a NEAR **FunctionCall** access key, created with
-  `receiver_id = sandbox.allowance-merchant.testnet` and `method_names = ["spend_as"]`.
+  `receiver_id = demo.allowance-merchant.testnet` and `method_names = ["spend_as"]`.
   The runtime rejects any other method with `MethodNameMismatch` **before the contract runs**.
 - It cannot transfer, stake, add keys, delete keys, or call any other app.
-- The contract caps it: **0.05 N per tx, 0.25 N per day**, per-agent, and it will only pay
+- It can call only `spend_as` on this one vault; no other contract methods.
+- The contract caps it: **0.05 N per tx, 5 N per day**, per-agent, and it will only pay
   `allowance-merchant.testnet` (the allowlist).
-- It is **testnet only**, funded from a faucet. Worst case for an abuser is 0.25 testnet NEAR
+- It is **testnet only**, funded from a faucet. Worst case for an abuser is 5 testnet NEAR
   per day, which is worth nothing.
 - **Never reuse this pattern on mainnet.** A public key with a spend allowance is a public
   spending allowance. On mainnet, the key stays secret and the vault caps are the last line
@@ -74,7 +76,7 @@ The sandbox vault, the agent and the caps are all readable on chain:
 curl -s -X POST https://rpc.testnet.near.org -H 'content-type: application/json' -d '{
   "jsonrpc":"2.0","id":1,"method":"query","params":{
     "request_type":"call","finality":"final",
-    "account_id":"sandbox.allowance-merchant.testnet",
+    "account_id":"demo.allowance-merchant.testnet",
     "method_name":"get_policy","args_base64":"e30="}}'
 ```
 
@@ -114,6 +116,6 @@ Not shipped yet, do not claim otherwise:
 
 ---
 
-Contract: `allowance-swarm.testnet` · sandbox: `sandbox.allowance-merchant.testnet` ·
+Contract: `demo.allowance-merchant.testnet` · sandbox: `demo.allowance-merchant.testnet` ·
 source-verified, rebuilt wasm hash matches the deployed code hash byte for byte
 (`node contract/verify_onchain.py`).

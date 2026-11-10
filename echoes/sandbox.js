@@ -125,6 +125,19 @@ async function main() {
       const onchain = await txLogs(cfg.rpc || 'https://rpc.testnet.fastnear.com', hash, cfg.vault);
       const hit = (onchain.logs || []).find((l) => /blocked|allowkey|cap|paused/i.test(l));
       if (hit) reason = hit.trim();
+      if (t.expect === 'reverted' && !/recipient is not on the allowlist/i.test(reason)) {
+        // A daily/tx cap revert is NOT proof of the allowlist. Never report it as a pass.
+        results.push({ test: t.name, recipient: t.recipient, amount: t.amount,
+          expected: t.expect, outcome: 'reverted', pass: false, hash, reason: reason || 'revert reason unavailable',
+          explorer: hash ? `https://testnet.nearblocks.io/txns/${hash}` : null });
+        if (!AS_JSON) {
+          console.log(`FAIL  ${t.name}`);
+          console.log(`      expected allowlist block, got: ${reason || 'revert reason unavailable'}`);
+          if (hash) console.log(`      tx ${hash}`);
+          console.log('');
+        }
+        continue;
+      }
     }
     const outcome = ok ? 'accepted' : 'reverted';
     results.push({

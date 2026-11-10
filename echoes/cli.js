@@ -80,6 +80,20 @@ async function accountExists(accountId) {
   return !data.error;
 }
 
+/** The vault's own key IS the owner key (owner = vault). If we do not persist it,
+ *  nobody can ever call register_agent / set_policy / set_paused again. */
+function saveOwnerCredentials(vault, keyPair) {
+  const p = credentialsPath(vault);
+  fs.mkdirSync(path.dirname(p), { recursive: true });
+  fs.writeFileSync(p, JSON.stringify({
+    account_id: vault,
+    public_key: keyPair.getPublicKey().toString(),
+    private_key: keyPair.toString(),
+  }, null, 2));
+  fs.chmodSync(p, 0o600);
+  return p;
+}
+
 function configPath(vault) {
   return path.join(process.cwd(), '.echoes', `${vault}.json`);
 }
@@ -150,6 +164,9 @@ async function init() {
   } else {
     console.log(`\n[1/4] ${vault} already exists — reusing`);
   }
+
+  const ownerCredPath = saveOwnerCredentials(vault, vaultKey);
+  console.log(`      owner key saved to ${ownerCredPath} (keep it — it is the only owner key)`);
 
   const vaultAccount = await signer(vault, vaultKey.toString());
 
