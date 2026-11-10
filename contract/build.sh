@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Build the guardrail vault. The deployed testnet contract was produced by
 # exactly this command; `sha256sum` of the output must match code hash
-# 9JNpk7uGkuWyp6Yd834muCtADcjGXFufHJu6A3jdMTrn (base58).
+# FeZL3sAZN6Z6d4UgUJd1soy9T9XbuNubd5m8dKj1k4H6 (base58) on allowance-swarm.testnet.
 set -euo pipefail
 cd "$(dirname "$0")"
 cargo build --release --target wasm32-unknown-unknown
