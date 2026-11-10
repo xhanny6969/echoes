@@ -323,6 +323,7 @@
         <a href="#telemetry" class="px-3 py-2 text-near-slate hover:text-near-green transition-colors">[01 // TELEMETRY]</a>
         <a href="#swarm-matrix" class="px-3 py-2 text-near-slate hover:text-near-green transition-colors">[02 // SWARM_AGENTS]</a>
         <a href="#playground" class="px-3 py-2 text-near-slate hover:text-near-green transition-colors">[03 // PLAYGROUND]</a>
+        <a href="#install" class="px-3 py-2 text-near-green font-semibold hover:underline">[03.5 // INSTALL]</a>
         <a href="#audit-log" class="px-3 py-2 text-near-slate hover:text-near-green transition-colors">[04 // AUDIT_LOG]</a>
         <a href="#brand-kit" class="px-3 py-2 text-near-slate hover:text-near-green transition-colors">[05 // LOGO_KIT]</a>
         <a href="#faq" class="px-3 py-2 text-near-green font-semibold hover:underline">[06 // FAQ]</a>
@@ -400,6 +401,11 @@
           <button onclick="scrollToSection('playground')" class="btn-near-primary px-5 py-3 rounded text-xs sm:text-sm flex items-center gap-2">
             <span>LAUNCH GUARDRAIL PLAYGROUND</span>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+          </button>
+
+          <button onclick="scrollToSection('install')" class="btn-near-ghost px-4 py-3 rounded text-xs sm:text-sm flex items-center gap-2 border-near-green text-near-green">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            <span>INSTALL IN YOUR AGENT</span>
           </button>
 
           <button onclick="runAutomatedSwarmDemo()" id="swarmDemoBtn" class="btn-near-ghost px-4 py-3 rounded text-xs sm:text-sm flex items-center gap-2">
@@ -933,6 +939,104 @@
 
       </div>
     </section>
+
+
+    <!-- ========================================================================
+         SECTION 03.5 // INSTALL IN YOUR AGENT (self-service, sandbox-verified)
+         ======================================================================== -->
+    <section id="install" class="space-y-4">
+      <div class="swiss-box swiss-corner p-6 sm:p-8 rounded">
+        <div class="flex flex-wrap items-start justify-between gap-4 border-b border-near-border pb-5">
+          <div>
+            <div class="font-mono text-xs text-near-green">[03.5 // INSTALL_IN_YOUR_AGENT]</div>
+            <h2 class="font-display font-extrabold text-2xl sm:text-3xl text-near-alabaster mt-2">
+              Your agent can install this itself
+            </h2>
+            <p class="text-near-slate text-sm mt-2 max-w-2xl">
+              Paste the prompt below into Claude Code, Cursor, Codex or any agent with a shell.
+              It clones the repo, runs the sandbox self-test against a <strong class="text-near-alabaster">live testnet vault</strong>,
+              and must come back with two on-chain outcomes: one payout <span class="text-near-green">accepted</span>,
+              one payout <span class="text-near-red">reverted at the allowlist</span>.
+              No wallet, no private key of yours, no account creation.
+            </p>
+          </div>
+          <button onclick="copyAgentPrompt()" id="copyPromptBtn" class="btn-near-primary px-4 py-2.5 rounded text-xs flex items-center gap-2 shrink-0">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            <span id="copyPromptLabel">COPY PROMPT</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 mt-5">
+          <div class="lg:col-span-7">
+            <pre id="agentPrompt" class="font-mono text-[11px] leading-relaxed text-near-slate bg-near-obsidian border border-near-border rounded p-4 overflow-x-auto whitespace-pre-wrap">Install and self-test Echoes — an on-chain spending vault for AI agents (NEAR).
+Work in a temp directory and do exactly this:
+
+1. git clone --depth 1 https://github.com/xhanny6969/echoes && cd echoes
+2. npm install --no-audit --no-fund
+3. node echoes/sandbox.js
+
+Expected: exactly two PASS lines —
+  PASS allowlisted recipient            -> accepted on chain
+  PASS recipient not on allowlist       -> reverted, log "recipient is not on the allowlist"
+
+Then verify both transactions yourself over NEAR RPC (method "tx", sender_account_id
+= the vault printed by the script) and show me the two statuses: SuccessValue and Failure.
+
+Rules: do not modify the repo, do not create accounts, do not touch any key other than
+the public sandbox key already in echoes/sandbox.json. If a line says FAIL, stop and
+paste the full output instead of retrying.</pre>
+          </div>
+
+          <div class="lg:col-span-5 space-y-3 font-mono text-xs">
+            <div class="p-3 rounded bg-near-obsidian border border-near-border">
+              <div class="text-near-dim text-[10px]">SANDBOX VAULT</div>
+              <div class="text-near-green mt-0.5 break-all">sandbox.allowance-merchant.testnet</div>
+              <div class="text-near-slate text-[11px] mt-1">agent <span class="text-near-alabaster">sandbox-worker</span> · 0.05 N/tx · 0.25 N/day</div>
+            </div>
+            <div class="p-3 rounded bg-near-obsidian border border-near-border">
+              <div class="text-near-dim text-[10px]">WHY THE KEY CAN BE PUBLIC</div>
+              <div class="text-near-slate text-[11px] mt-1 leading-relaxed">
+                It is a NEAR <span class="text-near-alabaster">FunctionCall</span> key scoped to
+                <code class="text-near-green">spend_as</code> on one testnet contract. The protocol rejects every other method,
+                the contract caps every payout, and only allowlisted recipients can be paid.
+              </div>
+            </div>
+            <div class="p-3 rounded bg-near-obsidian border border-near-border">
+              <div class="text-near-dim text-[10px]">FOR PRODUCTION</div>
+              <div class="text-near-slate text-[11px] mt-1 leading-relaxed">
+                Run <code class="text-near-green">echoes init</code> with your own account, then hand your agent
+                only the scoped key. Full instructions: <a class="text-near-cyan hover:underline" href="https://github.com/xhanny6969/echoes/blob/main/AGENT_INSTALL.md" target="_blank" rel="noopener noreferrer">AGENT_INSTALL.md</a>
+              </div>
+            </div>
+            <div class="p-3 rounded bg-near-obsidian border border-near-border">
+              <div class="text-near-dim text-[10px]">ROADMAP · NOT SHIPPED YET</div>
+              <div class="text-near-slate text-[11px] mt-1 leading-relaxed">
+                MCP server exposing <code class="text-near-amber">vault.spend_as</code> as a native tool.
+                Listed as roadmap on purpose — it is not in this repo yet.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      function copyAgentPrompt() {
+        const el = document.getElementById('agentPrompt');
+        const label = document.getElementById('copyPromptLabel');
+        const text = el.innerText;
+        const done = () => { label.textContent = 'COPIED'; setTimeout(() => (label.textContent = 'COPY PROMPT'), 1600); };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done).catch(() => fallback());
+        } else { fallback(); }
+        function fallback() {
+          const r = document.createRange(); r.selectNodeContents(el);
+          const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+          try { document.execCommand('copy'); done(); } catch (e) { console.error(e); }
+          s.removeAllRanges();
+        }
+      }
+    </script>
 
     <!-- ========================================================================
          SECTION 04 // IMMUTABLE AUDIT LOG STREAM (audit.jsonl)
