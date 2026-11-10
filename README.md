@@ -13,6 +13,35 @@ Give an agent a wallet without giving it the keys to everything.
 
 ---
 
+## Try it in 60 seconds — no wallet, no funded key
+
+The guardrail can be proven on the live testnet vault by anyone, without provisioning
+anything. The shared sandbox key is public on purpose (see [SECURITY.md](SECURITY.md)) and is
+scoped to a single method on a single contract.
+
+```bash
+git clone https://github.com/xhanny6969/echoes && cd echoes
+npm install          # near-api-js, nothing else
+node echoes/sandbox.js
+```
+
+Expected shape — two real transactions, one accepted and one reverted at the allowlist:
+
+```
+PASS  allowlisted recipient
+      recipient allowance-merchant.testnet · 0.05 N · expected accepted, got accepted
+      tx <hash>
+PASS  recipient not on allowlist
+      recipient not-on-the-allowlist.testnet · 0.05 N · expected reverted, got reverted
+      chain said: allowkey: blocked — recipient is not on the allowlist
+SELF-TEST PASSED — the contract blocked what it is supposed to block, on chain.
+```
+
+No wallet, no account, no full-access key. The reverted hash is a real receipt you can open
+in an explorer — the block happens inside the contract, before any transfer is scheduled.
+
+---
+
 ## Ten-line quickstart
 
 ```bash
