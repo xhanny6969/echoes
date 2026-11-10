@@ -84,6 +84,22 @@ compromise needs no jailbreak.
 
 ## Why the source is verifiable
 
+One command reads the live testnet deployment and asserts it, no keys needed:
+
+```bash
+node scripts/acceptance.js
+# PASS  policy reads from chain
+# PASS  balance reads from chain
+# PASS  registered agents visible
+# PASS  spend log readable
+# PASS  deployed wasm == repo wasm byte for byte
+```
+
+Add `ECHOES_TX=1` plus an owner key and an agent key to also exercise the guardrails end to
+end — allowlisted spend accepted, rogue recipient reverted, per-tx cap reverted, agent key
+rejected for `set_paused` / `revoke_agent`, owner pause blocking spends, and `spent_today`
+moving by exactly one accepted amount.
+
 The shipped wasm rebuilds byte-identically from this repo:
 
 ```bash
