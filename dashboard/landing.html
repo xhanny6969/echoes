@@ -5,8 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ECHOES // On-Chain Allowance & Guardrail Vault on NEAR Protocol</title>
   
-  <!-- Dynamic SVG Favicon -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' fill='none'%3E%3Crect width='64' height='64' rx='12' fill='%2306080B'/%3E%3Cpath d='M32 6L54.5 19V45L32 58L9.5 45V19L32 6Z' stroke='%2300EC97' stroke-width='2.5' stroke-dasharray='8 4'/%3E%3Cpath d='M21 43V21L43 43V21' stroke='%23F2F6FA' stroke-width='4.5' stroke-linecap='square' stroke-linejoin='miter'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%2300EC97'/%3E%3C/svg%3E" />
+  <!-- Brand assets (hand-built logo kit) -->
+  <link rel="icon" type="image/svg+xml" href="assets/echoes-favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
+  <meta name="theme-color" content="#000000" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="ECHOES" />
+  <meta property="og:title" content="ECHOES — Guardrail Vault on NEAR" />
+  <meta property="og:description" content="Scoped FunctionCall access keys plus a deterministic Rust vault: per-tx velocity caps, cumulative daily allowance, recipient allowlist, and an on-chain revert before funds move." />
+  <meta property="og:image" content="https://xhanny6969.github.io/echoes/assets/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://xhanny6969.github.io/echoes/assets/og-image.png" />
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -355,18 +368,14 @@
       <a href="#" class="flex items-center gap-3 group focus:outline-none">
         <!-- Bespoke ECHOES SVG Mark -->
         <div class="w-10 h-10 rounded bg-near-carbon border border-near-borderBright flex items-center justify-center relative overflow-hidden group-hover:border-near-green transition-colors">
-          <svg class="w-8 h-8" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <!-- Outer Guardrail Perimeter Hexagon -->
-            <path d="M32 5L55.5 18.5V45.5L32 59L8.5 45.5V18.5L32 5Z" stroke="#00EC97" stroke-width="2" stroke-dasharray="7 3.5" class="group-hover:stroke-[#0091FD] transition-colors"/>
-            <!-- Inner Acoustic Echo Rings -->
-            <circle cx="32" cy="32" r="20" stroke="#00EC97" stroke-width="1.2" stroke-opacity="0.35"/>
-            <circle cx="32" cy="32" r="14" stroke="#0091FD" stroke-width="1.2" stroke-dasharray="4 3" stroke-opacity="0.6"/>
-            <!-- NEAR Monolith Diagonal Fold + Vault Core -->
-            <path d="M21 43V21L43 43V21" stroke="#F2F1E9" stroke-width="4" stroke-linecap="square" stroke-linejoin="miter"/>
-            <path d="M21 21L29 29" stroke="#00EC97" stroke-width="4" stroke-linecap="square"/>
-            <!-- Central Guard Node -->
-            <circle cx="32" cy="32" r="4" fill="#00EC97" stroke="#000000" stroke-width="1.5"/>
-          </svg>
+          <svg class="w-9 h-9" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect width="64" height="64" rx="14" fill="#000000"/>
+          <circle cx="17" cy="32" r="3.5" fill="#00EC97"/>
+          <path d="M 24.64 24.09 A 11 11 0 0 1 24.64 39.91" stroke="#F2F1E9" stroke-width="4" stroke-linecap="round"/>
+          <path d="M 28.96 17.23 A 19 19 0 0 1 34.94 25.75 M 34.94 38.25 A 19 19 0 0 1 28.96 46.77" stroke="#F2F1E9" stroke-opacity="0.52" stroke-width="4" stroke-linecap="round"/>
+          <path d="M 32.10 9.62 A 27 27 0 0 1 43.27 25.75 M 43.27 38.25 A 27 27 0 0 1 32.10 54.38" stroke="#00EC97" stroke-width="4" stroke-linecap="round"/>
+          <line x1="36" y1="32" x2="44" y2="32" stroke="#00EC97" stroke-width="4" stroke-linecap="round"/>
+        </svg>
         </div>
         <div>
           <div class="flex items-center gap-2">
@@ -1192,18 +1201,42 @@ the public sandbox key already in echoes/sandbox.json.</pre>
             <span>512×512</span>
           </div>
           <div class="h-44 rounded bg-near-obsidian border border-near-border flex items-center justify-center p-4 bg-blueprint">
-            <svg id="svg-asset-dark-mark" class="w-32 h-32" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="128" height="128" rx="24" fill="#000000"/>
-              <path d="M64 12L109 38V90L64 116L19 90V38L64 12Z" stroke="#00EC97" stroke-width="3.5" stroke-dasharray="14 7"/>
-              <circle cx="64" cy="64" r="39" stroke="#00EC97" stroke-width="2" stroke-opacity="0.35"/>
-              <circle cx="64" cy="64" r="28" stroke="#0091FD" stroke-width="2" stroke-dasharray="8 6" stroke-opacity="0.65"/>
-              <path d="M42 86V42L86 86V42" stroke="#F2F1E9" stroke-width="8" stroke-linecap="square" stroke-linejoin="miter"/>
-              <path d="M42 42L58 58" stroke="#00EC97" stroke-width="8" stroke-linecap="square"/>
-              <circle cx="64" cy="64" r="7" fill="#00EC97" stroke="#000000" stroke-width="3"/>
+            <svg class="w-32 h-32" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Background: NEAR Black (#000000) -->
+                <rect width="512" height="512" rx="112" fill="#000000"/>
+                <rect x="2" y="2" width="508" height="508" rx="110" stroke="#F2F1E9" stroke-opacity="0.08" stroke-width="2"/>
+              
+                <!-- Agent Origin Node: NEAR Green (#00EC97) -->
+                <circle cx="136" cy="256" r="28" fill="#00EC97"/>
+              
+                <!-- Wave 1 (Inner Allowance Pulse): NEAR Sand / Off-White (#F2F1E9) -->
+                <path d="M 197.13 192.70 A 88 88 0 0 1 197.13 319.30"
+                      stroke="#F2F1E9"
+                      stroke-width="32"
+                      stroke-linecap="round"/>
+              
+                <!-- Wave 2 (Daily Quota - Parallel Corridor Split): NEAR Sand (#F2F1E9, 52% opacity) -->
+                <path d="M 231.66 137.87 A 152 152 0 0 1 279.54 206.00 M 279.54 306.00 A 152 152 0 0 1 231.66 374.13"
+                      stroke="#F2F1E9"
+                      stroke-opacity="0.52"
+                      stroke-width="32"
+                      stroke-linecap="round"/>
+              
+                <!-- Wave 3 (Hard On-Chain Guardrail Gate): NEAR Green (#00EC97) -->
+                <path d="M 256.79 76.93 A 216 216 0 0 1 346.13 206.00 M 346.13 306.00 A 216 216 0 0 1 256.79 435.07"
+                      stroke="#00EC97"
+                      stroke-width="32"
+                      stroke-linecap="round"/>
+              
+                <!-- Central Vault Gate Lock / 'E' Crossbar: NEAR Green (#00EC97) -->
+                <line x1="288" y1="256" x2="352" y2="256"
+                      stroke="#00EC97"
+                      stroke-width="32"
+                      stroke-linecap="round"/>
             </svg>
           </div>
           <div class="mt-4 flex items-center justify-between gap-2">
-            <button onclick="downloadSvgAsset('svg-asset-dark-mark', 'echoes-logo.svg')" class="btn-near-primary flex-1 py-2 rounded text-xs">DOWNLOAD .SVG</button>
+            <a href="assets/echoes-logo.svg" download class="btn-near-primary flex-1 py-2 rounded text-xs text-center">DOWNLOAD .SVG</a>
             <button onclick="copySvgAsset('svg-asset-dark-mark', this)" class="btn-near-ghost px-3 py-2 rounded text-xs">COPY CODE</button>
           </div>
         </div>
@@ -1212,24 +1245,60 @@ the public sandbox key already in echoes/sandbox.json.</pre>
         <div class="swiss-box swiss-corner p-5 rounded flex flex-col justify-between">
           <div class="flex items-center justify-between text-xs font-mono text-near-slate mb-3">
             <code class="text-near-green">./assets/echoes-logo-horizontal.svg</code>
-            <span>640×160</span>
+            <span>960×280</span>
           </div>
           <div class="h-44 rounded bg-near-obsidian border border-near-border flex items-center justify-center p-4 bg-blueprint">
-            <svg id="svg-asset-horiz-dark" class="w-full h-auto max-h-28" viewBox="0 0 460 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="460" height="120" rx="16" fill="#000000"/>
-              <g transform="translate(16, 12)">
-                <path d="M48 6L84 27V69L48 90L12 69V27L48 6Z" stroke="#00EC97" stroke-width="3" stroke-dasharray="10 5"/>
-                <circle cx="48" cy="48" r="28" stroke="#0091FD" stroke-width="1.5" stroke-dasharray="6 4" stroke-opacity="0.7"/>
-                <path d="M32 64V32L64 64V32" stroke="#F2F1E9" stroke-width="6" stroke-linecap="square"/>
-                <path d="M32 32L44 44" stroke="#00EC97" stroke-width="6" stroke-linecap="square"/>
-                <circle cx="48" cy="48" r="5.5" fill="#00EC97" stroke="#000000" stroke-width="2"/>
-              </g>
-              <text x="128" y="64" fill="#F2F1E9" font-family="Syne, Space Grotesk, sans-serif" font-weight="800" font-size="44" letter-spacing="4">ECHOES</text>
-              <text x="130" y="88" fill="#00EC97" font-family="JetBrains Mono, monospace" font-weight="600" font-size="13" letter-spacing="2.5">NEAR AGENT GUARDRAIL VAULT</text>
+            <svg class="w-full h-auto max-h-28" viewBox="0 0 960 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Banner Background: NEAR Black (#000000) -->
+                <rect width="960" height="280" rx="44" fill="#000000"/>
+                <rect x="1.5" y="1.5" width="957" height="277" rx="42.5" stroke="#F2F1E9" stroke-opacity="0.1" stroke-width="1.5"/>
+              
+                <!-- Logomark Group (Scaled cleanly around y=140) -->
+                <g transform="translate(52, 12) scale(0.5)">
+                  <circle cx="136" cy="256" r="28" fill="#00EC97"/>
+                  <path d="M 197.13 192.70 A 88 88 0 0 1 197.13 319.30"
+                        stroke="#F2F1E9"
+                        stroke-width="32"
+                        stroke-linecap="round"/>
+                  <path d="M 231.66 137.87 A 152 152 0 0 1 279.54 206.00 M 279.54 306.00 A 152 152 0 0 1 231.66 374.13"
+                        stroke="#F2F1E9"
+                        stroke-opacity="0.52"
+                        stroke-width="32"
+                        stroke-linecap="round"/>
+                  <path d="M 256.79 76.93 A 216 216 0 0 1 346.13 206.00 M 346.13 306.00 A 216 216 0 0 1 256.79 435.07"
+                        stroke="#00EC97"
+                        stroke-width="32"
+                        stroke-linecap="round"/>
+                  <line x1="288" y1="256" x2="352" y2="256"
+                        stroke="#00EC97"
+                        stroke-width="32"
+                        stroke-linecap="round"/>
+                </g>
+              
+                <!-- Subtle Structural Divider -->
+                <line x1="292" y1="76" x2="292" y2="204" stroke="#F2F1E9" stroke-opacity="0.14" stroke-width="2" stroke-linecap="round"/>
+              
+                <!-- Wordmark: NEAR Off-White / Sand (#F2F1E9) -->
+                <text x="336" y="152"
+                      fill="#F2F1E9"
+                      font-family="'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+                      font-size="92"
+                      font-weight="700"
+                      letter-spacing="-3.5">echoes</text>
+              
+                <!-- Subtitle Tag: NEAR Green (#00EC97) & Muted Sand -->
+                <circle cx="344" cy="196" r="4.5" fill="#00EC97"/>
+                <text x="360" y="201"
+                      fill="#F2F1E9"
+                      fill-opacity="0.58"
+                      font-family="'JetBrains Mono', 'Fira Code', monospace"
+                      font-size="15"
+                      font-weight="500"
+                      letter-spacing="3.5">GUARDRAIL VAULT ON NEAR</text>
             </svg>
           </div>
           <div class="mt-4 flex items-center justify-between gap-2">
-            <button onclick="downloadSvgAsset('svg-asset-horiz-dark', 'echoes-logo-horizontal.svg')" class="btn-near-primary flex-1 py-2 rounded text-xs">DOWNLOAD .SVG</button>
+            <a href="assets/echoes-logo-horizontal.svg" download class="btn-near-primary flex-1 py-2 rounded text-xs text-center">DOWNLOAD .SVG</a>
             <button onclick="copySvgAsset('svg-asset-horiz-dark', this)" class="btn-near-ghost px-3 py-2 rounded text-xs">COPY CODE</button>
           </div>
         </div>
@@ -1241,18 +1310,43 @@ the public sandbox key already in echoes/sandbox.json.</pre>
             <span>LIGHT + FAVICON</span>
           </div>
           <div class="h-44 rounded bg-[#F2F1E9] border border-near-border flex items-center justify-around p-4">
-            <svg id="svg-asset-light-mark" class="w-28 h-28" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="128" height="128" rx="24" fill="#F2F1E9"/>
-              <path d="M64 12L109 38V90L64 116L19 90V38L64 12Z" stroke="#000000" stroke-width="4" stroke-dasharray="14 7"/>
-              <circle cx="64" cy="64" r="36" stroke="#00EC97" stroke-width="2.5" stroke-dasharray="8 5"/>
-              <path d="M42 86V42L86 86V42" stroke="#000000" stroke-width="8.5" stroke-linecap="square"/>
-              <path d="M42 42L58 58" stroke="#00EC97" stroke-width="8.5" stroke-linecap="square"/>
-              <circle cx="64" cy="64" r="7.5" fill="#00EC97" stroke="#000000" stroke-width="3"/>
+            <svg class="w-28 h-28" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Background: NEAR Off-White / Sand (#F2F1E9) -->
+                <rect width="512" height="512" rx="112" fill="#F2F1E9"/>
+                <rect x="2" y="2" width="508" height="508" rx="110" stroke="#000000" stroke-opacity="0.08" stroke-width="2"/>
+              
+                <!-- Agent Origin Node: NEAR Black (#000000) -->
+                <circle cx="136" cy="256" r="28" fill="#000000"/>
+              
+                <!-- Wave 1 (Inner Allowance Pulse): NEAR Black (#000000) -->
+                <path d="M 197.13 192.70 A 88 88 0 0 1 197.13 319.30"
+                      stroke="#000000"
+                      stroke-width="32"
+                      stroke-linecap="round"/>
+              
+                <!-- Wave 2 (Daily Quota - Parallel Corridor Split): NEAR Black (#000000, 42% opacity) -->
+                <path d="M 231.66 137.87 A 152 152 0 0 1 279.54 206.00 M 279.54 306.00 A 152 152 0 0 1 231.66 374.13"
+                      stroke="#000000"
+                      stroke-opacity="0.42"
+                      stroke-width="32"
+                      stroke-linecap="round"/>
+              
+                <!-- Wave 3 (Hard On-Chain Guardrail Gate): NEAR Green (#00EC97) -->
+                <path d="M 256.79 76.93 A 216 216 0 0 1 346.13 206.00 M 346.13 306.00 A 216 216 0 0 1 256.79 435.07"
+                      stroke="#00EC97"
+                      stroke-width="32"
+                      stroke-linecap="round"/>
+              
+                <!-- Central Vault Gate Lock / 'E' Crossbar: NEAR Green (#00EC97) -->
+                <line x1="288" y1="256" x2="352" y2="256"
+                      stroke="#00EC97"
+                      stroke-width="32"
+                      stroke-linecap="round"/>
             </svg>
           </div>
           <div class="mt-4 flex items-center justify-between gap-2">
-            <button onclick="downloadSvgAsset('svg-asset-light-mark', 'echoes-logo-light.svg')" class="btn-near-primary flex-1 py-2 rounded text-xs">DOWNLOAD LIGHT .SVG</button>
-            <button onclick="downloadSvgAsset('svg-asset-dark-mark', 'echoes-favicon.svg')" class="btn-near-ghost px-3 py-2 rounded text-xs">FAVICON .SVG</button>
+            <a href="assets/echoes-logo-light.svg" download class="btn-near-primary flex-1 py-2 rounded text-xs text-center">DOWNLOAD LIGHT .SVG</a>
+            <a href="assets/echoes-favicon.svg" download class="btn-near-ghost px-3 py-2 rounded text-xs text-center">FAVICON .SVG</a>
           </div>
         </div>
 
@@ -1482,9 +1576,12 @@ the public sandbox key already in echoes/sandbox.json.</pre>
       <div class="flex items-center gap-3.5">
         <svg class="w-9 h-9" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="64" height="64" rx="12" fill="#000000" stroke="#262626"/>
-          <path d="M32 7L54 19.5V44.5L32 57L10 44.5V19.5L32 7Z" stroke="#00EC97" stroke-width="2" stroke-dasharray="6 3"/>
-          <path d="M21 43V21L43 43V21" stroke="#F2F1E9" stroke-width="4" stroke-linecap="square"/>
-          <circle cx="32" cy="32" r="4" fill="#00EC97"/>
+          <rect width="64" height="64" rx="14" fill="#000000"/>
+          <circle cx="17" cy="32" r="3.5" fill="#00EC97"/>
+          <path d="M 24.64 24.09 A 11 11 0 0 1 24.64 39.91" stroke="#F2F1E9" stroke-width="4" stroke-linecap="round"/>
+          <path d="M 28.96 17.23 A 19 19 0 0 1 34.94 25.75 M 34.94 38.25 A 19 19 0 0 1 28.96 46.77" stroke="#F2F1E9" stroke-opacity="0.52" stroke-width="4" stroke-linecap="round"/>
+          <path d="M 32.10 9.62 A 27 27 0 0 1 43.27 25.75 M 43.27 38.25 A 27 27 0 0 1 32.10 54.38" stroke="#00EC97" stroke-width="4" stroke-linecap="round"/>
+          <line x1="36" y1="32" x2="44" y2="32" stroke="#00EC97" stroke-width="4" stroke-linecap="round"/>
         </svg>
         <div>
           <div class="font-display font-bold text-sm text-near-alabaster tracking-wider">ECHOES // AUTONOMOUS SWARM GUARDRAIL VAULT</div>
