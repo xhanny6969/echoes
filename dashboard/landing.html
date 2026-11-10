@@ -2833,6 +2833,7 @@ the public sandbox key already in echoes/sandbox.json.</pre>
 
 
 
+
   <script id="echoes-motion-js">
   (function () {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -2907,6 +2908,12 @@ the public sandbox key already in echoes/sandbox.json.</pre>
       revealAll();
       var h = document.querySelector('main > section');
       if (h) { h.style.opacity = '1'; h.style.transform = 'none'; }
+      // scroll-scoped chrome: a capture must not freeze the header mid-hide or
+      // leave a section looking active because the tool scrolled and came back
+      var hd = document.querySelector('header');
+      if (hd) hd.classList.remove('nav-hidden');
+      [].slice.call(document.querySelectorAll('header nav a.nav-active'))
+        .forEach(function (a) { a.classList.remove('nav-active'); });
     }
     window.addEventListener('beforeprint', captureSettle);
 
