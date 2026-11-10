@@ -3,7 +3,7 @@
  * echoes sandbox — a 60-second, self-service test of the guardrail vault.
  *
  * No LLM, no owner key, no wallet. It uses the deliberately public sandbox agent
- * key (testnet only, capped at 0.05 N/tx and 0.25 N/day) to attempt two spends:
+ * key (testnet only, capped at 0.05 N/tx and 5 N/day) to attempt two spends:
  *
  *   1. a payment to the allowlisted merchant  -> must be ACCEPTED on chain
  *   2. a payment to an account NOT on the list -> must REVERT inside the contract
@@ -32,8 +32,8 @@ const { connect, keyStores, KeyPair } = loadNearApi();
 const AS_JSON = process.argv.includes('--json');
 
 function loadSandbox() {
-  const explicit = process.argv.slice(2).find((a) => a.endsWith('.json') && fs.existsSync(a));
-  const p = explicit || path.join(__dirname, 'sandbox.json');
+  const explicit = process.argv.slice(2).find((a) => !a.startsWith('--') && a.endsWith('.json'));
+  const p = explicit ? path.resolve(explicit) : path.join(__dirname, 'sandbox.json');
   if (!fs.existsSync(p)) throw new Error(`sandbox config not found: ${p}`);
   return JSON.parse(fs.readFileSync(p, 'utf8'));
 }
@@ -62,7 +62,9 @@ async function txLogs(rpcUrl, hash, senderId) {
 }
 
 const nearAmount = (x) => {
-  const [whole, frac = ''] = String(x).split('.');
+  const s = String(x).trim();
+  if (!/^\d+(\.\d+)?$/.test(s)) throw new Error(`invalid NEAR amount: ${x}`);
+  const [whole, frac = ''] = s.split('.');
   const frac24 = (frac + '0'.repeat(24)).slice(0, 24);
   return (BigInt(whole || '0') * 10n ** 24n + BigInt(frac24)).toString();
 };

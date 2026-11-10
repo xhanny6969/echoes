@@ -323,6 +323,7 @@
         <a href="#telemetry" class="px-3 py-2 text-near-slate hover:text-near-green transition-colors">[01 // TELEMETRY]</a>
         <a href="#swarm-matrix" class="px-3 py-2 text-near-slate hover:text-near-green transition-colors">[02 // SWARM_AGENTS]</a>
         <a href="#playground" class="px-3 py-2 text-near-slate hover:text-near-green transition-colors">[03 // PLAYGROUND]</a>
+        <a href="#install" class="px-3 py-2 text-near-green font-semibold hover:underline">[03.5 // INSTALL]</a>
         <a href="#audit-log" class="px-3 py-2 text-near-slate hover:text-near-green transition-colors">[04 // AUDIT_LOG]</a>
         <a href="#brand-kit" class="px-3 py-2 text-near-slate hover:text-near-green transition-colors">[05 // LOGO_KIT]</a>
         <a href="#faq" class="px-3 py-2 text-near-green font-semibold hover:underline">[06 // FAQ]</a>
@@ -372,7 +373,7 @@
           
           <p class="text-near-slate text-base sm:text-lg leading-relaxed max-w-2xl font-normal">
             Never hand a <code class="text-near-red font-mono text-sm bg-near-red/10 px-1.5 py-0.5 rounded">FullAccess</code> key to an autonomous AI agent. 
-            <strong class="text-near-alabaster">Echoes</strong> pairs NEAR's protocol-level <span class="text-near-green font-mono text-sm">FunctionCall Access Keys</span> with a deterministic Rust Guardrail Vault—enforcing per-transaction velocity limits, cumulative agent allowances, trusted recipient allowlists, and <strong class="text-near-alabaster">deterministic on-chain rejection</strong> &mdash; a breaching call traps and reverts before a single yoctoNEAR leaves the vault, with owner-controlled <code class="text-near-cyan font-mono text-sm">revoke_agent</code> for permanent lockout.
+            <strong class="text-near-alabaster">Echoes</strong> pairs NEAR's protocol-level <span class="text-near-green font-mono text-sm">FunctionCall Access Keys</span> with a deterministic Rust Guardrail Vault—enforcing per-transaction velocity limits, cumulative agent allowances, trusted recipient allowlists, and <strong class="text-near-alabaster">deterministic on-chain rejection</strong> &mdash; a breaching call traps and reverts before a single yoctoNEAR leaves the vault, with owner-controlled <code class="text-near-cyan font-mono text-sm">revoke_agent</code> that blocks the key's spending immediately &mdash; delete the key on the account for permanent lockout.
           </p>
 
           <!-- Key Architecture Pill Badges -->
@@ -400,6 +401,11 @@
           <button onclick="scrollToSection('playground')" class="btn-near-primary px-5 py-3 rounded text-xs sm:text-sm flex items-center gap-2">
             <span>LAUNCH GUARDRAIL PLAYGROUND</span>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+          </button>
+
+          <button onclick="scrollToSection('install')" class="btn-near-ghost px-4 py-3 rounded text-xs sm:text-sm flex items-center gap-2 border-near-green text-near-green">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            <span>INSTALL IN YOUR AGENT</span>
           </button>
 
           <button onclick="runAutomatedSwarmDemo()" id="swarmDemoBtn" class="btn-near-ghost px-4 py-3 rounded text-xs sm:text-sm flex items-center gap-2">
@@ -667,7 +673,7 @@
       </div>
       <div class="swiss-box p-5 rounded">
         <div class="font-mono text-[11px] text-near-slate">BUILD IS REPRODUCIBLE</div>
-        <div class="mt-2 font-mono text-[11px] text-near-alabaster break-all">9JNpk7uGkuWyp6Yd834muCtADcjGXFufHJu6A3jdMTrn</div>
+        <div class="mt-2 font-mono text-[11px] text-near-alabaster break-all">FeZL3sAZN6Z6d4UgUJd1soy9T9XbuNubd5m8dKj1k4H6</div>
         <div class="mt-2 text-[11px] text-near-dim font-mono leading-relaxed">Rebuild from <code class="text-near-cyan">contract/</code> and the sha256 matches the live code hash byte for byte.</div>
       </div>
       <div class="swiss-box p-5 rounded border-near-red/30">
@@ -784,8 +790,7 @@
             <select id="simCaller" onchange="updateCliPreview()" class="w-full bg-near-obsidian border border-near-borderBright rounded px-3 py-2.5 font-mono text-xs text-near-alabaster focus:border-near-green focus:outline-none">
               <option value="agent-alpha">agent-alpha (ed25519:GY1SXN4z…ps17) — live</option>
               <option value="agent-beta">agent-beta (ed25519:GYSHUupm…GKEQ) — live</option>
-              <option value="scraper-agent">Arb-03 // scraper-agent (ed25519:7x5D...2p4R)</option>
-              <option value="rogue-agent">Rogue-04 // rogue-agent [REVOKED] (ed25519:1z8F...6v9X)</option>
+              <option value="rogue-agent">Rogue-04 // rogue-agent [REVOKED / UNREGISTERED] (ed25519:1z8F...6v9X)</option>
               <option value="owner">allowance-swarm.testnet (FullAccess Vault Owner)</option>
             </select>
           </div>
@@ -794,10 +799,10 @@
           <div>
             <label class="block font-mono text-xs text-near-slate mb-1.5">2. CONTRACT METHOD</label>
             <select id="simMethod" onchange="updateCliPreview()" class="w-full bg-near-obsidian border border-near-borderBright rounded px-3 py-2.5 font-mono text-xs text-near-green focus:border-near-green focus:outline-none">
-              <option value="spend_as">spend_as(agent_id, recipient, amount)</option>
-              <option value="spend">spend(recipient, amount)</option>
+              <option value="spend_as">spend_as(amount, recipient, memo)</option>
+              <option value="spend">spend(amount, recipient, memo) [Owner Only]</option>
               <option value="set_paused">set_paused(paused: true) [Owner Only]</option>
-              <option value="reactivate_agent">reactivate_agent(agent_id) [Owner Only]</option>
+              <option value="reactivate_agent">reactivate_agent(public_key) [Owner Only]</option>
             </select>
           </div>
 
@@ -933,6 +938,114 @@
 
       </div>
     </section>
+
+
+    <!-- ========================================================================
+         SECTION 03.5 // INSTALL IN YOUR AGENT (self-service, sandbox-verified)
+         ======================================================================== -->
+    <section id="install" class="space-y-4">
+      <div class="swiss-box swiss-corner p-6 sm:p-8 rounded">
+        <div class="flex flex-wrap items-start justify-between gap-4 border-b border-near-border pb-5">
+          <div>
+            <div class="font-mono text-xs text-near-green">[03.5 // INSTALL_IN_YOUR_AGENT]</div>
+            <h2 class="font-display font-extrabold text-2xl sm:text-3xl text-near-alabaster mt-2">
+              Your agent can install this itself
+            </h2>
+            <p class="text-near-slate text-sm mt-2 max-w-2xl">
+              Paste the prompt below into Claude Code, Cursor, Codex or any agent with a shell.
+              It clones the repo, runs the sandbox self-test against a <strong class="text-near-alabaster">live testnet vault</strong>,
+              and must come back with two on-chain outcomes: one payout <span class="text-near-green">accepted</span>,
+              one payout <span class="text-near-red">reverted at the allowlist</span>.
+              No wallet, no private key of yours, no account creation. This is a shared, rate-limited testnet sandbox—not unlimited concurrent capacity.
+            </p>
+          </div>
+          <button onclick="copyAgentPrompt()" id="copyPromptBtn" class="btn-near-primary px-4 py-2.5 rounded text-xs flex items-center gap-2 shrink-0">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            <span id="copyPromptLabel">COPY PROMPT</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 mt-5">
+          <div class="lg:col-span-7">
+            <pre id="agentPrompt" class="font-mono text-[11px] leading-relaxed text-near-slate bg-near-obsidian border border-near-border rounded p-4 overflow-x-auto whitespace-pre-wrap">Install and self-test Echoes — an on-chain spending vault for AI agents (NEAR).
+Work in a temp directory and do exactly this:
+
+1. git clone --depth 1 https://github.com/xhanny6969/echoes && cd echoes
+2. npm install --no-audit --no-fund
+3. node echoes/sandbox.js
+
+Expected: exactly two PASS lines —
+  PASS allowlisted recipient            -> accepted on chain
+  PASS recipient not on allowlist       -> reverted, log "recipient is not on the allowlist"
+
+Then verify both transactions yourself over NEAR RPC (method "tx", sender_account_id
+= the vault printed by the script) and show me the two statuses: SuccessValue and Failure.
+
+This is a shared, rate-limited testnet sandbox; it is intended for sequential demos, not unlimited concurrent runs. Each successful test costs 0.05 N from the shared vault and consumes gas allowance. If a line says FAIL or shows cap/allowance exhaustion, stop and report it—don't loop or retry repeatedly.
+
+Rules: do not modify the repo, do not create accounts, do not touch any key other than
+the public sandbox key already in echoes/sandbox.json.</pre>
+          </div>
+
+          <div class="lg:col-span-5 space-y-3 font-mono text-xs">
+            <div class="p-3 rounded bg-near-obsidian border border-near-amber/40">
+              <div class="text-near-amber text-[10px] font-bold">SHARED TESTNET · CAPACITY LIMIT</div>
+              <div class="text-near-slate text-[11px] mt-1 leading-relaxed">
+                Everyone runs against the same vault. It's for sequential demos, not unlimited concurrent users.
+                Each run spends 0.05 N; agent policy cap is 5 N/day, while the scoped key's separate gas allowance can also run out.
+                If the test says FAIL or reports a cap/allowance error, the shared sandbox is busy or depleted—not proof the guardrail failed.
+                Try later; do not keep retrying.
+              </div>
+            </div>
+            <div class="p-3 rounded bg-near-obsidian border border-near-border">
+              <div class="text-near-dim text-[10px]">SANDBOX VAULT</div>
+              <div class="text-near-green mt-0.5 break-all">demo.allowance-merchant.testnet</div>
+              <div class="text-near-slate text-[11px] mt-1">agent <span class="text-near-alabaster">sandbox-worker</span> · 0.05 N/test · 5 N/day shared cap</div>
+            </div>
+            <div class="p-3 rounded bg-near-obsidian border border-near-border">
+              <div class="text-near-dim text-[10px]">WHY THE KEY CAN BE PUBLIC</div>
+              <div class="text-near-slate text-[11px] mt-1 leading-relaxed">
+                It is a NEAR <span class="text-near-alabaster">FunctionCall</span> key scoped to
+                <code class="text-near-green">spend_as</code> on one testnet contract. The protocol rejects every other method,
+                the contract caps every payout, and only allowlisted recipients can be paid.
+              </div>
+            </div>
+            <div class="p-3 rounded bg-near-obsidian border border-near-border">
+              <div class="text-near-dim text-[10px]">FOR PRODUCTION</div>
+              <div class="text-near-slate text-[11px] mt-1 leading-relaxed">
+                Run <code class="text-near-green">echoes init</code> with your own account, then hand your agent
+                only the scoped key. Full instructions: <a class="text-near-cyan hover:underline" href="https://github.com/xhanny6969/echoes/blob/main/AGENT_INSTALL.md" target="_blank" rel="noopener noreferrer">AGENT_INSTALL.md</a>
+              </div>
+            </div>
+            <div class="p-3 rounded bg-near-obsidian border border-near-border">
+              <div class="text-near-dim text-[10px]">ROADMAP · NOT SHIPPED YET</div>
+              <div class="text-near-slate text-[11px] mt-1 leading-relaxed">
+                MCP server exposing <code class="text-near-amber">vault.spend_as</code> as a native tool.
+                Listed as roadmap on purpose — it is not in this repo yet.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      function copyAgentPrompt() {
+        const el = document.getElementById('agentPrompt');
+        const label = document.getElementById('copyPromptLabel');
+        const text = el.innerText;
+        const done = () => { label.textContent = 'COPIED'; setTimeout(() => (label.textContent = 'COPY PROMPT'), 1600); };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done).catch(() => fallback());
+        } else { fallback(); }
+        function fallback() {
+          const r = document.createRange(); r.selectNodeContents(el);
+          const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+          try { document.execCommand('copy'); done(); } catch (e) { console.error(e); }
+          s.removeAllRanges();
+        }
+      }
+    </script>
 
     <!-- ========================================================================
          SECTION 04 // IMMUTABLE AUDIT LOG STREAM (audit.jsonl)
@@ -1386,7 +1499,7 @@
         </div>
         <div class="flex flex-wrap gap-2">
           <button onclick="generateNewEphemeralKey()" class="btn-near-ghost px-3 py-2 rounded text-xs font-mono">GENERATE ROGUE / EPHEMERAL KEY</button>
-          <button onclick="activateSession('research-agent', 'SCOPED KEY (spend_as)')" class="btn-near-primary px-4 py-2 rounded text-xs font-mono ml-auto">ACTIVATE AGENT SIGNER</button>
+          <button onclick="activateSession('agent-alpha', 'SCOPED KEY (spend_as)')" class="btn-near-primary px-4 py-2 rounded text-xs font-mono ml-auto">ACTIVATE AGENT SIGNER</button>
         </div>
       </div>
 
@@ -1476,6 +1589,12 @@
 
     let vaultState = JSON.parse(JSON.stringify(INITIAL_STATE));
 
+    function esc(s) {
+      return String(s ?? '').replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[c]));
+    }
+
     // ==========================================================================
     // 2. RENDER TELEMETRY, SWARM CARDS & AUDIT LOG
     // ==========================================================================
@@ -1540,7 +1659,7 @@
       allowlistContainer.innerHTML = vaultState.allowlist.map(rec => `
         <span class="px-2 py-0.5 rounded bg-near-obsidian border border-near-borderBright text-near-green flex items-center gap-1">
           <span class="w-1.5 h-1.5 rounded-full bg-near-green"></span>
-          ${rec}
+          ${esc(rec)}
         </span>
       `).join('');
     }
@@ -1548,29 +1667,30 @@
     function renderAgentCards() {
       const grid = document.getElementById('agentCardsGrid');
       grid.innerHTML = vaultState.agents.map(agent => {
-        const pct = Math.min(100, (agent.spent / agent.allowance) * 100);
+        const pct = Math.min(100, (agent.spent / (agent.allowance || 1)) * 100);
         const statusBadge = agent.isActive
           ? `<span class="px-2 py-0.5 rounded bg-near-green/15 text-near-green border border-near-green/40 font-mono text-[10px] font-bold">ACTIVE KEY</span>`
           : `<span class="px-2 py-0.5 rounded bg-near-red/15 text-near-red border border-near-red/40 font-mono text-[10px] font-bold">REVOKED</span>`;
 
         const borderClass = agent.isActive ? 'border-near-border hover:border-near-green/60' : 'border-near-red/50 bg-near-red/5';
+        const safeId = esc(agent.id);
 
         return `
           <div class="swiss-box p-5 rounded flex flex-col justify-between transition-all ${borderClass}">
             <div>
               <div class="flex items-center justify-between gap-2">
                 <div>
-                  <span class="font-mono text-[10px] text-near-green block">${agent.alias || 'SWARM NODE'}</span>
-                  <span class="font-mono font-bold text-sm text-near-alabaster">${agent.id}</span>
+                  <span class="font-mono text-[10px] text-near-green block">${esc(agent.alias || 'SWARM NODE')}</span>
+                  <span class="font-mono font-bold text-sm text-near-alabaster">${safeId}</span>
                 </div>
                 ${statusBadge}
               </div>
-              <p class="text-xs text-near-slate mt-1">${agent.role}</p>
+              <p class="text-xs text-near-slate mt-1">${esc(agent.role)}</p>
 
               <div class="mt-3 p-2.5 rounded bg-near-obsidian border border-near-border font-mono text-[11px] space-y-1">
                 <div class="flex items-center justify-between">
                   <span class="text-near-dim">SCOPED KEY:</span>
-                  <span class="text-near-cyan">${agent.pubKey}</span>
+                  <span class="text-near-cyan">${esc(agent.pubKey)}</span>
                 </div>
                 <div class="flex items-center justify-between">
                   <span class="text-near-dim">MAX / TX CAP:</span>
@@ -1578,7 +1698,7 @@
                 </div>
                 <div class="flex items-center justify-between">
                   <span class="text-near-dim">METHOD SCOPE:</span>
-                  <span class="text-near-green">["spend", "spend_as"]</span>
+                  <span class="text-near-green">["spend_as"]</span>
                 </div>
               </div>
 
@@ -1592,22 +1712,22 @@
                 </div>
               </div>
 
-              <div class="mt-2.5 font-mono text-[10px] text-near-dim truncate" title="${agent.lastAction}">
-                LAST: ${agent.lastAction}
+              <div class="mt-2.5 font-mono text-[10px] text-near-dim truncate" title="${esc(agent.lastAction)}">
+                LAST: ${esc(agent.lastAction)}
               </div>
             </div>
 
             <div class="mt-4 pt-3 border-t border-near-border grid grid-cols-2 gap-2">
               ${agent.isActive ? `
-                <button onclick="quickAgentSpend('${agent.id}', 0.05)" class="btn-near-ghost py-1.5 px-2 rounded text-[11px] font-mono">
+                <button data-agent="${safeId}" onclick="quickAgentSpend(this.dataset.agent, 0.05)" class="btn-near-ghost py-1.5 px-2 rounded text-[11px] font-mono">
                   SPEND 0.05 Ⓝ
                 </button>
-                <button onclick="quickAgentBreach('${agent.id}')" class="btn-near-danger py-1.5 px-2 rounded text-[11px] font-mono">
+                <button data-agent="${safeId}" onclick="quickAgentBreach(this.dataset.agent)" class="btn-near-danger py-1.5 px-2 rounded text-[11px] font-mono">
                   TEST BREACH
                 </button>
               ` : `
-                <button onclick="ownerReactivateAgent('${agent.id}')" class="col-span-2 btn-near-primary py-1.5 px-2 rounded text-[11px] font-mono">
-                  OWNER: reactivate_agent("${agent.id}")
+                <button data-agent="${safeId}" onclick="ownerReactivateAgent(this.dataset.agent)" class="col-span-2 btn-near-primary py-1.5 px-2 rounded text-[11px] font-mono">
+                  OWNER: reactivate_agent("${safeId}")
                 </button>
               `}
             </div>
@@ -1618,6 +1738,7 @@
 
     function renderAuditTable() {
       const tbody = document.getElementById('auditTableBody');
+      const targetVault = encodeURIComponent(vaultState.contractId || 'allowance-swarm.testnet');
       tbody.innerHTML = vaultState.auditLog.map(entry => {
         const badgeClass = entry.statusType === 'pass'
           ? 'bg-near-green/15 text-near-green border-near-green/30'
@@ -1627,15 +1748,15 @@
 
         return `
           <tr class="hover:bg-near-panel/60 transition-colors">
-            <td class="py-2.5 px-4 text-near-dim">${entry.timestamp}</td>
-            <td class="py-2.5 px-4 text-near-alabaster font-semibold">${entry.caller}</td>
-            <td class="py-2.5 px-4 text-near-slate">${entry.method}</td>
-            <td class="py-2.5 px-4 text-near-alabaster">${entry.amount}</td>
+            <td class="py-2.5 px-4 text-near-dim">${esc(entry.timestamp)}</td>
+            <td class="py-2.5 px-4 text-near-alabaster font-semibold">${esc(entry.caller)}</td>
+            <td class="py-2.5 px-4 text-near-slate">${esc(entry.method)}</td>
+            <td class="py-2.5 px-4 text-near-alabaster">${esc(entry.amount)}</td>
             <td class="py-2.5 px-4">
-              <span class="px-2 py-0.5 rounded border text-[10px] font-bold ${badgeClass}">${entry.verdict}</span>
+              <span class="px-2 py-0.5 rounded border text-[10px] font-bold ${badgeClass}">${esc(entry.verdict)}</span>
             </td>
             <td class="py-2.5 px-4">
-              <a href="https://testnet.nearblocks.io/address/allowance-swarm.testnet" target="_blank" rel="noopener noreferrer" class="text-near-cyan hover:underline">${entry.hash}</a>
+              <a href="https://testnet.nearblocks.io/address/${targetVault}" target="_blank" rel="noopener noreferrer" class="text-near-cyan hover:underline">${esc(entry.hash)}</a>
             </td>
           </tr>
         `;
@@ -1734,40 +1855,39 @@
       }
 
       if (presetId === 1) {
-        // Ensure research-agent is active for demo clarity
-        const ag = vaultState.agents.find(a => a.id === 'research-agent');
+        const ag = vaultState.agents.find(a => a.id === 'agent-alpha');
         if (ag) ag.isActive = true;
         vaultState.isPaused = false;
-        callerEl.value = 'research-agent';
+        callerEl.value = 'agent-alpha';
         methodEl.value = 'spend_as';
-        amountEl.value = '0.15';
+        amountEl.value = '0.10';
         recipientEl.value = 'allowance-merchant.testnet';
       } else if (presetId === 2) {
-        const ag = vaultState.agents.find(a => a.id === 'scraper-agent');
+        const ag = vaultState.agents.find(a => a.id === 'agent-alpha');
         if (ag) ag.isActive = true;
         vaultState.isPaused = false;
-        callerEl.value = 'scraper-agent';
+        callerEl.value = 'agent-alpha';
         methodEl.value = 'spend_as';
-        amountEl.value = '0.25'; // Over 0.20 per-tx cap
-        recipientEl.value = 'hacker-drain.testnet';
+        amountEl.value = '0.25'; // Over 0.20 agent per-tx cap -> blocked at Gate 05
+        recipientEl.value = 'allowance-merchant.testnet';
       } else if (presetId === 3) {
         const ag = vaultState.agents.find(a => a.id === 'agent-beta');
         if (ag) ag.isActive = true;
         vaultState.isPaused = false;
         callerEl.value = 'agent-beta';
         methodEl.value = 'spend_as';
-        amountEl.value = '0.90'; // Exceeds 1.00 global cap
-        recipientEl.value = 'hacker-drain.testnet';
+        amountEl.value = '0.90'; // Exceeds 0.50 vault per-tx cap -> blocked at Gate 05
+        recipientEl.value = 'allowance-merchant.testnet';
       } else if (presetId === 4) {
-        const ag = vaultState.agents.find(a => a.id === 'rogue-agent');
-        if (ag) ag.isActive = true; // demo only: contract would reject the tx, agent state is untouched
+        const ag = vaultState.agents.find(a => a.id === 'agent-alpha');
+        if (ag) ag.isActive = true;
         vaultState.isPaused = false;
-        callerEl.value = 'rogue-agent';
+        callerEl.value = 'agent-alpha';
         methodEl.value = 'spend_as';
         amountEl.value = '0.15';
-        recipientEl.value = 'hacker-drain.testnet';
+        recipientEl.value = 'hacker-drain.testnet'; // Not on allowlist -> blocked at Gate 04
       } else if (presetId === 5) {
-        callerEl.value = 'research-agent';
+        callerEl.value = 'agent-alpha';
         methodEl.value = 'set_paused';
         amountEl.value = '0.00';
         recipientEl.value = 'allowance-swarm.testnet';
@@ -1807,23 +1927,19 @@
         spendContainer.classList.add('opacity-40', 'pointer-events-none');
       }
 
-      const yoctoAmount = BigInt(Math.round(parseFloat(amount || '0') * 10000)) * BigInt("100000000000000000000");
+      const yoctoAmount = BigInt(Math.round(parseFloat(amount || '0') * 1e6)) * BigInt("1000000000000000000");
+      const selAgent = vaultState.agents.find(a => a.id === caller) || vaultState.agents[0];
       let argsJson = '';
-      if (method === 'spend_as') {
+      if (method === 'spend_as' || method === 'spend') {
         argsJson = JSON.stringify({
-          agent_id: caller === 'owner' ? 'research-agent' : caller,
+          amount: yoctoAmount.toString(),
           recipient: recipient,
-          amount: yoctoAmount.toString()
-        });
-      } else if (method === 'spend') {
-        argsJson = JSON.stringify({
-          recipient: recipient,
-          amount: yoctoAmount.toString()
+          memo: 'echoes verification'
         });
       } else if (method === 'set_paused') {
         argsJson = JSON.stringify({ paused: true });
       } else {
-        argsJson = JSON.stringify({ agent_id: caller === 'owner' ? 'rogue-agent' : caller });
+        argsJson = JSON.stringify({ public_key: (selAgent && (selAgent.fullPubKey || selAgent.pubKey)) || 'ed25519:GY1SXN4zftJ7u2iY3RZ5GgwWBAQBtb6g5TMcTpm8ps17' });
       }
 
       const cliText = `near contract call-function as-transaction ${vaultState.contractId} ${method} \\\n  json-args '${argsJson}' \\\n  prepaid-gas '30.0 Tgas' attached-deposit '0 NEAR' \\\n  sign-as ${vaultState.contractId} network-config testnet`;
@@ -1899,13 +2015,13 @@
       }
 
       // GATE 1: Scoped Key Method Permission & Predecessor check
-      if (caller !== 'owner' && method !== 'spend_as' && method !== 'spend') {
+      if (caller !== 'owner' && method !== 'spend_as') {
         setGateVisual(1, 'fail', 'KEY SCOPE REJECTED');
         for (let i = 2; i <= 5; i++) setGateVisual(i, 'standby', 'HALTED');
         overallBadge.className = 'font-mono text-xs px-2.5 py-1 rounded bg-near-red/20 border border-near-red text-near-red font-bold';
         overallBadge.textContent = 'BLOCKED @ GATE 01';
         summaryText.className = 'text-near-red font-semibold';
-        summaryText.textContent = `> RUNTIME & PREDECESSOR REJECT: Scoped FunctionCall key for '${caller}' is restricted strictly to ["spend", "spend_as"]. Privilege escalation call to '${method}' was blocked at Gate 01!`;
+        summaryText.textContent = `> RUNTIME & PREDECESSOR REJECT: Scoped FunctionCall key for '${caller}' is restricted strictly to ["spend_as"]. Privilege escalation call to '${method}' was blocked at Gate 01!`;
         fireRadarPulse('breach');
         pushAuditLog(caller, `${method}() [HIJACK]`, '0.00 NEAR', 'BLOCKED @ GATE 01 (KEY SCOPE)', 'breach', randomHash);
         showToast(`Blocked privilege escalation attempt by ${caller}!`, 'danger');
@@ -1929,17 +2045,21 @@
       setGateVisual(2, 'pass', 'UNPAUSED');
 
       // GATE 3: Agent Registration & Active State
-      const agentObj = vaultState.agents.find(a => a.id === caller) || vaultState.agents[0];
-      if (!agentObj.isActive) {
-        setGateVisual(3, 'fail', 'AGENT REVOKED');
+      const agentObj = caller === 'owner'
+        ? { id: 'allowance-swarm.testnet', maxPerTx: vaultState.perTxCap || 0.50, allowance: vaultState.globalCap || 5.00, spent: vaultState.totalSpent || 0, isActive: true }
+        : vaultState.agents.find(a => a.id === caller);
+      if (!agentObj || !agentObj.isActive) {
+        setGateVisual(3, 'fail', !agentObj ? 'UNREGISTERED KEY' : 'AGENT REVOKED');
         setGateVisual(4, 'standby', 'HALTED');
         setGateVisual(5, 'standby', 'HALTED');
         overallBadge.className = 'font-mono text-xs px-2.5 py-1 rounded bg-near-red/20 border border-near-red text-near-red font-bold';
         overallBadge.textContent = 'BLOCKED @ GATE 03';
         summaryText.className = 'text-near-red font-semibold';
-        summaryText.textContent = `> REJECTED: Agent '${agentObj.id}' is marked inactive (active = false) in contract storage. Only the Vault Owner can call reactivate_agent().`;
+        summaryText.textContent = !agentObj
+          ? `> REJECTED: Signer key for '${caller}' is not a registered agent in contract storage.`
+          : `> REJECTED: Agent '${agentObj.id}' is marked inactive (active = false) in contract storage. Only the Vault Owner can call reactivate_agent().`;
         fireRadarPulse('breach');
-        pushAuditLog(agentObj.id, `${method} → ${recipient}`, `${amount.toFixed(2)} NEAR`, 'BLOCKED @ GATE 03 (REVOKED KEY)', 'breach', randomHash);
+        pushAuditLog(caller, `${method} → ${recipient}`, `${amount.toFixed(2)} NEAR`, 'BLOCKED @ GATE 03 (REVOKED/UNREGISTERED)', 'breach', randomHash);
         renderAll();
         return;
       }
@@ -1947,15 +2067,14 @@
 
       // GATE 4: Recipient Allowlist Check
       if (!vaultState.allowlist.includes(recipient)) {
-        setGateVisual(4, 'fail', 'UNTRUSTED TARGET + REVOKED');
+        setGateVisual(4, 'fail', 'UNTRUSTED TARGET (REVERTED)');
         setGateVisual(5, 'standby', 'HALTED');
-        agentObj.isActive = false;
-        agentObj.lastAction = `REVOKED: Untrusted target (${recipient})`;
+        agentObj.lastAction = `REVERTED: Untrusted target (${recipient})`;
 
         overallBadge.className = 'font-mono text-xs px-2.5 py-1 rounded bg-near-red/20 border border-near-red text-near-red font-bold';
         overallBadge.textContent = 'REVERTED @ ALLOWLIST (GATE 04)';
         summaryText.className = 'text-near-red font-semibold';
-        summaryText.textContent = `> GUARDRAIL REFLEX: Recipient '${recipient}' is NOT in the Vault Allowlist. The real contract traps here — 0 NEAR transferred, receipt reverts, agent state untouched. Owner can then call revoke_agent('${agentObj.id}').`;
+        summaryText.textContent = `> GUARDRAIL REFLEX: Recipient '${recipient}' is NOT in the Vault Allowlist. The contract traps here — 0 NEAR transferred, receipt reverts, agent state untouched. Owner can call revoke_agent('${agentObj.id}') if compromised.`;
         fireRadarPulse('breach');
         pushAuditLog(agentObj.id, `${method} → ${recipient}`, `${amount.toFixed(2)} NEAR`, 'REVERTED @ ALLOWLIST', 'breach', randomHash);
         showToast(`Guardrail breach: transfer reverted at Gate 04 (allowlist).`, 'danger');
@@ -1965,20 +2084,23 @@
       setGateVisual(4, 'pass', 'ALLOWLISTED');
 
       // GATE 5: Per-Tx Cap, Agent Allowance & Global Vault Cap Arithmetic
+      const vaultPerTxCap = vaultState.perTxCap || 0.50;
+      const exceedsVaultPerTx = amount > vaultPerTxCap + 1e-6;
       const exceedsPerTx = amount > agentObj.maxPerTx + 1e-6;
       const exceedsAgentAllowance = (agentObj.spent + amount) > agentObj.allowance + 1e-6;
       const exceedsGlobalCap = (vaultState.totalSpent + amount) > vaultState.globalCap + 1e-6;
 
-      if (exceedsPerTx || exceedsAgentAllowance || exceedsGlobalCap) {
-        let reason = exceedsPerTx
-          ? `OVER PER-TX CAP (${amount.toFixed(2)} > ${agentObj.maxPerTx.toFixed(2)} Ⓝ)`
+      if (exceedsVaultPerTx || exceedsPerTx || exceedsAgentAllowance || exceedsGlobalCap) {
+        let reason = exceedsVaultPerTx
+          ? `OVER VAULT PER-TX CAP (${amount.toFixed(2)} > ${vaultPerTxCap.toFixed(2)} Ⓝ)`
+          : exceedsPerTx
+          ? `OVER AGENT PER-TX CAP (${amount.toFixed(2)} > ${agentObj.maxPerTx.toFixed(2)} Ⓝ)`
           : exceedsGlobalCap
           ? `OVER GLOBAL VAULT CAP (${(vaultState.totalSpent + amount).toFixed(2)} > ${vaultState.globalCap.toFixed(2)} Ⓝ)`
-          : `OVER AGENT ALLOWANCE`;
+          : `OVER AGENT DAILY ALLOWANCE`;
 
-        setGateVisual(5, 'fail', 'CAP BREACH + REVOKED');
-        agentObj.isActive = false;
-        agentObj.lastAction = `REVOKED: ${reason}`;
+        setGateVisual(5, 'fail', 'CAP BREACH (REVERTED)');
+        agentObj.lastAction = `REVERTED: ${reason}`;
 
         overallBadge.className = 'font-mono text-xs px-2.5 py-1 rounded bg-near-red/20 border border-near-red text-near-red font-bold';
         overallBadge.textContent = 'REVERTED @ VELOCITY CAP (GATE 05)';
@@ -2231,6 +2353,8 @@
       const customId = document.getElementById('customVaultInput').value.trim() || 'allowance-swarm.testnet';
       vaultState.contractId = customId;
       closeWalletModal();
+      hydrateFromChain(true);
+      loadRejections();
       syncLiveTestnetState();
       renderAll();
     }
@@ -2346,6 +2470,7 @@
           alias: String(a.agent_id || '').toUpperCase(),
           role: 'Scoped FunctionCall key · ' + ((a.key_methods || []).join(' / ') || 'spend_as'),
           pubKey: shortKeyHex(a.public_key),
+          fullPubKey: a.public_key,
           maxPerTx: near(a.per_tx_near),
           allowance: near(a.daily_near),
           spent: near(a.spent_near),
@@ -2398,10 +2523,11 @@
      * Used when the page is hosted as a static site (no /api backend).
      * The RPC returns Access-Control-Allow-Origin: *, so this needs no server.
      */
-    async function directRpcState() {
+    async function directRpcState(targetAccount) {
+      const vaultAccount = targetAccount || (vaultState && vaultState.contractId) || VAULT_ID;
       const viewCall = async (method_name) => {
         const r = await rpcQuery({
-          request_type: 'call_function', account_id: VAULT_ID, method_name,
+          request_type: 'call_function', account_id: vaultAccount, method_name,
           args_base64: 'e30=', finality: 'final'
         });
         return JSON.parse(new TextDecoder().decode(new Uint8Array(r.result || [])));
@@ -2411,7 +2537,7 @@
         viewCall('get_balance'),
         viewCall('get_log'),
         viewCall('get_agents'),
-        rpcQuery({ request_type: 'view_access_key_list', account_id: VAULT_ID, finality: 'final' })
+        rpcQuery({ request_type: 'view_access_key_list', account_id: vaultAccount, finality: 'final' })
       ]);
       const keys = (keyRes.keys || []).filter(k => k.access_key && k.access_key.permission && k.access_key.permission.FunctionCall).map(k => {
         const fc = k.access_key.permission.FunctionCall;
@@ -2433,7 +2559,7 @@
       });
       const spentBig = BigInt(policy.spent_today || '0');
       return {
-        vault: VAULT_ID,
+        vault: vaultAccount,
         policy,
         balance,
         balance_near: fmtYocto(balance),
@@ -2451,14 +2577,16 @@
 
     async function hydrateFromChain(announce) {
       try {
+        const targetVault = (vaultState && vaultState.contractId) || VAULT_ID;
         let s;
         try {
+          if (targetVault !== VAULT_ID) throw new Error('custom vault');
           const res = await fetch('/api/state', { cache: 'no-store' });
           if (!res.ok) throw new Error('HTTP ' + res.status);
           s = await res.json();
         } catch (_) {
-          // static hosting: no backend, read the chain ourselves
-          s = await directRpcState();
+          // static hosting or custom vault: read the chain directly
+          s = await directRpcState(targetVault);
         }
         if (s.source === 'direct-rpc') LIVE_SOURCE = 'NEAR RPC';
         vaultState = Object.assign({}, vaultState, mapChainState(s));
@@ -2490,13 +2618,15 @@
     async function loadRejections() {
       const tbody = document.getElementById('rejectionsBody');
       if (!tbody) return;
+      const targetVault = (vaultState && vaultState.contractId) || VAULT_ID;
       try {
         let rows;
         try {
+          if (targetVault !== VAULT_ID) throw new Error('custom vault');
           const res = await fetch('/api/rejections', { cache: 'no-store' });
           rows = await res.json();
         } catch (_) {
-          const r = await fetch('https://api-testnet.nearblocks.io/v3/accounts/' + VAULT_ID + '/txns?limit=100');
+          const r = await fetch('https://api-testnet.nearblocks.io/v3/accounts/' + encodeURIComponent(targetVault) + '/txns?limit=100');
           const payload = await r.json();
           rows = (payload.data || [])
             .filter(t => !(t.outcomes && t.outcomes.status))
@@ -2510,15 +2640,18 @@
           tbody.innerHTML = '<tr><td colspan="4" class="py-3 px-4 text-near-dim">no failed transactions returned</td></tr>';
           return;
         }
-        tbody.innerHTML = rows.slice(0, 12).map(r => `
+        tbody.innerHTML = rows.slice(0, 12).map(r => {
+          const safeHash = esc(String(r.hash || ''));
+          return `
           <tr class="hover:bg-near-panel/60 transition-colors">
             <td class="py-2.5 px-4 text-near-dim">${r.block ? '#' + Number(r.block).toLocaleString() : '—'}</td>
-            <td class="py-2.5 px-4 text-near-alabaster">${r.method}</td>
+            <td class="py-2.5 px-4 text-near-alabaster">${esc(r.method)}</td>
             <td class="py-2.5 px-4"><span class="px-2 py-0.5 rounded border text-[10px] font-bold bg-near-red/15 text-near-red border-near-red/30">REVERTED</span></td>
-            <td class="py-2.5 px-4"><a href="https://testnet.nearblocks.io/txns/${r.hash}" target="_blank" rel="noopener noreferrer" class="text-near-cyan hover:underline">${String(r.hash).slice(0, 10)}…${String(r.hash).slice(-6)}</a></td>
-          </tr>`).join('');
+            <td class="py-2.5 px-4"><a href="https://testnet.nearblocks.io/txns/${encodeURIComponent(String(r.hash || ''))}" target="_blank" rel="noopener noreferrer" class="text-near-cyan hover:underline">${esc(String(r.hash || '').slice(0, 10))}…${esc(String(r.hash || '').slice(-6))}</a></td>
+          </tr>`;
+        }).join('');
       } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="4" class="py-3 px-4 text-near-amber">rejections feed unavailable: ${err.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" class="py-3 px-4 text-near-amber">rejections feed unavailable: ${esc(err.message)}</td></tr>`;
       }
     }
 

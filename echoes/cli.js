@@ -13,7 +13,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function loadNearApi() {
+function loadNearApi(optional = false) {
   for (const c of ['near-api-js', '/root/.hermes/node/lib/node_modules/near-cli/node_modules/near-api-js']) {
     try {
       return require(c);
@@ -21,10 +21,10 @@ function loadNearApi() {
       /* next */
     }
   }
+  if (optional) return null;
   throw new Error('near-api-js not installed — run `npm install`');
 }
 
-const { connect, keyStores, KeyPair, utils } = loadNearApi();
 const NETWORK = process.env.ECHOES_NETWORK || 'testnet';
 const RPC = process.env.ECHOES_RPC || (NETWORK === 'testnet'
   ? 'https://rpc.testnet.fastnear.com'
@@ -42,8 +42,14 @@ for (let i = 1; i < argv.length; i++) {
   }
 }
 
-const nearAmount = (x) => utils.format.parseNearAmount(String(x));
-const toYocto = (x) => (BigInt(Math.round(Number(x) * 1e6)) * 10n ** 18n).toString();
+const toYocto = (x) => {
+  const s = String(x).trim();
+  if (!/^\d+(\.\d+)?$/.test(s)) throw new Error(`invalid NEAR amount: ${x}`);
+  const [whole, frac = ''] = s.split('.');
+  const frac24 = (frac + '0'.repeat(24)).slice(0, 24);
+  return (BigInt(whole || '0') * YOCTO + BigInt(frac24)).toString();
+};
+const nearAmount = (x) => toYocto(x);
 
 function credentialsPath(account) {
   return path.join(os.homedir(), '.near-credentials', NETWORK, `${account}.json`);
@@ -61,6 +67,7 @@ function readKey(account) {
 }
 
 async function signer(accountId, secretKey) {
+  const { connect, keyStores, KeyPair } = loadNearApi();
   const keyStore = new keyStores.InMemoryKeyStore();
   keyStore.setKey(NETWORK, accountId, KeyPair.fromString(secretKey));
   const near = await connect({ networkId: NETWORK, nodeUrl: RPC, keyStore, headers: {} });
@@ -150,23 +157,26 @@ async function init() {
   console.log(`recipients ${recipients.join(', ')}`);
   console.log(`wasm       ${wasmPath} (${wasm.length} bytes)`);
 
-  const masterKey = flags.key || readKey(master);
-  const masterAccount = await signer(master, masterKey);
-
-  const vaultKey = KeyPair.fromRandom('ed25519');
+  const { KeyPair } = loadNearApi();
   const exists = await accountExists(vault);
+  let vaultKey;
 
   if (!exists) {
+    if (!master) throw new Error('--master is required to create a new vault account');
+    const masterKey = flags.key || readKey(master);
+    const masterAccount = await signer(master, masterKey);
+    vaultKey = KeyPair.fromRandom('ed25519');
     console.log(`\n[1/4] creating ${vault} with ${fund} NEAR …`);
     const res = await masterAccount.createAccount(vault, vaultKey.getPublicKey(), nearAmount(fund));
     console.log(`      ${res.transaction_outcome.id}`);
+    const ownerCredPath = saveOwnerCredentials(vault, vaultKey);
+    console.log(`      owner key saved to ${ownerCredPath} (keep it — it is the only owner key)`);
     await new Promise((r) => setTimeout(r, 1500));
   } else {
-    console.log(`\n[1/4] ${vault} already exists — reusing`);
+    const existingSecret = flags['vault-key'] || flags.key || readKey(vault);
+    vaultKey = KeyPair.fromString(existingSecret);
+    console.log(`\n[1/4] ${vault} already exists — reusing existing owner key`);
   }
-
-  const ownerCredPath = saveOwnerCredentials(vault, vaultKey);
-  console.log(`      owner key saved to ${ownerCredPath} (keep it — it is the only owner key)`);
 
   const vaultAccount = await signer(vault, vaultKey.toString());
 
@@ -175,14 +185,29 @@ async function init() {
   console.log(`      ${dep.transaction_outcome.id}`);
 
   console.log('[3/4] initialising policy …');
-  const initRes = await vaultAccount.functionCall({
-    contractId: vault,
-    methodName: 'new',
-    args: { owner: vault, per_tx: toYocto(vaultPerTx), daily: toYocto(vaultDaily), recipients },
-    gas: '100000000000000',
-    attachedDeposit: '0',
-  });
-  console.log(`      ${initRes.transaction.hash}`);
+  try {
+    const initRes = await vaultAccount.functionCall({
+      contractId: vault,
+      methodName: 'new',
+      args: { owner: vault, per_tx: toYocto(vaultPerTx), daily: toYocto(vaultDaily), recipients },
+      gas: '100000000000000',
+      attachedDeposit: '0',
+    });
+    console.log(`      ${initRes.transaction.hash}`);
+  } catch (err) {
+    if (exists && /already initialized|Cannot initialize/i.test(String(err.message || err))) {
+      const polRes = await vaultAccount.functionCall({
+        contractId: vault,
+        methodName: 'set_policy',
+        args: { per_tx: toYocto(vaultPerTx), daily: toYocto(vaultDaily), recipients },
+        gas: '100000000000000',
+        attachedDeposit: '0',
+      });
+      console.log(`      updated policy (${polRes.transaction.hash})`);
+    } else {
+      throw err;
+    }
+  }
 
   const agents = [];
   const agentIds = String(flags.agent || 'agent-1').split(',').map((s) => s.trim()).filter(Boolean);
@@ -224,7 +249,7 @@ async function init() {
   console.log(`\nsaved ${saved}`);
   console.log('\nNext:');
   console.log(`  echoes status --vault ${vault}`);
-  console.log(`  ECHOES_AGENT_ID=${agents[0].id} node agent/demo.js ${saved}`);
+  console.log(`  ECHOES_AGENT_ID=${agents[0].id} node echoes/agent/demo.js ${saved}`);
   console.log('\nHand the agent its secret_key and nothing else. It cannot transfer,');
   console.log('add keys, or call any method other than spend_as on this vault.');
 }
@@ -292,7 +317,7 @@ function doctor() {
   console.log(`node            ${process.version}`);
   console.log(`network         ${NETWORK}`);
   console.log(`rpc             ${RPC}`);
-  console.log(`near-api-js     ${loadNearApi() ? 'ok' : 'missing'}`);
+  console.log(`near-api-js     ${loadNearApi(true) ? 'ok' : 'missing'}`);
   console.log(`wasm            ${fs.existsSync(wasm) ? fs.statSync(wasm).size + ' bytes' : 'MISSING'}`);
   console.log(`credentials dir ${path.join(os.homedir(), '.near-credentials', NETWORK)}`);
 }

@@ -2,8 +2,8 @@
 /**
  * sandbox-reset — rolls the public sandbox agent's daily counter and keeps it funded.
  *
- * The public sandbox key is capped at 0.25 N/day, so after ~5 self-tests the vault starts
- * rejecting legitimate runs. This runs as the OWNER (the vault's own key, which is NOT
+ * The public sandbox key is capped at 0.05 N/tx and 5 N/day, so after repeated self-tests the vault
+ * may need its daily counter rolled over. This runs as the OWNER (the vault's own key, which is NOT
  * published) and calls reset_agent_day for the sandbox agent.
  *
  *   node scripts/sandbox-reset.js            # uses echoes/sandbox.json for vault/agent ids
@@ -13,9 +13,20 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const { connect, keyStores, KeyPair } = require('near-api-js');
+function loadNearApi() {
+  for (const c of ['near-api-js', '/root/.hermes/node/lib/node_modules/near-cli/node_modules/near-api-js']) {
+    try {
+      return require(c);
+    } catch (e) {
+      /* next */
+    }
+  }
+  throw new Error('near-api-js not installed — run `npm install`');
+}
 
-const NETWORK = 'testnet';
+const { connect, keyStores, KeyPair } = loadNearApi();
+
+const NETWORK = process.env.ECHOES_NETWORK || 'testnet';
 const RPC = process.env.ECHOES_RPC || 'https://rpc.testnet.fastnear.com';
 const cfg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'echoes', 'sandbox.json'), 'utf8'));
 const vault = cfg.vault;
@@ -37,11 +48,11 @@ const topup = topupIdx > -1 ? process.argv[topupIdx + 1] : null;
   const res = await account.functionCall({
     contractId: vault,
     methodName: 'reset_agent_day',
-    args: { agent_id: cfg.agent },
+    args: { public_key: cfg.public_key },
     gas: '30000000000000',
     attachedDeposit: '0',
   });
-  console.log(`reset_agent_day ${cfg.agent} -> ${res.transaction_outcome.id}`);
+  console.log(`reset_agent_day ${cfg.agent} (${cfg.public_key}) -> ${res.transaction_outcome.id}`);
 
   if (topup) {
     // move funds from the master account that funds the sandbox (owner key of the vault

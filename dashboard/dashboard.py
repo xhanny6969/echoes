@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -31,6 +32,7 @@ AUDIT_LOG = Path(
 PORT = int(os.environ.get("PORT", "8088"))
 YOCTO = 10**24
 
+_CACHE_LOCK = threading.Lock()
 _CACHE: dict = {"at": 0.0, "state": None}
 CACHE_TTL = 15
 
@@ -58,7 +60,7 @@ def _audit_rows(limit: int = 50) -> list[dict]:
     return list(reversed(rows))
 
 
-_REJ_CACHE: dict = {"at": 0.0, "data": []}
+_REJ_CACHE: dict = {"at": 0.0, "data": None}
 
 
 def _rejections(limit: int = 40) -> list[dict]:
@@ -66,8 +68,9 @@ def _rejections(limit: int = 40) -> list[dict]:
     import urllib.request
 
     now = time.time()
-    if now - float(_REJ_CACHE.get("at") or 0) < 30 and _REJ_CACHE.get("data"):
-        return list(_REJ_CACHE["data"])  # type: ignore[arg-type]
+    with _CACHE_LOCK:
+        if now - float(_REJ_CACHE.get("at") or 0) < 30 and _REJ_CACHE.get("data") is not None:
+            return list(_REJ_CACHE["data"])[:limit]  # type: ignore[arg-type]
     url = f"https://api-testnet.nearblocks.io/v3/accounts/{VAULT}/txns?limit=100"
     rows: list[dict] = []
     try:
@@ -89,7 +92,8 @@ def _rejections(limit: int = 40) -> list[dict]:
     except Exception as exc:  # explorer hiccup must not kill the demo
         sys.stderr.write(f"[rejections] {exc}\n")
     out = rows[:limit]
-    _REJ_CACHE.update({"at": now, "data": out})
+    with _CACHE_LOCK:
+        _REJ_CACHE.update({"at": now, "data": rows})
     return out
 
 
@@ -119,8 +123,9 @@ def _scoped_keys(c: NearClient) -> list[dict]:
 
 def _state(force: bool = False) -> dict:
     now = time.time()
-    if not force and _CACHE["state"] and now - _CACHE["at"] < CACHE_TTL:
-        return _CACHE["state"]
+    with _CACHE_LOCK:
+        if not force and _CACHE["state"] and now - _CACHE["at"] < CACHE_TTL:
+            return _CACHE["state"]
     c = _near()
     policy = c.view(VAULT, "get_policy")
     balance = c.view(VAULT, "get_balance")
@@ -177,8 +182,9 @@ def _state(force: bool = False) -> dict:
         "audit": _audit_rows(),
         "fetched_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
     }
-    _CACHE["state"] = state
-    _CACHE["at"] = now
+    with _CACHE_LOCK:
+        _CACHE["state"] = state
+        _CACHE["at"] = now
     return state
 
 
@@ -1587,7 +1593,7 @@ function renderAgents(agents, scopedKeys) {
       <div class="agent-key-row">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <span>Signer Key:</span>
-          <button class="copy-pill mono" onclick="copyText('${esc(a.public_key)}')">
+          <button class="copy-pill mono" data-copy="${esc(a.public_key)}" onclick="copyText(this.dataset.copy)">
             ${esc(shortKey(a.public_key, 10, 4))} ⧉
           </button>
         </div>
@@ -1628,7 +1634,7 @@ function renderKeys(keys, agents) {
     const methods = (k.method_names || []).map(m => `<span class="badge warn mono" style="font-size:10px">${esc(m)}</span>`).join(' ');
     return `<tr>
       <td>
-        <button class="copy-pill mono" onclick="copyText('${esc(k.public_key)}')">
+        <button class="copy-pill mono" data-copy="${esc(k.public_key)}" onclick="copyText(this.dataset.copy)">
           ${esc(shortKey(k.public_key, 12, 4))} ⧉
         </button>
       </td>
@@ -2048,9 +2054,21 @@ function evaluatePlayground(highlightTop = false) {
     let g3Fail = null;
     if (method !== 'spend_as') {
       const ownerId = (s.policy && s.policy.owner) || VAULT_ID;
-      const connectedId = SESSION_SIGNER ? SESSION_SIGNER.accountId : (WALLET_CONN && WALLET_CONN.isSignedIn() ? WALLET_CONN.getAccountId() : '');
+      const connectedId = caller === 'wallet'
+        ? (SESSION_SIGNER ? SESSION_SIGNER.accountId : (WALLET_CONN && WALLET_CONN.isSignedIn() ? WALLET_CONN.getAccountId() : ''))
+        : '';
       if (connectedId !== ownerId) {
         g3Fail = 'allowkey: blocked — only the vault owner can call this';
+      } else if (method === 'spend') {
+        if (paused) {
+          g3Fail = 'allowkey: blocked — vault is paused by owner';
+        } else if (amount <= 0 || isNaN(amount)) {
+          g3Fail = 'allowkey: blocked — amount must be > 0';
+        } else if (amount > vaultPerTx) {
+          g3Fail = `allowkey: blocked — per-transaction cap exceeded (${amount} > ${vaultPerTx} NEAR)`;
+        } else if (amount > vaultRem) {
+          g3Fail = `allowkey: blocked — daily cap exceeded (${amount} > ${vaultRem} NEAR left)`;
+        }
       }
     } else if (paused) {
       g3Fail = 'allowkey: blocked — vault is paused by owner';
@@ -2104,10 +2122,11 @@ function evaluatePlayground(highlightTop = false) {
   </div>`).join('');
 
   const yocto = BigInt(Math.round(Math.max(0, amount) * 1e6)) * 1000000000000000000n;
+  const targetResetKey = ag ? ag.public_key : (agents[0] ? agents[0].public_key : 'ed25519:...');
   const argsJson = method === 'set_paused'
     ? JSON.stringify({ paused: true })
     : (method === 'reset_agent_day'
-      ? JSON.stringify({ public_key: ag ? ag.public_key : 'ed25519:...' })
+      ? JSON.stringify({ public_key: targetResetKey })
       : JSON.stringify({ amount: yocto.toString(), recipient, memo }));
   $('pg-cli-cmd').dataset.cmd = `near call ${VAULT_ID} ${method} '${argsJson}' --accountId ${VAULT_ID}`;
 
@@ -2253,10 +2272,14 @@ async function broadcastPlaygroundTx() {
   const memo = ($('pg-memo').value || '').trim();
   const yocto = (BigInt(Math.round(Math.max(0, amount) * 1e6)) * 1000000000000000000n).toString();
 
+  const s = LAST_STATE || INITIAL_STATE;
+  const caller = $('pg-caller').value;
+  const agents = s.agents || [];
+  const selectedAgent = agents.find(a => a.agent_id === caller) || agents[0];
   const args = method === 'set_paused'
     ? { paused: true }
     : (method === 'reset_agent_day'
-      ? { public_key: SESSION_SIGNER ? SESSION_SIGNER.publicKey : 'ed25519:GY1SXN4zftJ7u2iY3RZ5GgwWBAQBtb6g5TMcTpm8ps17' }
+      ? { public_key: selectedAgent ? selectedAgent.public_key : 'ed25519:GY1SXN4zftJ7u2iY3RZ5GgwWBAQBtb6g5TMcTpm8ps17' }
       : { amount: yocto, recipient, memo });
 
   if (SESSION_SIGNER && window.nearApi) {

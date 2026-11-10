@@ -8,7 +8,7 @@ Verified facts to use (checked 2026-11-10 against rpc.testnet.near.org):
 | Fact | Value |
 |---|---|
 | Contract | `allowance-swarm.testnet` |
-| On-chain code hash | `9JNpk7uGkuWyp6Yd834muCtADcjGXFufHJu6A3jdMTrn` (192,109 bytes) |
+| On-chain code hash | `FeZL3sAZN6Z6d4UgUJd1soy9T9XbuNubd5m8dKj1k4H6` (192,979 bytes) |
 | Accepted tx | `HENHbkBQycS9d56NX2K8zV6VN5DqaZn4QkEpJvoR3cX3` → `SuccessValue`, signer `lab-worker.allowance-swarm.testnet` |
 | Reverted tx | `6GvjL2aWxBhnVVkAqdyx31PQpMmCLguUTKoBjzSrnyuA` → `Failure` (wasm trap) |
 | Allowlisted recipient | `allowance-merchant.testnet` |

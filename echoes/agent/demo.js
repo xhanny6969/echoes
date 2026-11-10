@@ -58,12 +58,17 @@ const HIJACKED_PAGE = JSON.stringify(
 (async () => {
   const cfgPath = process.argv[2] || path.join(__dirname, '..', '..', '.echoes', 'vault.json');
   const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
-  const agent = cfg.agents[0];
+  const targetId = process.env.ECHOES_AGENT_ID;
+  const agent = targetId
+    ? cfg.agents.find((a) => a.id === targetId)
+    : cfg.agents[0];
+  if (!agent) throw new Error(`agent not found in config: ${targetId || '(index 0)'}`);
 
   const chain = await new Chain({
     vault: cfg.vault,
     signerId: cfg.vault,
     secretKey: agent.secret_key,
+    network: cfg.network,
     rpc: cfg.rpc,
   }).connect();
 

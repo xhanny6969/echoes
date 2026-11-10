@@ -74,13 +74,16 @@ class Chain {
     this.vault = opts.vault;
     this.signerId = opts.signerId;
     this.secretKey = opts.secretKey;
-    this.rpc = opts.rpc || 'https://rpc.testnet.fastnear.com';
+    this.network = opts.network || process.env.ECHOES_NETWORK || 'testnet';
+    this.rpc = opts.rpc || (this.network === 'mainnet'
+      ? 'https://rpc.mainnet.fastnear.com'
+      : 'https://rpc.testnet.fastnear.com');
   }
 
   async connect() {
     const keyStore = new keyStores.InMemoryKeyStore();
-    keyStore.setKey('testnet', this.signerId, KeyPair.fromString(this.secretKey));
-    this.near = await connect({ networkId: 'testnet', nodeUrl: this.rpc, keyStore, headers: {} });
+    keyStore.setKey(this.network, this.signerId, KeyPair.fromString(this.secretKey));
+    this.near = await connect({ networkId: this.network, nodeUrl: this.rpc, keyStore, headers: {} });
     this.account = await this.near.account(this.signerId);
     return this;
   }
@@ -119,11 +122,13 @@ class Chain {
   async spend(amountNear, recipient, memo) {
     const started = Date.now();
     try {
+      const yocto = utils.format.parseNearAmount(String(amountNear));
+      if (!yocto) throw new Error(`invalid NEAR amount: ${amountNear}`);
       const res = await this.account.functionCall({
         contractId: this.vault,
         methodName: 'spend_as',
         args: {
-          amount: utils.format.parseNearAmount(String(amountNear)),
+          amount: yocto,
           recipient,
           memo: memo || 'agent purchase',
         },
@@ -180,7 +185,9 @@ async function callModel(conversation, opts = {}) {
     throw new Error(`model HTTP ${res.status}: ${(await res.text()).slice(0, 200)}`);
   }
   const data = await res.json();
-  return data.choices[0].message.content;
+  const content = data?.choices?.[0]?.message?.content;
+  if (!content) throw new Error('model returned empty response: ' + JSON.stringify(data).slice(0, 200));
+  return content;
 }
 
 function parseAction(text) {
@@ -220,14 +227,19 @@ module.exports = { Chain, runOnce, callModel, SYSTEM_PROMPT, COMPROMISED_PROMPT 
 
 if (require.main === module) {
   (async () => {
-    const cfgPath = process.argv[2] || path.join(__dirname, '..', '.echoes', 'vault.json');
+    const cfgPath = process.argv[2] || path.join(__dirname, '..', '..', '.echoes', 'vault.json');
     const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
     const vault = cfg.vault;
-    const agentId = cfg.agents[0].id;
+    const targetId = process.env.ECHOES_AGENT_ID;
+    const agent = targetId
+      ? cfg.agents.find((a) => a.id === targetId)
+      : cfg.agents[0];
+    if (!agent) throw new Error(`agent not found in config: ${targetId || '(index 0)'}`);
     const chain = await new Chain({
       vault,
       signerId: vault,
-      secretKey: cfg.agents[0].secret_key,
+      secretKey: agent.secret_key,
+      network: cfg.network,
       rpc: cfg.rpc,
     }).connect();
     console.log(JSON.stringify(await chain.policy(), null, 2));

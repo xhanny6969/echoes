@@ -59,7 +59,7 @@ SELF-TEST PASSED — the contract blocked what it is supposed to block, on chain
 Exit code `0` means both expectations held. `1` means an outcome did not happen — the
 script is safe for an agent to gate on.
 
-## 3. Why the key in `echoes/sandbox.json` is public on purpose
+## 4. Why the key in `echoes/sandbox.json` is public on purpose
 
 - It is a NEAR **FunctionCall** access key, created with
   `receiver_id = demo.allowance-merchant.testnet` and `method_names = ["spend_as"]`.
@@ -77,12 +77,12 @@ The sandbox vault, the agent and the caps are all readable on chain:
 ```bash
 curl -s -X POST https://rpc.testnet.near.org -H 'content-type: application/json' -d '{
   "jsonrpc":"2.0","id":1,"method":"query","params":{
-    "request_type":"call","finality":"final",
+    "request_type":"call_function","finality":"final",
     "account_id":"demo.allowance-merchant.testnet",
     "method_name":"get_policy","args_base64":"e30="}}'
 ```
 
-## 4. Put it in front of your own agent (production path)
+## 5. Put it in front of your own agent (production path)
 
 You run this once, as the owner — the agent never sees this step:
 
@@ -105,9 +105,9 @@ ECHOES_AGENT_ID=worker-1 node echoes/agent/demo.js .echoes/myvault.testnet.json
 ```
 
 Owner controls: `register_agent`, `set_agent_policy`, `revoke_agent`, `reactivate_agent`,
-`reset_agent_day`, `set_paused`, `add_to_allowlist` — all behind `assert_owner()`.
+`reset_agent_day`, `reset_vault_day`, `set_paused`, `add_to_allowlist` — all behind `assert_owner()`.
 
-## 5. Roadmap (honest status)
+## 6. Roadmap (honest status)
 
 Not shipped yet, do not claim otherwise:
 
@@ -120,4 +120,4 @@ Not shipped yet, do not claim otherwise:
 
 Contract: `demo.allowance-merchant.testnet` · sandbox: `demo.allowance-merchant.testnet` ·
 source-verified, rebuilt wasm hash matches the deployed code hash byte for byte
-(`node contract/verify_onchain.py`).
+(`python3 contract/verify_onchain.py`).

@@ -26,6 +26,13 @@
 use near_sdk::{env, near, AccountId, NearToken, PanicOnDefault, Promise, PublicKey};
 
 const NS_PER_DAY: u64 = 86_400_000_000_000;
+const MAX_MEMO_LEN: usize = 256;
+const MAX_LOG_ENTRIES: usize = 200;
+
+fn parse_u128(raw: &str, label: &str) -> u128 {
+    raw.parse::<u128>()
+        .unwrap_or_else(|_| fail(&format!("{label} not a number")))
+}
 
 #[near(serializers = [json, borsh])]
 #[derive(Clone)]
@@ -139,8 +146,8 @@ impl Vault {
         if env::state_exists() {
             fail("already initialized");
         }
-        let per_tx: u128 = per_tx.parse().expect("per_tx not a number");
-        let daily: u128 = daily.parse().expect("daily not a number");
+        let per_tx: u128 = parse_u128(&per_tx, "per_tx");
+        let daily: u128 = parse_u128(&daily, "daily");
         if per_tx == 0 {
             fail("per_tx must be > 0");
         }
@@ -167,8 +174,8 @@ impl Vault {
 
     pub fn set_policy(&mut self, per_tx: String, daily: String, recipients: Vec<AccountId>) {
         self.assert_owner();
-        let per_tx: u128 = per_tx.parse().expect("per_tx not a number");
-        let daily: u128 = daily.parse().expect("daily not a number");
+        let per_tx: u128 = parse_u128(&per_tx, "per_tx");
+        let daily: u128 = parse_u128(&daily, "daily");
         if per_tx == 0 {
             fail("per_tx must be > 0");
         }
@@ -178,6 +185,14 @@ impl Vault {
         self.per_tx = per_tx;
         self.daily = daily;
         self.recipients = recipients;
+    }
+
+    /// Add a recipient account to the vault allowlist if not already present.
+    pub fn add_to_allowlist(&mut self, recipient: AccountId) {
+        self.assert_owner();
+        if !self.recipients.iter().any(|r| r == &recipient) {
+            self.recipients.push(recipient);
+        }
     }
 
     /// Kill switch. While paused every `spend` and `spend_as` is rejected on-chain.
@@ -202,8 +217,8 @@ impl Vault {
         daily: String,
     ) {
         self.assert_owner();
-        let per_tx: u128 = per_tx.parse().expect("per_tx not a number");
-        let daily: u128 = daily.parse().expect("daily not a number");
+        let per_tx: u128 = parse_u128(&per_tx, "per_tx");
+        let daily: u128 = parse_u128(&daily, "daily");
         if per_tx == 0 {
             fail("agent per_tx must be > 0");
         }
@@ -241,8 +256,8 @@ impl Vault {
     pub fn set_agent_policy(&mut self, public_key: String, per_tx: String, daily: String) {
         self.assert_owner();
         let raw = self.parse_key(&public_key);
-        let per_tx: u128 = per_tx.parse().expect("per_tx not a number");
-        let daily: u128 = daily.parse().expect("daily not a number");
+        let per_tx: u128 = parse_u128(&per_tx, "per_tx");
+        let daily: u128 = parse_u128(&daily, "daily");
         if per_tx == 0 {
             fail("agent per_tx must be > 0");
         }
@@ -312,7 +327,6 @@ impl Vault {
     /// inside the same UTC day. On a live deployment this happens by itself at
     /// UTC midnight (`block_timestamp / 86_400s`); this call exists because the
     /// demo and the judges' re-runs would otherwise hit an already-spent budget.
-    /// The vault-level counter is untouched.
     pub fn reset_agent_day(&mut self, public_key: String) {
         self.assert_owner();
         let raw = self.parse_key(&public_key);
@@ -320,6 +334,9 @@ impl Vault {
         let mut found = false;
         for a in self.agents.iter_mut() {
             if a.public_key == raw {
+                if self.day == day && a.day == day {
+                    self.spent_today = self.spent_today.saturating_sub(a.spent_today);
+                }
                 a.day = day;
                 a.spent_today = 0;
                 found = true;
@@ -331,17 +348,32 @@ impl Vault {
         }
     }
 
+    /// Owner-only: zero the vault-level daily counter.
+    pub fn reset_vault_day(&mut self) {
+        self.assert_owner();
+        self.day = env::block_timestamp() / NS_PER_DAY;
+        self.spent_today = 0;
+    }
+
     // ------------------------------------------------------------------
     // agent surface — single agent (vault-level policy)
     // ------------------------------------------------------------------
 
     /// Spend from the vault using the vault's own policy. Callable by a
-    /// function call key whose method allowlist is exactly `["spend"]`.
+    /// function call key on the vault account whose method allowlist is
+    /// `["spend"]`, or directly by the vault owner.
     pub fn spend(&mut self, amount: String, recipient: AccountId, memo: String) -> SpendEntry {
+        let caller = env::predecessor_account_id();
+        if caller != env::current_account_id() && caller != self.owner {
+            fail("only the vault or owner can call spend");
+        }
         if self.paused {
             fail("vault is paused by owner");
         }
-        let amount: u128 = amount.parse().expect("amount not a number");
+        if memo.len() > MAX_MEMO_LEN {
+            fail("memo exceeds maximum length (256 bytes)");
+        }
+        let amount: u128 = parse_u128(&amount, "amount");
         self.assert_vault_amount(amount);
 
         let day = env::block_timestamp() / NS_PER_DAY;
@@ -353,7 +385,8 @@ impl Vault {
             fail("daily cap exceeded");
         }
         self.assert_recipient(&recipient);
-        if self.available_balance() < amount {
+        let storage_buffer = self.estimate_entry_storage("vault", &recipient, &memo);
+        if self.available_balance().saturating_sub(storage_buffer) < amount {
             fail("vault balance is lower than the requested amount");
         }
 
@@ -374,10 +407,16 @@ impl Vault {
     /// the vault daily cap. (Before this fix, `spend_as` never touched the
     /// vault counters, so the vault daily cap did not bind swarm spends.)
     pub fn spend_as(&mut self, amount: String, recipient: AccountId, memo: String) -> SpendEntry {
+        if env::predecessor_account_id() != env::signer_account_id() {
+            fail("cross-contract calls to spend_as are not allowed");
+        }
         if self.paused {
             fail("vault is paused by owner");
         }
-        let amount: u128 = amount.parse().expect("amount not a number");
+        if memo.len() > MAX_MEMO_LEN {
+            fail("memo exceeds maximum length (256 bytes)");
+        }
+        let amount: u128 = parse_u128(&amount, "amount");
         if amount == 0 {
             fail("amount must be > 0");
         }
@@ -419,13 +458,14 @@ impl Vault {
             fail("agent daily cap exceeded");
         }
         self.assert_recipient(&recipient);
-        if self.available_balance() < amount {
+        let label = self.agents[i].agent_id.to_string();
+        let storage_buffer = self.estimate_entry_storage(&label, &recipient, &memo);
+        if self.available_balance().saturating_sub(storage_buffer) < amount {
             fail("vault balance is lower than the requested amount");
         }
 
         self.spent_today += amount;
         self.agents[i].spent_today += amount;
-        let label = self.agents[i].agent_id.to_string();
         self.record(&label, amount, recipient, memo)
     }
 
@@ -531,11 +571,22 @@ impl Vault {
             timestamp: env::block_timestamp(),
         };
         self.next_id += 1;
+        if self.log.len() >= MAX_LOG_ENTRIES {
+            self.log.remove(0);
+        }
         self.log.push(entry.clone());
         Promise::new(recipient)
             .transfer(NearToken::from_yoctonear(amount))
             .detach();
         entry
+    }
+
+    fn estimate_entry_storage(&self, agent_label: &str, recipient: &AccountId, memo: &str) -> u128 {
+        if self.log.len() >= MAX_LOG_ENTRIES {
+            return 0;
+        }
+        let approx_bytes = (128 + agent_label.len() + recipient.as_str().len() + memo.len()) as u128;
+        approx_bytes.saturating_mul(env::storage_byte_cost().as_yoctonear())
     }
 
     /// Balance minus the NEAR that is locked for contract storage.

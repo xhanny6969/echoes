@@ -9,7 +9,7 @@ Give an agent a wallet without giving it the keys to everything.
 - Live showcase: https://xhanny6969.github.io/echoes/
 - Live console: https://xhanny6969.github.io/echoes/console.html
 - Contract: [`allowance-swarm.testnet`](https://testnet.nearblocks.io/address/allowance-swarm.testnet)
-- Deployed code hash: `9JNpk7uGkuWyp6Yd834muCtADcjGXFufHJu6A3jdMTrn`
+- Deployed code hash: `FeZL3sAZN6Z6d4UgUJd1soy9T9XbuNubd5m8dKj1k4H6`
 
 ---
 
@@ -89,23 +89,54 @@ The shipped wasm rebuilds byte-identically from this repo:
 ```bash
 cd contract && cargo build --release --target wasm32-unknown-unknown
 sha256sum target/wasm32-unknown-unknown/release/allowance_vault.wasm
-# 7b510b71…  ->  base58 9JNpk7uGkuWyp6Yd834muCtADcjGXFufHJu6A3jdMTrn  (the deployed code hash)
+# d9a2a929…  ->  base58 FeZL3sAZN6Z6d4UgUJd1soy9T9XbuNubd5m8dKj1k4H6  (the deployed code hash)
 ```
 
 Even better, check it against the chain instead of trusting me:
 
 ```
 $ python3 contract/verify_onchain.py
-code bytes onchain 192109
-code hash onchain  9JNpk7uGkuWyp6Yd834muCtADcjGXFufHJu6A3jdMTrn
-node reported      9JNpk7uGkuWyp6Yd834muCtADcjGXFufHJu6A3jdMTrn  (agrees)
-code hash local    9JNpk7uGkuWyp6Yd834muCtADcjGXFufHJu6A3jdMTrn
+code bytes onchain 192979
+code hash onchain  FeZL3sAZN6Z6d4UgUJd1soy9T9XbuNubd5m8dKj1k4H6
+node reported      FeZL3sAZN6Z6d4UgUJd1soy9T9XbuNubd5m8dKj1k4H6  (agrees)
+code hash local    FeZL3sAZN6Z6d4UgUJd1soy9T9XbuNubd5m8dKj1k4H6
 
 VERIFIED — the live contract is byte-identical to this source tree.
 ```
 
 That pulls the live code bytes from RPC and hashes them, so it does not depend on
 an explorer badge being granted.
+
+## Hardening pass (post-audit)
+
+Five issues were reported against the first bundle; each was checked against the source rather
+than accepted at face value, then the ones that were real were fixed and re-proved on chain:
+
+| Report | Verdict | What actually changed |
+|---|---|---|
+| Agent identity can be spoofed via an `agent_id` argument | **not applicable** — `spend_as` never took an `agent_id`; identity comes from `env::signer_account_pk()` | unchanged by design; a direct-call guard was added so `spend_as` can only be called by the signer's own transaction, never through a cross-contract call |
+| `revoke_agent` does not remove the protocol key | **true, by design and now stated** — revocation blocks spending but keeps the key on the account | docs now separate "revoke" from "delete the key"; the contract still never claims to delete keys |
+| Missing per-agent cap / daily window | **not applicable** — per-agent and vault per-tx/daily caps were already enforced together | reset is per UTC day; `reset_vault_day` added for demo re-runs |
+| Async transfer failure leaves counters incremented | **true** — the transfer is detached, so a failed payout is not rolled back automatically | **disclosed, not silently "fixed"**: the vault only pays accounts the owner allowlisted, and this limitation is listed below |
+| No storage-staking reserve | **partly true** — balance was storage-adjusted but not for the next log entry | `estimate_entry_storage()` now reserves the marginal cost; the log is capped at 200 entries; memo is capped at 256 bytes |
+
+The one **real, unreported** hole that this pass found and closed: `spend()` (the single-agent
+path) had no caller check at all, so any account could invoke it and trigger a payout to an
+allowlisted recipient. It now requires `predecessor == vault || predecessor == owner`, proved by a
+rejected call on the live contract:
+
+```
+$ # allowance-merchant.testnet calling allowance-swarm.spend directly
+allowkey: blocked — only the vault or owner can call spend
+tx (reverted) DsrngUhdcG7ur7qAwWLNxybMDK3q8Mm9w9f6WSy9X17n
+```
+
+Contract upgraded in place (state preserved) and re-verified afterwards:
+
+- upgrade tx `5maMhL5X356Uf45dSXbTbauTKpqS8Yq77aitG65QvaAE`
+- `python3 contract/verify_onchain.py` -> `FeZL3sAZN6Z6d4UgUJd1soy9T9XbuNubd5m8dKj1k4H6` on both sides
+- public sandbox self-test still passes on the new code: accepted `FgXcZmccbxQGimr14qtNBYE6TxtrusT7WyMT1N63fhM`,
+  reverted at the allowlist `3Y669LvRSnr6Moh8M2enD84N1MHcWtiFFjBH2Rqumn3P`
 
 ## Hosting
 
@@ -132,6 +163,9 @@ agent/           original swarm demo + invariant checker used during development
 ## Disclosures
 
 - Testnet only. Amounts are small and the vault is deliberately public.
+- A payout that reverts at the *transfer* receipt (for example because the allowlisted
+  recipient account was deleted) is not rolled back automatically: the transfer is detached,
+  so the quota for that spend stays consumed and the log keeps the entry.
 - Revocation is **owner-triggered**, not automatic. We do not claim an auto-revoke
   primitive: a contract cannot self-disable a key on a reverted receipt without a keeper.
 - The dashboard's playground is a client-side replay of the gate logic and is labelled
