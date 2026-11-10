@@ -260,8 +260,13 @@
       opacity: 0;
     }
     .faq-item.open .faq-answer {
-      max-height: 800px;
+      max-height: none;
       opacity: 1;
+    }
+    /* Long on-chain identifiers must wrap, never clip, at any viewport width */
+    .faq-answer code {
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
     .faq-item.open .faq-icon {
       transform: rotate(45deg);
@@ -1400,7 +1405,7 @@ the public sandbox key already in echoes/sandbox.json.</pre>
 
         <!-- Category Filter Tabs -->
         <div class="flex flex-wrap items-center gap-2 my-5 font-mono text-xs">
-          <button onclick="setFaqCategory('all')" data-cat="all" class="faq-cat-btn px-3 py-1.5 rounded border border-near-green bg-near-green text-near-obsidian font-bold transition-all">ALL QUESTIONS (7)</button>
+          <button onclick="setFaqCategory('all')" data-cat="all" class="faq-cat-btn px-3 py-1.5 rounded border border-near-green bg-near-green text-near-obsidian font-bold transition-all">ALL QUESTIONS (8)</button>
           <button onclick="setFaqCategory('security')" data-cat="security" class="faq-cat-btn px-3 py-1.5 rounded border border-near-border bg-near-obsidian text-near-slate hover:border-near-green transition-all">SECURITY &amp; ACCESS KEYS</button>
           <button onclick="setFaqCategory('contract')" data-cat="contract" class="faq-cat-btn px-3 py-1.5 rounded border border-near-border bg-near-obsidian text-near-slate hover:border-near-green transition-all">RUST CONTRACT &amp; CAPS</button>
           <button onclick="setFaqCategory('judges')" data-cat="judges" class="faq-cat-btn px-3 py-1.5 rounded border border-near-border bg-near-obsidian text-near-slate hover:border-near-green transition-all">HACKATHON JUDGES</button>
@@ -1434,10 +1439,51 @@ the public sandbox key already in echoes/sandbox.json.</pre>
           </div>
 
           <!-- FAQ 02 -->
-          <div class="faq-item border border-near-border rounded bg-near-obsidian/80 transition-colors" data-category="contract">
+          <div class="faq-item border border-near-border rounded bg-near-obsidian/80 transition-colors" data-category="security">
             <button onclick="toggleFaqItem(this)" class="w-full text-left p-4 sm:p-5 flex items-start justify-between gap-4 focus:outline-none">
               <div class="flex items-start gap-3 min-w-0">
                 <span class="font-mono text-xs text-near-green font-bold mt-0.5">[Q02]</span>
+                <div>
+                  <h3 class="font-sans font-bold text-base sm:text-lg text-near-alabaster">
+                    Why not just fund a plain sub-account with a small balance? Why does an agent need a vault contract at all?
+                  </h3>
+                  <span class="inline-block mt-1 font-mono text-[10px] px-2 py-0.5 rounded bg-near-border/40 text-near-slate">VS. PLAIN SUB-ACCOUNT</span>
+                </div>
+              </div>
+              <span class="faq-icon w-6 h-6 rounded border border-near-border flex items-center justify-center font-mono text-sm text-near-slate shrink-0 transition-transform">+</span>
+            </button>
+            <div class="faq-answer px-4 sm:px-5 pb-5 pt-1 text-sm text-near-slate space-y-3 border-t border-near-border/60">
+              <p>
+                Because a sub-account constrains <em>how much sits in the account</em> — never <em>where the money may go</em>. Three structural gaps make "capped sub-account" a weaker guarantee than it looks:
+              </p>
+              <ol class="list-decimal list-inside space-y-2 font-mono text-xs text-near-alabaster bg-near-carbon p-3.5 rounded border border-near-border">
+                <li>
+                  <span class="text-near-green">Access keys scope method names, never arguments.</span>
+                  A NEAR access key is a tuple of <code class="text-near-cyan">(receiver_id, method_names, allowance)</code>. The runtime checks the <em>method being called</em>; it never parses that method's JSON arguments. A key scoped to <code class="font-mono">usdc.testnet</code> / <code class="font-mono">["ft_transfer"]</code> is therefore a key that can move <strong class="text-near-red">any amount to any recipient</strong> — <code class="font-mono">ft_transfer({"receiver_id": "hacker-drain.testnet", "amount": "..."})</code> is a valid call for that key. A recipient allowlist cannot live in a key; it can only live in a contract that owns the funds.
+                </li>
+                <li>
+                  <span class="text-near-green">Splitting liquidity destroys the global ceiling.</span>
+                  N sub-accounts means N independent balances. There is then no single on-chain place that enforces your real fleet-wide limit: to know the swarm spent at most 5 Ⓝ today you must aggregate off-chain — i.e. trust a keeper bot. Echoes keeps one treasury and enforces the per-agent daily cap and the vault daily cap against the same counters inside the same receipt, so the global ceiling is a <span class="text-near-green">storage invariant</span>, not a monitoring claim.
+                </li>
+                <li>
+                  <span class="text-near-green">The balance is all-or-nothing.</span>
+                  With a sub-account the pre-loaded balance is the only real limit, which forces a bad choice: fund it small and the agent dies mid-task on an unhelpful "insufficient balance" (or silently retries and burns gas); fund it large and one compromise takes everything at once, because nothing caps the <em>individual</em> transfer. Echoes separates "funded" from "spendable": the vault holds the capital, and policy decides what leaves per transaction and per day.
+                </li>
+              </ol>
+              <p>
+                <strong class="text-near-alabaster">The Echoes answer: the agent never holds the money.</strong> It holds a <code class="text-near-cyan">FunctionCall</code> key on <code class="font-mono text-near-alabaster">allowance-swarm.testnet</code> scoped to <code class="text-near-green">["spend", "spend_as"]</code>, with no transferable allowance — protocol rules already forbid that key from attaching a deposit. Every payout must pass <code class="text-near-cyan">assert_recipient()</code> plus the per-agent and vault arithmetic ceilings <em>before</em> <code class="font-mono">Promise::transfer</code> is even constructed. Worst case for a fully compromised agent key: at most <code class="font-mono">per_tx</code> NEAR, to an address you approved in advance, with the attempt sitting in <code class="font-mono">get_log()</code>.
+              </p>
+              <p class="font-mono text-[11px] text-near-dim">
+                Honest limit: this protects the <strong>funds in the vault</strong>. A leaked agent key can still burn its own gas allowance on reverted calls — that is bounded by the key's gas allowance (≤ 0.25 Ⓝ) and by <code class="font-mono">revoke_agent</code>, not by Echoes' policy engine.
+              </p>
+            </div>
+          </div>
+
+          <!-- FAQ 03 -->
+          <div class="faq-item border border-near-border rounded bg-near-obsidian/80 transition-colors" data-category="contract">
+            <button onclick="toggleFaqItem(this)" class="w-full text-left p-4 sm:p-5 flex items-start justify-between gap-4 focus:outline-none">
+              <div class="flex items-start gap-3 min-w-0">
+                <span class="font-mono text-xs text-near-green font-bold mt-0.5">[Q03]</span>
                 <div>
                   <h3 class="font-sans font-bold text-base sm:text-lg text-near-alabaster">
                     What exactly happens on-chain when an agent breaches a guardrail &mdash; and who can revoke a key?
@@ -1460,11 +1506,11 @@ the public sandbox key already in echoes/sandbox.json.</pre>
             </div>
           </div>
 
-          <!-- FAQ 03 -->
+          <!-- FAQ 04 -->
           <div class="faq-item border border-near-border rounded bg-near-obsidian/80 transition-colors" data-category="contract">
             <button onclick="toggleFaqItem(this)" class="w-full text-left p-4 sm:p-5 flex items-start justify-between gap-4 focus:outline-none">
               <div class="flex items-start gap-3 min-w-0">
-                <span class="font-mono text-xs text-near-green font-bold mt-0.5">[Q03]</span>
+                <span class="font-mono text-xs text-near-green font-bold mt-0.5">[Q04]</span>
                 <div>
                   <h3 class="font-sans font-bold text-base sm:text-lg text-near-alabaster">
                     How does the 5-Gate Defense-in-Depth Pipeline protect against both single-shot drains and slow-drip sybil attacks?
@@ -1475,7 +1521,7 @@ the public sandbox key already in echoes/sandbox.json.</pre>
               <span class="faq-icon w-6 h-6 rounded border border-near-border flex items-center justify-center font-mono text-sm text-near-slate shrink-0 transition-transform">+</span>
             </button>
             <div class="faq-answer px-4 sm:px-5 pb-5 pt-1 text-sm text-near-slate space-y-2 border-t border-near-border/60">
-              <p>Every <code class="font-mono text-near-green">spend_as(agent_id, recipient, amount)</code> call traverses five sequential verification gates:</p>
+              <p>Every <code class="font-mono text-near-green">spend_as(amount, recipient, memo)</code> call traverses five sequential verification gates &mdash; the agent is identified by the <code class="font-mono text-near-cyan">signer_account_pk()</code> of the calling key, not by a passed-in id:</p>
               <ol class="list-decimal list-inside space-y-1.5 font-mono text-xs text-near-alabaster bg-near-carbon p-3.5 rounded border border-near-border">
                 <li><span class="text-near-green">GATE 01 (Protocol Key Scope &amp; Predecessor):</span> NEAR Runtime validates the <code class="text-near-cyan">ed25519</code> key is restricted to <code class="text-near-cyan">spend / spend_as</code> with gas ≤ 0.25 NEAR.</li>
                 <li><span class="text-near-green">GATE 02 (Circuit Breaker):</span> Asserts the vault is not paused by the owner (<code class="text-near-cyan">!self.is_paused</code>).</li>
@@ -1486,11 +1532,11 @@ the public sandbox key already in echoes/sandbox.json.</pre>
             </div>
           </div>
 
-          <!-- FAQ 04 -->
+          <!-- FAQ 05 -->
           <div class="faq-item border border-near-border rounded bg-near-obsidian/80 transition-colors" data-category="security">
             <button onclick="toggleFaqItem(this)" class="w-full text-left p-4 sm:p-5 flex items-start justify-between gap-4 focus:outline-none">
               <div class="flex items-start gap-3 min-w-0">
-                <span class="font-mono text-xs text-near-green font-bold mt-0.5">[Q04]</span>
+                <span class="font-mono text-xs text-near-green font-bold mt-0.5">[Q05]</span>
                 <div>
                   <h3 class="font-sans font-bold text-base sm:text-lg text-near-alabaster">
                     What prevents a compromised agent from calling <code class="text-near-green font-mono">reactivate_agent</code> or <code class="text-near-amber font-mono">set_paused(false)</code> to unfreeze itself?
@@ -1510,11 +1556,11 @@ the public sandbox key already in echoes/sandbox.json.</pre>
             </div>
           </div>
 
-          <!-- FAQ 05 -->
+          <!-- FAQ 06 -->
           <div class="faq-item border border-near-border rounded bg-near-obsidian/80 transition-colors" data-category="contract">
             <button onclick="toggleFaqItem(this)" class="w-full text-left p-4 sm:p-5 flex items-start justify-between gap-4 focus:outline-none">
               <div class="flex items-start gap-3 min-w-0">
-                <span class="font-mono text-xs text-near-green font-bold mt-0.5">[Q05]</span>
+                <span class="font-mono text-xs text-near-green font-bold mt-0.5">[Q06]</span>
                 <div>
                   <h3 class="font-sans font-bold text-base sm:text-lg text-near-alabaster">
                     How does Echoes enable concurrent multi-agent swarm execution without <code class="text-near-cyan font-mono">nonce</code> collisions?
@@ -1531,11 +1577,11 @@ the public sandbox key already in echoes/sandbox.json.</pre>
             </div>
           </div>
 
-          <!-- FAQ 06 -->
+          <!-- FAQ 07 -->
           <div class="faq-item border border-near-border rounded bg-near-obsidian/80 transition-colors" data-category="judges">
             <button onclick="toggleFaqItem(this)" class="w-full text-left p-4 sm:p-5 flex items-start justify-between gap-4 focus:outline-none">
               <div class="flex items-start gap-3 min-w-0">
-                <span class="font-mono text-xs text-near-green font-bold mt-0.5">[Q06]</span>
+                <span class="font-mono text-xs text-near-green font-bold mt-0.5">[Q07]</span>
                 <div>
                   <h3 class="font-sans font-bold text-base sm:text-lg text-near-alabaster">
                     How can Hackathon Judges verify the live <code class="text-near-green font-mono">allowance-swarm.testnet</code> deployment and <code class="text-near-cyan font-mono">audit.jsonl</code> telemetry?
@@ -1555,11 +1601,11 @@ the public sandbox key already in echoes/sandbox.json.</pre>
             </div>
           </div>
 
-          <!-- FAQ 07 -->
+          <!-- FAQ 08 -->
           <div class="faq-item border border-near-border rounded bg-near-obsidian/80 transition-colors" data-category="judges">
             <button onclick="toggleFaqItem(this)" class="w-full text-left p-4 sm:p-5 flex items-start justify-between gap-4 focus:outline-none">
               <div class="flex items-start gap-3 min-w-0">
-                <span class="font-mono text-xs text-near-green font-bold mt-0.5">[Q07]</span>
+                <span class="font-mono text-xs text-near-green font-bold mt-0.5">[Q08]</span>
                 <div>
                   <h3 class="font-sans font-bold text-base sm:text-lg text-near-alabaster">
                     What is the production roadmap for Echoes with NEAR Chain Signatures (MPC) and NEAR Intents?
@@ -1575,7 +1621,8 @@ the public sandbox key already in echoes/sandbox.json.</pre>
               </p>
               <ul class="list-disc list-inside space-y-1.5">
                 <li><strong class="text-near-green">NEAR Chain Signatures (MPC) Guardrails:</strong> Before the Echoes Vault requests a threshold signature from <code class="font-mono text-near-alabaster">v1.signer-prod.testnet</code> to sign an EVM, Bitcoin, or Solana payload on behalf of an agent, the payload must pass Echoes' 5-Gate velocity and destination allowlist checks.</li>
-                <li><strong class="text-near-cyan">NEAR Intents Solver Verification:</strong> Agents can submit bounded swap or compute intents where Echoes verifies maximum slippage and daily notional caps before committing solver settlement.</li>
+                <li><strong class="text-near-alabaster">NEP-141 stablecoin policies (USDC / USDT) &mdash; roadmap, not in this build:</strong> real agents pay in stablecoins, and today <code class="font-mono text-near-green">spend_as</code> schedules only a native <code class="font-mono">Promise::transfer</code>. Shipping NEP-141 spending needs three concrete changes we have scoped but deliberately not faked: a <code class="font-mono text-near-cyan">spend_ft(amount, token, recipient, memo)</code> path that calls <code class="font-mono">ft_transfer</code> on the token contract (with the same <code class="font-mono">assert_recipient</code> allowlist), a per-token <code class="font-mono">spent_today</code> counter keyed by token contract account, and a one-time <code class="font-mono">storage_deposit</code> so the vault can hold the token balance. Gates 02&ndash;05 already operate on plain <code class="font-mono">u128</code> integers and are token-agnostic, so the policy struct applies per token unchanged.</li>
+                <li><strong class="text-near-cyan">NEAR Intents Solver Verification:</strong> Agents can submit bounded swap or compute intents where Echoes verifies maximum slippage and daily notional caps before committing solver settlement &mdash; the same counters, extended to a notional ceiling so an intent can be rejected before a solver ever quotes.</li>
               </ul>
             </div>
           </div>
@@ -2452,7 +2499,23 @@ the public sandbox key already in echoes/sandbox.json.</pre>
 
     function toggleFaqItem(buttonEl) {
       const item = buttonEl.closest('.faq-item');
-      item.classList.toggle('open');
+      const ans = item.querySelector('.faq-answer');
+      if (!ans) { item.classList.toggle('open'); return; }
+
+      if (item.classList.contains('open')) {
+        // collapse: pin current height first so the transition has a start value
+        ans.style.maxHeight = ans.scrollHeight + 'px';
+        requestAnimationFrame(() => {
+          ans.style.maxHeight = '0px';
+          item.classList.remove('open');
+        });
+        setTimeout(() => { if (!item.classList.contains('open')) ans.style.maxHeight = ''; }, 380);
+      } else {
+        item.classList.add('open');
+        ans.style.maxHeight = ans.scrollHeight + 'px';
+        // release the pin afterwards so a later reflow can never clip the answer
+        setTimeout(() => { if (item.classList.contains('open')) ans.style.maxHeight = 'none'; }, 380);
+      }
     }
 
     function setFaqCategory(cat) {
@@ -2477,7 +2540,11 @@ the public sandbox key already in echoes/sandbox.json.</pre>
 
         if (matchesCat && matchesQuery) {
           item.classList.remove('hidden');
-          if (query.length > 1) item.classList.add('open');
+          if (query.length > 1) {
+            item.classList.add('open');
+            const a = item.querySelector('.faq-answer');
+            if (a) a.style.maxHeight = 'none';
+          }
         } else {
           item.classList.add('hidden');
         }
@@ -2847,6 +2914,10 @@ the public sandbox key already in echoes/sandbox.json.</pre>
       syncLiveTestnetState();
     });
   </script>
+
+
+
+
 
 
 
