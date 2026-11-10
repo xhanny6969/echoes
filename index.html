@@ -611,8 +611,8 @@
         <!-- Radar Interactive Trigger Controls -->
         <div class="space-y-2.5 pt-3 border-t border-near-border">
           <div id="radarTelemetryFeed" class="font-mono text-[11px] bg-near-obsidian border border-near-border px-3 py-2 rounded text-near-slate flex items-center justify-between">
-            <span id="radarLogText" class="truncate text-near-green">&gt; ECHO_SONAR: live read of scoped FunctionCall keys...</span>
-            <span class="text-[10px] text-near-dim ml-2 shrink-0">5 GATES ACTIVE</span>
+            <span id="radarLogText" class="text-near-green min-w-0 leading-snug">&gt; SONAR: idle · arm a pulse</span>
+            <span class="text-[10px] text-near-dim ml-2 shrink-0">5 GATES</span>
           </div>
 
           <div class="grid grid-cols-2 gap-2">
@@ -1939,12 +1939,13 @@ the public sandbox key already in echoes/sandbox.json.</pre>
     function fireRadarPulse(mode) {
       const pulseLayer = document.getElementById('radarPulseLayer');
       const logText = document.getElementById('radarLogText');
+      logText.dataset.armed = '1';
       const badge = document.getElementById('radarStatusBadge');
       const breachWave = document.getElementById('radarBreachWave');
 
       if (mode === 'valid') {
-        logText.className = 'truncate text-near-green';
-        logText.textContent = '> VALID PULSE: research-agent -> spend_as(0.15 Ⓝ) -> PASSED 5 GATES';
+        logText.className = 'text-near-green min-w-0 leading-snug';
+        logText.textContent = '> PULSE 0.15 Ⓝ PASSED 5 GATES';
         badge.className = 'font-mono text-[11px] px-2 py-0.5 rounded bg-near-green/15 text-near-green border border-near-green/30';
         badge.textContent = 'PULSE: APPROVED';
 
@@ -1970,8 +1971,8 @@ the public sandbox key already in echoes/sandbox.json.</pre>
         }
         requestAnimationFrame(step);
       } else {
-        logText.className = 'truncate text-near-red font-semibold';
-        logText.textContent = '> BREACH BLOCKED: rogue-agent -> hacker-drain.testnet INTERCEPTED @ GATE 04!';
+        logText.className = 'text-near-red font-semibold min-w-0 leading-snug';
+        logText.textContent = '> BREACH REVERTED @ GATE 04';
         badge.className = 'font-mono text-[11px] px-2 py-0.5 rounded bg-near-red/20 text-near-red border border-near-red/40';
         badge.textContent = 'BREACH INTERCEPTED!';
 
@@ -2763,6 +2764,15 @@ the public sandbox key already in echoes/sandbox.json.</pre>
         LIVE_SYNCED_AT = new Date();
         renderAll();
         renderLiveBadge();
+        // The sonar line reports the read we actually made, not a promise of one
+        const sonarLine = document.getElementById('radarLogText');
+        if (sonarLine && !sonarLine.dataset.armed) {
+          const keys = vaultState.scopedKeys || [];
+          const scoped = keys.map(k => Number(k.allowance_near)).filter(n => isFinite(n)).reduce((a, b) => a + b, 0);
+          sonarLine.textContent = keys.length
+            ? `> LIVE: ${keys.length} keys · ${scoped.toFixed(2)} Ⓝ scoped`
+            : '> LIVE: 0 scoped keys on account';
+        }
         if (announce) showToast(`Live state: ${s.vault} · ${s.agent_count} agents · ${s.spent_today_near}/${s.daily_near} NEAR today`, 'success');
         return s;
       } catch (err) {
