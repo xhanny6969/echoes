@@ -15,18 +15,24 @@ const path = require('path');
 const fs = require('fs');
 
 function loadNearApi() {
-  const candidates = [
-    'near-api-js',
-    '/root/.hermes/node/lib/node_modules/near-cli/node_modules/near-api-js',
-  ];
+  // Portable resolution: local node_modules first, then the global npm root.
+  // No author-machine paths — this must work on a judge's laptop too.
+  const candidates = ['near-api-js'];
+  try {
+    const root = require('child_process')
+      .execSync('npm root -g', { stdio: ['ignore', 'pipe', 'ignore'] })
+      .toString().trim();
+    if (root) candidates.push(require('path').join(root, 'near-api-js'));
+  } catch (e) { /* npm missing is fine, a local install may still resolve */ }
   for (const c of candidates) {
     try {
       return require(c);
     } catch (e) {
-      /* try next */
+      /* next */
     }
   }
-  throw new Error('near-api-js not found — run `npm install` in the repo root');
+  if (false) return null;
+  throw new Error('near-api-js not installed — run `npm install` (or `npm i -g near-api-js`)');
 }
 
 const { connect, keyStores, KeyPair, utils } = loadNearApi();

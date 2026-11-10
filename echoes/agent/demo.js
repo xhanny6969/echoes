@@ -56,12 +56,18 @@ const HIJACKED_PAGE = JSON.stringify(
 );
 
 (async () => {
-  const cfgPath = process.argv[2] || path.join(__dirname, '..', '..', '.echoes', 'vault.json');
+  // Default to the published sandbox config so a clean clone can run this.
+  const localCfg = path.join(__dirname, '..', '..', '.echoes', 'vault.json');
+  const sandboxCfg = path.join(__dirname, '..', 'sandbox.json');
+  const cfgPath = process.argv[2] || (fs.existsSync(localCfg) ? localCfg : sandboxCfg);
   const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  // Two shapes are accepted: a full vault config with agents[], or the flat
+  // published sandbox config (single agent at top level).
+  const agents = Array.isArray(cfg.agents)
+    ? cfg.agents
+    : [{ id: cfg.agent || 'sandbox-agent', secret_key: cfg.secret_key }];
   const targetId = process.env.ECHOES_AGENT_ID;
-  const agent = targetId
-    ? cfg.agents.find((a) => a.id === targetId)
-    : cfg.agents[0];
+  const agent = targetId ? agents.find((a) => a.id === targetId) : agents[0];
   if (!agent) throw new Error(`agent not found in config: ${targetId || '(index 0)'}`);
 
   const chain = await new Chain({

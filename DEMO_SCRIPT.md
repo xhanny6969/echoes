@@ -64,12 +64,12 @@ Verified facts to use (checked 2026-11-10 against rpc.testnet.near.org):
 
 ```bash
 # 1. terminal prep — big font, clean shell, dark theme
-cd /root/echoes-repo
-export OPENROUTER_API_KEY=$(grep -h OPENROUTER_API_KEY /root/.hermes/.env | head -1 | cut -d= -f2-)
+cd "$(git rev-parse --show-toplevel)"   # any checkout, not one machine
+export OPENROUTER_API_KEY=...           # any OpenRouter key; the model only writes the invoice text
 node echoes/cli.js status --vault lab.allowance-swarm.testnet   # warm-up, show nothing
 
 # 2. record terminal (this is the money shot)
-node echoes/agent/demo.js .echoes/vault.json                    # both runs, one take
+node echoes/agent/demo.js echoes/sandbox.json                   # both runs, one take (public sandbox key)
 
 # 3. record verify step
 python3 contract/verify_onchain.py
