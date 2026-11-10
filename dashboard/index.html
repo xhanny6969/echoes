@@ -20,57 +20,59 @@
 <style>
 /* --- Professional Developer & Infra Palette (No AI Slop / No Neon Gradients) --- */
 :root, [data-theme="dark"] {
-  --bg: #090a0f;
-  --panel: #11131a;
-  --panel-hover: #151821;
-  --panel-muted: #171a24;
-  --border: #202430;
-  --border-focus: #374151;
-  --border-subtle: #171a22;
-  --text: #f3f4f6;
-  --text-muted: #9ca3af;
-  --text-dim: #64748b;
-  --near-green: #00ec97;
+  --bg: #000000;
+  --panel: #141414;
+  --panel-hover: #262626;
+  --panel-muted: #141414;
+  --border: #262626;
+  --border-focus: #525252;
+  --border-subtle: #262626;
+  --text: #F2F1E9;
+  --text-muted: #525252;
+  --text-dim: #525252;
+  --near-green: #00EC97;
+  --near-green-ink: #00EC97;
   --near-green-subtle: rgba(0, 236, 151, 0.1);
   --near-green-border: rgba(0, 236, 151, 0.28);
-  --blue: #38bdf8;
-  --blue-subtle: rgba(56, 189, 248, 0.1);
-  --blue-border: rgba(56, 189, 248, 0.25);
-  --amber: #f59e0b;
-  --amber-subtle: rgba(245, 158, 11, 0.1);
-  --amber-border: rgba(245, 158, 11, 0.25);
-  --red: #f43f5e;
-  --red-subtle: rgba(244, 63, 94, 0.1);
-  --red-border: rgba(244, 63, 94, 0.25);
-  --purple: #a855f7;
+  --blue: #0091FD;
+  --blue-subtle: rgba(0, 145, 253, 0.1);
+  --blue-border: rgba(0, 145, 253, 0.25);
+  --amber: #9797FF;
+  --amber-subtle: rgba(151, 151, 255, 0.1);
+  --amber-border: rgba(151, 151, 255, 0.25);
+  --red: #FF7966;
+  --red-subtle: rgba(255, 121, 102, 0.1);
+  --red-border: rgba(255, 121, 102, 0.25);
+  --purple: #9797FF;
   --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 10px 24px -8px rgba(0,0,0,0.6);
 }
 
 [data-theme="light"] {
-  --bg: #f8fafc;
+  --bg: #F2F1E9;
   --panel: #ffffff;
-  --panel-hover: #fcfdfe;
-  --panel-muted: #f1f5f9;
-  --border: #e2e8f0;
-  --border-focus: #cbd5e1;
-  --border-subtle: #edf2f7;
-  --text: #0f172a;
-  --text-muted: #475569;
-  --text-dim: #94a3b8;
-  --near-green: #059669;
-  --near-green-subtle: rgba(5, 150, 105, 0.08);
-  --near-green-border: rgba(5, 150, 105, 0.25);
-  --blue: #0284c7;
-  --blue-subtle: rgba(2, 132, 199, 0.08);
-  --blue-border: rgba(2, 132, 199, 0.25);
-  --amber: #d97706;
-  --amber-subtle: rgba(217, 119, 6, 0.08);
-  --amber-border: rgba(217, 119, 6, 0.25);
-  --red: #e11d48;
-  --red-subtle: rgba(225, 29, 72, 0.08);
-  --red-border: rgba(225, 29, 72, 0.25);
-  --purple: #7c3aed;
-  --shadow: 0 1px 3px rgba(15,23,42,0.06), 0 8px 20px -6px rgba(15,23,42,0.08);
+  --panel-hover: #FFFFFF;
+  --panel-muted: #E6E6E6;
+  --border: #E6E6E6;
+  --border-focus: #858585;
+  --border-subtle: #E6E6E6;
+  --text: #141414;
+  --text-muted: #525252;
+  --text-dim: #858585;
+  --near-green: #00EC97;
+  --near-green-ink: #141414;
+  --near-green-subtle: rgba(0, 236, 151, 0.22);
+  --near-green-border: rgba(0, 236, 151, 0.25);
+  --blue: #0091FD;
+  --blue-subtle: rgba(0, 145, 253, 0.08);
+  --blue-border: rgba(0, 145, 253, 0.25);
+  --amber: #9797FF;
+  --amber-subtle: rgba(151, 151, 255, 0.08);
+  --amber-border: rgba(151, 151, 255, 0.25);
+  --red: #FF7966;
+  --red-subtle: rgba(255, 121, 102, 0.08);
+  --red-border: rgba(255, 121, 102, 0.25);
+  --purple: #9797FF;
+  --shadow: 0 1px 3px rgba(20,20,20,0.06), 0 8px 20px -6px rgba(20,20,20,0.08);
 }
 
 * { box-sizing: border-box; }
@@ -140,7 +142,7 @@ a:hover { text-decoration: underline; }
   display: grid;
   place-items: center;
 }
-.brand-icon svg { width: 18px; height: 18px; fill: #090a0f; }
+.brand-icon svg { width: 18px; height: 18px; fill: #000000; }
 
 .brand-title {
   display: flex;
@@ -175,7 +177,7 @@ a:hover { text-decoration: underline; }
   border-radius: 5px;
   white-space: nowrap;
 }
-.badge.ok { background: var(--near-green-subtle); color: var(--near-green); border: 1px solid var(--near-green-border); }
+.badge.ok { background: var(--near-green-subtle); color: var(--near-green-ink); border: 1px solid var(--near-green-border); }
 .badge.warn { background: var(--amber-subtle); color: var(--amber); border: 1px solid var(--amber-border); }
 .badge.bad { background: var(--red-subtle); color: var(--red); border: 1px solid var(--red-border); }
 .badge.info { background: var(--blue-subtle); color: var(--blue); border: 1px solid var(--blue-border); }
@@ -222,13 +224,13 @@ a:hover { text-decoration: underline; }
 
 .btn-primary {
   background: var(--near-green);
-  color: #090a0f;
+  color: #000000;
   border-color: var(--near-green);
 }
 .btn-primary:hover {
-  background: #00df8e;
-  border-color: #00df8e;
-  color: #090a0f;
+  background: #00EC97;
+  border-color: #00EC97;
+  color: #000000;
 }
 
 /* --- Main Layout --- */
@@ -612,7 +614,7 @@ tbody tr:hover { background: var(--panel-hover); }
   border: 1px solid var(--border);
   border-radius: 4px;
   font-size: 11.5px;
-  color: var(--near-green);
+  color: var(--near-green-ink);
   overflow-x: auto;
 }
 
@@ -765,7 +767,7 @@ footer {
 
     #scrollProgress {
       position: fixed; top: 0; left: 0; height: 2px; width: 0%; z-index: 70;
-      background: linear-gradient(90deg, #00EC97 0%, #179EFF 55%, #00EC97 100%);
+      background: linear-gradient(90deg, #00EC97 0%, #0091FD 55%, #00EC97 100%);
       box-shadow: 0 0 12px rgba(0, 236, 151, 0.55);
       pointer-events: none;
     }
@@ -832,7 +834,7 @@ footer {
 <header class="topbar">
   <div class="topbar-inner">
     <div class="brand">
-      <div class="brand-icon" style="background:#000000;border:1px solid #222222;border-radius:7px;display:flex;align-items:center;justify-content:center;padding:2px">
+      <div class="brand-icon" style="background:#000000;border:1px solid #262626;border-radius:7px;display:flex;align-items:center;justify-content:center;padding:2px">
         <svg viewBox="0 0 64 64" width="22" height="22" fill="none">
           <circle cx="20" cy="32" r="3.2" fill="#FFFFFF"/>
           <path d="M 26.68 39.81 A 9.24 9.24 0 0 0 26.68 24.19" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round"/>
@@ -939,7 +941,7 @@ footer {
     <div class="kpi-card">
       <div class="kpi-label">
         <span>Vault Treasury Balance</span>
-        <span class="mono" style="color:var(--near-green)">get_balance()</span>
+        <span class="mono" style="color:var(--near-green-ink)">get_balance()</span>
       </div>
       <div class="kpi-val mono"><span id="kpi-balance">—</span><small>NEAR</small></div>
       <div class="kpi-foot">
@@ -974,7 +976,7 @@ footer {
       <div class="kpi-val mono"><span id="kpi-agent-count">2</span><small>actors</small></div>
       <div class="kpi-foot">
         <span>Individual daily caps</span>
-        <span class="mono" style="color:var(--near-green)">Isolated Budgets</span>
+        <span class="mono" style="color:var(--near-green-ink)">Isolated Budgets</span>
       </div>
     </div>
 
@@ -985,7 +987,7 @@ footer {
       </div>
       <div class="kpi-val mono">
         <span id="kpi-blocked" style="color:var(--red)">4</span>
-        <small>Blocked · <span id="kpi-allowed" style="color:var(--near-green)">3</span> Allowed</small>
+        <small>Blocked · <span id="kpi-allowed" style="color:var(--near-green-ink)">3</span> Allowed</small>
       </div>
       <div class="kpi-foot">
         <span id="kpi-block-breakdown">2 Contract Cap · 2 Protocol Scope</span>
@@ -1123,7 +1125,7 @@ footer {
         <div class="gate-checklist" id="pg-gates"></div>
 
         <div style="border-top:1px solid var(--border);padding-top:8px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11.5px">
-          <span class="mono" id="pg-reason-text" style="color:var(--near-green)">Passes all protocol & contract checks</span>
+          <span class="mono" id="pg-reason-text" style="color:var(--near-green-ink)">Passes all protocol & contract checks</span>
           <button class="copy-pill mono" onclick="copyText($('pg-cli-cmd').dataset.cmd || '')">Copy near-cli ⧉</button>
         </div>
         <div id="pg-cli-cmd" data-cmd="" style="display:none"></div>
@@ -1448,7 +1450,7 @@ function renderAgents(agents, scopedKeys) {
         </div>
         <div class="stat-item">
           <span class="k">Spent Today</span>
-          <span class="v" style="color:var(--near-green)">${esc(a.spent_near)} NEAR</span>
+          <span class="v" style="color:var(--near-green-ink)">${esc(a.spent_near)} NEAR</span>
         </div>
         <div class="stat-item">
           <span class="k">Per-Tx Cap</span>
@@ -1497,7 +1499,7 @@ function renderLog(log) {
     return `<tr>
       <td class="mono" style="color:var(--text-dim)">#${esc(e.id)}</td>
       <td><span class="badge info mono">${esc(e.agent || 'vault')}</span></td>
-      <td class="mono" style="color:var(--near-green);font-weight:600">+${esc(amt)} NEAR</td>
+      <td class="mono" style="color:var(--near-green-ink);font-weight:600">+${esc(amt)} NEAR</td>
       <td class="mono">${esc(e.recipient)}</td>
       <td>${esc(e.memo)}</td>
       <td class="mono" style="color:var(--text-dim)">${esc(ts)}</td>
@@ -1994,7 +1996,7 @@ function evaluatePlayground(highlightTop = false) {
   $('pg-verdict-badge').textContent = verdict;
   $('pg-verdict-badge').className = 'badge mono ' + verdictCls;
   $('pg-reason-text').textContent = reason;
-  $('pg-reason-text').style.color = verdictCls === 'ok' ? 'var(--near-green)' : (verdictCls === 'warn' ? 'var(--amber)' : 'var(--red)');
+  $('pg-reason-text').style.color = verdictCls === 'ok' ? 'var(--near-green-ink)' : (verdictCls === 'warn' ? 'var(--amber)' : 'var(--red)');
 
   $('pg-gates').innerHTML = gates.map(g => `<div class="gate-item">
     <span><strong>${esc(g.name)}</strong> <span class="mono" style="color:var(--text-dim);margin-left:6px">${esc(g.detail)}</span></span>
