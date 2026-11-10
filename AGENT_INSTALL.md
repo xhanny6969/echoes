@@ -119,5 +119,7 @@ Not shipped yet, do not claim otherwise:
 ---
 
 Contract: `demo.allowance-merchant.testnet` · sandbox: `demo.allowance-merchant.testnet` ·
-source-verified, rebuilt wasm hash matches the deployed code hash byte for byte
-(`python3 contract/verify_onchain.py`).
+the shipped wasm rebuilds byte-identically from this repo and its hash matches the deployed
+code hash (`python3 contract/verify_onchain.py`). The contract source is public in
+`contract/src/lib.rs`; no explorer source-verification badge has been submitted, so compare
+the hash instead of trusting a badge.

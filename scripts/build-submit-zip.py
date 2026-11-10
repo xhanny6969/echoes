@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parent.parent
 PREFIX = "echoes"
 OUT = Path(sys.argv[1] if len(sys.argv) > 1 else ROOT.parent / "echoes-submit-final.zip")
 
-EXCLUDE_DIRS = {"node_modules", ".git", "__pycache__", ".echoes", "site/tmp"}
+EXCLUDE_DIRS = {"node_modules", ".git", "__pycache__", ".echoes", "site/tmp", "target"}
 EXCLUDE_FILES = {".DS_Store"}
 # The one-off page-editing helper is repo-only, it is not part of the shipped product.
 EXCLUDE_PATHS = {"scripts/faq-add.py"}

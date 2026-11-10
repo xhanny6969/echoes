@@ -151,8 +151,9 @@ Contract upgraded in place (state preserved) and re-verified afterwards:
 
 - upgrade tx `5maMhL5X356Uf45dSXbTbauTKpqS8Yq77aitG65QvaAE`
 - `python3 contract/verify_onchain.py` -> `FeZL3sAZN6Z6d4UgUJd1soy9T9XbuNubd5m8dKj1k4H6` on both sides
-- public sandbox self-test still passes on the new code: accepted `FgXcZmccbxQGimr14qtNBYE6TxtrusT7WyMT1N63fhM`,
-  reverted at the allowlist `3Y669LvRSnr6Moh8M2enD84N1MHcWtiFFjBH2Rqumn3P`
+- public sandbox self-test re-run on the shipped code (`node echoes/sandbox.js`): accepted
+  `C4tAUuCTUrRBwyrkX7Tv5GHqRL4Jrbk3YxbHUZXDwZ1f`, reverted at the allowlist
+  `HkvvXd8EfZAMmBzXKK4UuAfg76kZaCg2WdnkcCfG2aiX` — `allowkey: blocked — recipient is not on the allowlist`
 
 ## Hosting
 

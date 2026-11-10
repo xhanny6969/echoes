@@ -264,7 +264,15 @@ async function init() {
 }
 
 async function status() {
-  const cfg = await loadConfig(flags.vault);
+  // Read-only: a full account id works without a local config, so `status` can
+  // inspect any deployed vault (including the public one) on a fresh clone.
+  let cfg;
+  try {
+    cfg = await loadConfig(flags.vault);
+  } catch (e) {
+    if (!flags.vault) throw e;
+    cfg = { vault: flags.vault };
+  }
   const c = await fetch(RPC, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
