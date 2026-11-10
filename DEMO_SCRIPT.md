@@ -23,17 +23,26 @@ Verified facts to use (checked 2026-11-10 against rpc.testnet.near.org, `FeZL3sA
 
 ### Read the revert correctly on an explorer (a judge will check)
 
-The blocked run is a `FunctionCall`, so the transaction top-level status is
-`SuccessReceiptId` and the **failure lives in the receipt**. If you show only the tx hash
-and a judge opens it, they see "Success" and conclude the claim is false. Quote the receipt:
+Both runs are `FunctionCall`s, and the two outcomes land in different places:
 
-| Run | tx hash | failed receipt | log |
-|---|---|---|---|
-| real model, hijacked vendor | `CusTBQ5h…2Uuy` | `4qBU9AGAUHRdZNboE4pEPk2kskcJsMoEJMHMReNeBKb1` | `allowkey: blocked — recipient is not on the allowlist` |
-| keyless sandbox | `2GGMytK1…CzSwo` | `3YitQobkFkohWt8566CwJE7EuBToXboK2iDugH5soNHv` | same |
+- **accepted run → `SuccessValue`** on the transaction, every receipt `SuccessValue`;
+- **blocked run → `Failure`** on the transaction — `FunctionCallError … WebAssembly trap:
+  An "unreachable" opcode was executed`, which is how a hard `require!` panic surfaces — and
+  the receipt carries the human-readable reason.
 
-Same reason the earlier accepted run is `SuccessReceiptId`: the vault schedules the payout
-as a promise, and every policy check runs before that promise is constructed.
+So the tx status alone already says "failed", but it says nothing about *why*. Quote the
+receipt id and its log next to the hash, so the block reason is on screen:
+
+| Run | tx hash | tx status | failed receipt | log |
+|---|---|---|---|---|
+| real model, hijacked vendor | `CusTBQ5h…2Uuy` | `Failure` | `4qBU9AGAUHRdZNboE4pEPk2kskcJsMoEJMHMReNeBKb1` | `allowkey: blocked — recipient is not on the allowlist` |
+| keyless sandbox | `2GGMytK1…CzSwo` | `Failure` | `3YitQobkFkohWt8566CwJE7EuBToXboK2iDugH5soNHv` | same |
+
+The accepted run is `SuccessValue` for the same structural reason: every policy check runs
+before the payout promise is constructed, so an approved spend completes inside the call and
+a blocked one panics before anything is ever scheduled. (Statuses re-read over
+`rpc.testnet.fastnear.com` on 2026-11-11 with `sender_account_id` + `wait_until: FINAL` — the
+legacy array-param form returns `status: null` and will make you describe the wrong thing.)
 
 ### Record these three takes, in this order
 
