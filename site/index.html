@@ -377,12 +377,16 @@
           <line x1="36" y1="32" x2="44" y2="32" stroke="#00EC97" stroke-width="4" stroke-linecap="round"/>
         </svg>
         </div>
+        <!-- Wordmark: lowercase Space Grotesk 700 with the mark's tight tracking (asset: 92px / -3.5px) -->
+        <span class="hidden sm:block w-px h-8 bg-near-borderBright" aria-hidden="true"></span>
         <div>
           <div class="flex items-center gap-2">
-            <span class="font-display font-extrabold text-lg tracking-wider text-near-alabaster group-hover:text-near-green transition-colors">ECHOES</span>
+            <span class="font-sans font-bold text-[21px] leading-none tracking-[-0.045em] text-near-alabaster group-hover:text-near-green transition-colors">echoes</span>
             <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-near-green/10 text-near-green border border-near-green/30 font-semibold">v2.4</span>
           </div>
-          <p class="text-[10px] font-mono text-near-slate tracking-widest uppercase">NEAR Agent Guardrail Vault</p>
+          <p class="hidden min-[360px]:flex items-center gap-1.5 whitespace-nowrap text-[9px] font-mono text-near-slate tracking-[0.2em] uppercase mt-1.5">
+            <span class="w-1 h-1 rounded-full bg-near-green shrink-0" aria-hidden="true"></span>GUARDRAIL VAULT ON NEAR
+          </p>
         </div>
       </a>
 
@@ -938,9 +942,9 @@
             
             <!-- GATE 01 -->
             <div id="gate-1" class="p-3.5 rounded bg-near-obsidian border border-near-border flex items-start justify-between gap-3 transition-all">
-              <div class="flex items-start gap-3">
+              <div class="flex items-start gap-3 min-w-0">
                 <span id="gate-icon-1" class="w-6 h-6 rounded bg-near-carbon border border-near-border flex items-center justify-center text-xs text-near-slate shrink-0">01</span>
-                <div>
+                <div class="min-w-0">
                   <div class="text-xs font-bold text-near-alabaster">GATE 01 // Protocol FunctionCall Access Key &amp; Predecessor Guard</div>
                   <div class="text-[11px] text-near-slate mt-0.5">Verifies the <code class="text-near-cyan">ed25519</code> key is scoped to the target method with gas ≤ 0.25 Ⓝ and checks <code class="text-near-green">env::predecessor_account_id()</code>.</div>
                 </div>
@@ -950,9 +954,9 @@
 
             <!-- GATE 02 -->
             <div id="gate-2" class="p-3.5 rounded bg-near-obsidian border border-near-border flex items-start justify-between gap-3 transition-all">
-              <div class="flex items-start gap-3">
+              <div class="flex items-start gap-3 min-w-0">
                 <span id="gate-icon-2" class="w-6 h-6 rounded bg-near-carbon border border-near-border flex items-center justify-center text-xs text-near-slate shrink-0">02</span>
-                <div>
+                <div class="min-w-0">
                   <div class="text-xs font-bold text-near-alabaster">GATE 02 // Global Vault Circuit Breaker</div>
                   <div class="text-[11px] text-near-slate mt-0.5">Rust contract assertion: <code class="text-near-green">require!(!self.is_paused, "ERR_VAULT_PAUSED")</code></div>
                 </div>
@@ -962,9 +966,9 @@
 
             <!-- GATE 03 -->
             <div id="gate-3" class="p-3.5 rounded bg-near-obsidian border border-near-border flex items-start justify-between gap-3 transition-all">
-              <div class="flex items-start gap-3">
+              <div class="flex items-start gap-3 min-w-0">
                 <span id="gate-icon-3" class="w-6 h-6 rounded bg-near-carbon border border-near-border flex items-center justify-center text-xs text-near-slate shrink-0">03</span>
-                <div>
+                <div class="min-w-0">
                   <div class="text-xs font-bold text-near-alabaster">GATE 03 // Agent Registration &amp; Active Key State</div>
                   <div class="text-[11px] text-near-slate mt-0.5">Assertion: <code class="text-near-green">agent.is_active == true</code> (Owner-revoked keys can no longer transact).</div>
                 </div>
@@ -974,9 +978,9 @@
 
             <!-- GATE 04 -->
             <div id="gate-4" class="p-3.5 rounded bg-near-obsidian border border-near-border flex items-start justify-between gap-3 transition-all">
-              <div class="flex items-start gap-3">
+              <div class="flex items-start gap-3 min-w-0">
                 <span id="gate-icon-4" class="w-6 h-6 rounded bg-near-carbon border border-near-border flex items-center justify-center text-xs text-near-slate shrink-0">04</span>
-                <div>
+                <div class="min-w-0">
                   <div class="text-xs font-bold text-near-alabaster">GATE 04 // Trusted Recipient Allowlist Check</div>
                   <div class="text-[11px] text-near-slate mt-0.5">Assertion: <code class="text-near-green">self.allowlist.contains(&amp;recipient)</code> — On violation: <strong class="text-near-red">revert the transfer.</strong></div>
                 </div>
@@ -986,9 +990,9 @@
 
             <!-- GATE 05 -->
             <div id="gate-5" class="p-3.5 rounded bg-near-obsidian border border-near-border flex items-start justify-between gap-3 transition-all">
-              <div class="flex items-start gap-3">
+              <div class="flex items-start gap-3 min-w-0">
                 <span id="gate-icon-5" class="w-6 h-6 rounded bg-near-carbon border border-near-border flex items-center justify-center text-xs text-near-slate shrink-0">05</span>
-                <div>
+                <div class="min-w-0">
                   <div class="text-xs font-bold text-near-alabaster">GATE 05 // Dual Velocity Arithmetic (Per-Tx &amp; Global Cap)</div>
                   <div class="text-[11px] text-near-slate mt-0.5">Assertion: <code class="text-near-green">amount &lt;= agent.max_per_tx &amp;&amp; vault_spent + amount &lt;= vault_cap</code></div>
                 </div>
@@ -1408,7 +1412,7 @@ the public sandbox key already in echoes/sandbox.json.</pre>
           <!-- FAQ 01 -->
           <div class="faq-item open border border-near-border rounded bg-near-obsidian/80 transition-colors" data-category="security">
             <button onclick="toggleFaqItem(this)" class="w-full text-left p-4 sm:p-5 flex items-start justify-between gap-4 focus:outline-none">
-              <div class="flex items-start gap-3">
+              <div class="flex items-start gap-3 min-w-0">
                 <span class="font-mono text-xs text-near-green font-bold mt-0.5">[Q01]</span>
                 <div>
                   <h3 class="font-sans font-bold text-base sm:text-lg text-near-alabaster">
@@ -1432,7 +1436,7 @@ the public sandbox key already in echoes/sandbox.json.</pre>
           <!-- FAQ 02 -->
           <div class="faq-item border border-near-border rounded bg-near-obsidian/80 transition-colors" data-category="contract">
             <button onclick="toggleFaqItem(this)" class="w-full text-left p-4 sm:p-5 flex items-start justify-between gap-4 focus:outline-none">
-              <div class="flex items-start gap-3">
+              <div class="flex items-start gap-3 min-w-0">
                 <span class="font-mono text-xs text-near-green font-bold mt-0.5">[Q02]</span>
                 <div>
                   <h3 class="font-sans font-bold text-base sm:text-lg text-near-alabaster">
@@ -1459,7 +1463,7 @@ the public sandbox key already in echoes/sandbox.json.</pre>
           <!-- FAQ 03 -->
           <div class="faq-item border border-near-border rounded bg-near-obsidian/80 transition-colors" data-category="contract">
             <button onclick="toggleFaqItem(this)" class="w-full text-left p-4 sm:p-5 flex items-start justify-between gap-4 focus:outline-none">
-              <div class="flex items-start gap-3">
+              <div class="flex items-start gap-3 min-w-0">
                 <span class="font-mono text-xs text-near-green font-bold mt-0.5">[Q03]</span>
                 <div>
                   <h3 class="font-sans font-bold text-base sm:text-lg text-near-alabaster">
@@ -1485,7 +1489,7 @@ the public sandbox key already in echoes/sandbox.json.</pre>
           <!-- FAQ 04 -->
           <div class="faq-item border border-near-border rounded bg-near-obsidian/80 transition-colors" data-category="security">
             <button onclick="toggleFaqItem(this)" class="w-full text-left p-4 sm:p-5 flex items-start justify-between gap-4 focus:outline-none">
-              <div class="flex items-start gap-3">
+              <div class="flex items-start gap-3 min-w-0">
                 <span class="font-mono text-xs text-near-green font-bold mt-0.5">[Q04]</span>
                 <div>
                   <h3 class="font-sans font-bold text-base sm:text-lg text-near-alabaster">
@@ -1509,7 +1513,7 @@ the public sandbox key already in echoes/sandbox.json.</pre>
           <!-- FAQ 05 -->
           <div class="faq-item border border-near-border rounded bg-near-obsidian/80 transition-colors" data-category="contract">
             <button onclick="toggleFaqItem(this)" class="w-full text-left p-4 sm:p-5 flex items-start justify-between gap-4 focus:outline-none">
-              <div class="flex items-start gap-3">
+              <div class="flex items-start gap-3 min-w-0">
                 <span class="font-mono text-xs text-near-green font-bold mt-0.5">[Q05]</span>
                 <div>
                   <h3 class="font-sans font-bold text-base sm:text-lg text-near-alabaster">
@@ -1530,7 +1534,7 @@ the public sandbox key already in echoes/sandbox.json.</pre>
           <!-- FAQ 06 -->
           <div class="faq-item border border-near-border rounded bg-near-obsidian/80 transition-colors" data-category="judges">
             <button onclick="toggleFaqItem(this)" class="w-full text-left p-4 sm:p-5 flex items-start justify-between gap-4 focus:outline-none">
-              <div class="flex items-start gap-3">
+              <div class="flex items-start gap-3 min-w-0">
                 <span class="font-mono text-xs text-near-green font-bold mt-0.5">[Q06]</span>
                 <div>
                   <h3 class="font-sans font-bold text-base sm:text-lg text-near-alabaster">
@@ -1554,7 +1558,7 @@ the public sandbox key already in echoes/sandbox.json.</pre>
           <!-- FAQ 07 -->
           <div class="faq-item border border-near-border rounded bg-near-obsidian/80 transition-colors" data-category="judges">
             <button onclick="toggleFaqItem(this)" class="w-full text-left p-4 sm:p-5 flex items-start justify-between gap-4 focus:outline-none">
-              <div class="flex items-start gap-3">
+              <div class="flex items-start gap-3 min-w-0">
                 <span class="font-mono text-xs text-near-green font-bold mt-0.5">[Q07]</span>
                 <div>
                   <h3 class="font-sans font-bold text-base sm:text-lg text-near-alabaster">
