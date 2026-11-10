@@ -172,6 +172,10 @@ agent/           original swarm demo + invariant checker used during development
   `SIMULATION`. The numbers above it are live reads from `/api/state`.
 - No TEE attestation yet — that is the obvious next layer, and it composes cleanly with
   a scoped key (attest, then hold the key).
+- `.echoes/` was tracked in early commits and therefore still sits in git history with three
+  scoped testnet keys. They cannot transfer, cannot be re-scoped and are bounded to `spend_as`
+  with ~0.248 N of gas allowance — the on-chain proof, and why one of them is public on
+  purpose, is in [SECURITY.md](SECURITY.md). `.echoes/` is untracked and gitignored now.
 
 ## License
 
