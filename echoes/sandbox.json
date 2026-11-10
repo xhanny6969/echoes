@@ -1,0 +1,12 @@
+{
+  "network": "testnet",
+  "rpc": "https://rpc.testnet.fastnear.com",
+  "vault": "sandbox.allowance-merchant.testnet",
+  "agent": "sandbox-worker",
+  "public_key": "ed25519:9FGvU6MAXt69X4Dbu5SJL87awZDPqMpc6N3up1FQXZBF",
+  "secret_key": "ed25519:36wsk1GtGRXQH6JqA4gjovW44nqEUsRF7BuwApn2GNU26F9QJsBzh7t5a8RcejjjJNgwmLuzTxtF7zydjPwHHJY9",
+  "amount": "0.05",
+  "allowed_recipient": "allowance-merchant.testnet",
+  "blocked_recipient": "not-on-the-allowlist.testnet",
+  "_warning": "TESTNET ONLY. This key is intentionally public so any agent can run the self-test. It is a NEAR FunctionCall key scoped to spend_as() on this vault only, capped at 0.05 N/tx and 0.25 N/day. It cannot transfer, stake, add keys, or call any other method. Never reuse this pattern on mainnet."
+}

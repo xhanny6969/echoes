@@ -9,7 +9,8 @@
   "scripts": {
     "build:contract": "cd contract && cargo build --release --target wasm32-unknown-unknown",
     "status": "node echoes/cli.js status",
-    "demo": "node echoes/agent/demo.js"
+    "demo": "node echoes/agent/demo.js",
+    "sandbox": "node echoes/sandbox.js"
   },
   "dependencies": {
     "near-api-js": "^3.0.4"

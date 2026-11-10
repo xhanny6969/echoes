@@ -280,7 +280,12 @@ function doctor() {
   console.log(`credentials dir ${path.join(os.homedir(), '.near-credentials', NETWORK)}`);
 }
 
-const commands = { init, status, revoke, doctor };
+async function sandbox() {
+  // Delegates to echoes/sandbox.js — the public self-test any agent can run.
+  require('./sandbox.js');
+}
+
+const commands = { init, status, revoke, doctor, sandbox };
 
 (async () => {
   if (!commands[cmd]) {
@@ -290,6 +295,7 @@ const commands = { init, status, revoke, doctor };
   echoes status --vault <id>
   echoes revoke --vault <id> --agent <id>
   echoes doctor
+  echoes sandbox                      the 60-second self-test (public testnet key)
 
 Flags for init:
   --per-tx 0.2 --daily 1.0           per-agent budget (NEAR)

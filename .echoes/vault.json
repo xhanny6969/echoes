@@ -1,0 +1,23 @@
+{
+  "vault": "lab.allowance-swarm.testnet",
+  "network": "testnet",
+  "rpc": "https://rpc.testnet.fastnear.com",
+  "owner": "lab.allowance-swarm.testnet",
+  "policy": {
+    "per_tx": "0.3",
+    "daily": "2.0",
+    "recipients": [
+      "allowance-merchant.testnet"
+    ]
+  },
+  "agents": [
+    {
+      "id": "lab-worker",
+      "public_key": "ed25519:5jAbzxosVK5MNnn17xVQyKKmgnV1v6dnNv57p6YoJo5p",
+      "secret_key": "ed25519:5E91HmVZXEwT6TMKuHcfBnfXG4BTMzBybYXdncPr2FEoeR3ExXonw9UF6fkkZcd2pNPWdDFVG3sip8PhqAJr8ADt",
+      "per_tx": "0.15",
+      "daily": "0.5"
+    }
+  ],
+  "created_at": "2026-11-09T19:24:39.460Z"
+}
