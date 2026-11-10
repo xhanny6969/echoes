@@ -264,12 +264,27 @@
     :root { --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1); }
 
     header { transition: border-color 0.4s var(--ease-out-expo),
-                         box-shadow 0.4s var(--ease-out-expo); }
+                         box-shadow 0.4s var(--ease-out-expo),
+                         transform 0.45s var(--ease-out-expo); }
     header.nav-scrolled {
       border-bottom-color: rgba(0, 236, 151, 0.28) !important;
       box-shadow: 0 14px 34px -24px rgba(0, 0, 0, 0.95),
                   inset 0 -1px 0 rgba(0, 236, 151, 0.16);
     }
+    /* the header gets out of the way while you read downward, comes back up */
+    header.nav-hidden { transform: translateY(-102%); }
+
+    /* nav: the current section owns an underline that grows in */
+    header nav a { position: relative; }
+    header nav a::after {
+      content: ''; position: absolute; left: 0.7rem; right: 0.7rem; bottom: 0.15rem;
+      height: 1px; background: currentColor; opacity: 0.7;
+      transform: scaleX(0); transform-origin: left center;
+      transition: transform 0.5s var(--ease-out-expo);
+    }
+    header nav a.nav-active::after { transform: scaleX(1); }
+    header nav a.nav-active { color: #00EC97 !important; }
+    html[data-theme="light"] header nav a.nav-active { color: #141414 !important; }
 
     html.echo-motion [data-rv] {
       opacity: 0;
@@ -364,13 +379,13 @@
 
       <!-- Navigation Links -->
       <nav class="hidden lg:flex items-center gap-1 font-mono text-xs">
-        <a href="#telemetry" class="px-3 py-2 text-near-slate hover:text-near-green transition-colors">[01 // TELEMETRY]</a>
-        <a href="#swarm-matrix" class="px-3 py-2 text-near-slate hover:text-near-green transition-colors">[02 // SWARM_AGENTS]</a>
-        <a href="#playground" class="px-3 py-2 text-near-slate hover:text-near-green transition-colors">[03 // PLAYGROUND]</a>
-        <a href="#install" class="px-3 py-2 text-near-green font-semibold hover:underline">[03.5 // INSTALL]</a>
-        <a href="#audit-log" class="px-3 py-2 text-near-slate hover:text-near-green transition-colors">[04 // AUDIT_LOG]</a>
-        <a href="#brand-kit" class="px-3 py-2 text-near-slate hover:text-near-green transition-colors">[05 // LOGO_KIT]</a>
-        <a href="#faq" class="px-3 py-2 text-near-green font-semibold hover:underline">[06 // FAQ]</a>
+        <a href="#telemetry" class="px-3 py-2 text-near-slate hover:text-near-green transition-colors">[TELEMETRY]</a>
+        <a href="#swarm-matrix" class="px-3 py-2 text-near-slate hover:text-near-green transition-colors">[SWARM_AGENTS]</a>
+        <a href="#playground" class="px-3 py-2 text-near-slate hover:text-near-green transition-colors">[PLAYGROUND]</a>
+        <a href="#install" class="px-3 py-2 text-near-green font-semibold hover:underline">[INSTALL]</a>
+        <a href="#audit-log" class="px-3 py-2 text-near-slate hover:text-near-green transition-colors">[AUDIT_LOG]</a>
+        <a href="#brand-kit" class="px-3 py-2 text-near-slate hover:text-near-green transition-colors">[LOGO_KIT]</a>
+        <a href="#faq" class="px-3 py-2 text-near-green font-semibold hover:underline">[FAQ]</a>
       </nav>
 
       <!-- Active Session & Wallet Action -->
@@ -605,7 +620,7 @@
     <section id="telemetry" class="space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <div class="flex items-center gap-2 font-mono text-xs text-near-green">
-          <span>[01 // VAULT_TELEMETRY]</span>
+          <span>[VAULT_TELEMETRY]</span>
           <span class="text-near-dim">—</span>
           <span class="text-near-slate">LIVE STATE READ FROM <code class="text-near-alabaster">allowance-swarm.testnet</code></span>
           <span id="liveSourceBadge" class="font-mono text-[10px] px-2 py-0.5 rounded border border-near-border text-near-dim flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-near-amber"></span> connecting…</span>
@@ -736,7 +751,7 @@
     <section id="swarm-matrix" class="space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <div class="font-mono text-xs text-near-green">[02 // SWARM_AGENT_MATRIX]</div>
+          <div class="font-mono text-xs text-near-green">[SWARM_AGENT_MATRIX]</div>
           <h2 class="font-display font-bold text-2xl text-near-alabaster mt-1">Autonomous Agents &amp; Scoped Access Keys</h2>
         </div>
         <p class="text-xs font-mono text-near-slate max-w-md">
@@ -760,7 +775,7 @@
       </div>
       <div class="flex flex-wrap items-end justify-between gap-4 border-b border-near-border pb-4">
         <div>
-          <div class="font-mono text-xs text-near-green">[03 // GUARDRAIL_SIMULATOR_&_TESTNET_CONSOLE]</div>
+          <div class="font-mono text-xs text-near-green">[GUARDRAIL_SIMULATOR_&_TESTNET_CONSOLE]</div>
           <h2 class="font-display font-bold text-2xl sm:text-3xl text-near-alabaster mt-1">
             Interactive 5-Gate On-Chain Verification Playground
           </h2>
@@ -991,7 +1006,7 @@
       <div class="swiss-box swiss-corner p-6 sm:p-8 rounded">
         <div class="flex flex-wrap items-start justify-between gap-4 border-b border-near-border pb-5">
           <div>
-            <div class="font-mono text-xs text-near-green">[03.5 // INSTALL_IN_YOUR_AGENT]</div>
+            <div class="font-mono text-xs text-near-green">[INSTALL_IN_YOUR_AGENT]</div>
             <h2 class="font-display font-extrabold text-2xl sm:text-3xl text-near-alabaster mt-2">
               Your agent can install this itself
             </h2>
@@ -1097,7 +1112,7 @@ the public sandbox key already in echoes/sandbox.json.</pre>
     <section id="audit-log" class="space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <div class="font-mono text-xs text-near-green">[04 // IMMUTABLE_AUDIT_STREAM]</div>
+          <div class="font-mono text-xs text-near-green">[IMMUTABLE_AUDIT_STREAM]</div>
           <h2 class="font-display font-bold text-2xl text-near-alabaster mt-1">Structured On-Chain &amp; Agent Telemetry (<code class="text-near-cyan font-mono text-lg">audit.jsonl</code>)</h2>
         </div>
         <div class="flex items-center gap-2">
@@ -1158,7 +1173,7 @@ the public sandbox key already in echoes/sandbox.json.</pre>
     <section id="brand-kit" class="space-y-5 pt-4">
       <div class="flex flex-wrap items-end justify-between gap-4 border-b border-near-border pb-4">
         <div>
-          <div class="font-mono text-xs text-near-green">[05 // BESPOKE_LOGO_&_BRAND_ASSETS]</div>
+          <div class="font-mono text-xs text-near-green">[BESPOKE_LOGO_&_BRAND_ASSETS]</div>
           <h2 class="font-display font-bold text-2xl sm:text-3xl text-near-alabaster mt-1">
             Echoes Vector Identity &amp; Repository Asset Kit
           </h2>
@@ -1252,7 +1267,7 @@ the public sandbox key already in echoes/sandbox.json.</pre>
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-near-border pb-6">
           <div>
             <div class="inline-flex items-center gap-2 font-mono text-xs text-near-green">
-              <span>[06 // TECHNICAL_DOCUMENTATION_&_FAQ]</span>
+              <span>[TECHNICAL_DOCUMENTATION_&_FAQ]</span>
             </div>
             <h2 class="font-display font-extrabold text-2xl sm:text-4xl text-near-alabaster mt-2">
               Frequently Asked Questions <span class="font-serif italic font-normal text-near-green">(Architecture &amp; Security)</span>
@@ -2714,6 +2729,9 @@ the public sandbox key already in echoes/sandbox.json.</pre>
 
 
 
+
+
+
   <script id="echoes-motion-js">
   (function () {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -2749,7 +2767,7 @@ the public sandbox key already in echoes/sandbox.json.</pre>
       blocks.forEach(function (el) {
         var grid = el.querySelector(':scope > .grid');
         if (!grid) return;
-        [].slice.call(grid.children).slice(0, 4).forEach(function (card, k) {
+        [].slice.call(grid.children).slice(0, 8).forEach(function (card, k) {
           tag(card, k + 1);
         });
       });
@@ -2781,12 +2799,20 @@ the public sandbox key already in echoes/sandbox.json.</pre>
         if (!el.classList.contains('rv-in')) el.classList.add('rv-in');
       });
     }
-    window.addEventListener('beforeprint', revealAll);
+    // captures get the settled page: everything revealed AND the hero at full
+    // opacity, because a screenshot taken mid-scroll would otherwise bake in the
+    // recede fade and look like a rendering bug.
+    function captureSettle() {
+      revealAll();
+      var h = document.querySelector('main > section');
+      if (h) { h.style.opacity = '1'; h.style.transform = 'none'; }
+    }
+    window.addEventListener('beforeprint', captureSettle);
 
     // Automation (headless browsers, CI screenshotters, crawlers) reports
     // navigator.webdriver. Those never scroll, they snap the whole document —
     // so hand them the finished page instead of a page full of empty boxes.
-    if (navigator.webdriver) revealAll();
+    if (navigator.webdriver) captureSettle();
 
     // Full-page capture tools (headless screenshot, "capture full size" in
     // devtools) grow the viewport to the document height instead of scrolling,
@@ -2796,9 +2822,9 @@ the public sandbox key already in echoes/sandbox.json.</pre>
       return window.innerHeight > 1000 && window.innerHeight > h * 0.85;
     }
     window.addEventListener('resize', function () {
-      if (captureViewport()) revealAll();
+      if (captureViewport()) captureSettle();
     });
-    if (captureViewport()) revealAll();
+    if (captureViewport()) captureSettle();
 
     var idle = null;
     function resetIdle() {
@@ -2819,22 +2845,73 @@ the public sandbox key already in echoes/sandbox.json.</pre>
       });
     }, 400);
 
-    // ── scroll response: nav state (DINO switches at 50px) ──
-    // No element parallax: DINO drifts its full-bleed hero photo, Echoes has no
-    // such layer, and translating the interactive radar SVG would move its click
-    // targets under the cursor. Reveal + nav shadow is the whole DINO grammar.
+    // ── scroll response ──
+    // Three things move with the scroll position, all of them cheap:
+    //   1. header state (shadow past 50px) and auto-hide while reading down
+    //   2. nav scroll-spy: the underline follows the section in view
+    //   3. hero recedes as it leaves (opacity only — translating the radar
+    //      would move its click targets under the cursor)
     var header = document.querySelector('header');
+    var hero = sections[0];
+    var navItems = [].slice.call(document.querySelectorAll('header nav a[href^="#"]'))
+      .map(function (a) {
+        var href = a.getAttribute('href');
+        return href && href.length > 1 ? { a: a, el: document.querySelector(href) } : null;
+      })
+      .filter(function (x) { return x && x.el; });
+
     var queued = false;
     var lastState = null;
+    var lastY = window.pageYOffset || 0;
+    var navHidden = false;
+    var activeItem = null;
 
     function paint() {
       queued = false;
       var y = window.pageYOffset || document.documentElement.scrollTop || 0;
-      var next = y > 50;
-      if (header && next !== lastState) {
-        header.classList.toggle('nav-scrolled', next);
-        lastState = next;
+
+      // 1. header shadow + auto-hide
+      var scrolled = y > 50;
+      if (header && scrolled !== lastState) {
+        header.classList.toggle('nav-scrolled', scrolled);
+        lastState = scrolled;
       }
+      if (header) {
+        var delta = y - lastY;
+        if (y < 260) {
+          if (navHidden) { header.classList.remove('nav-hidden'); navHidden = false; }
+        } else if (delta > 6 && !navHidden) {
+          header.classList.add('nav-hidden'); navHidden = true;
+        } else if (delta < -6 && navHidden) {
+          header.classList.remove('nav-hidden'); navHidden = false;
+        }
+      }
+
+      // 2. scroll-spy
+      if (navItems.length) {
+        // probe a bit below the fold edge so a section counts as "current" as
+        // soon as its heading area is comfortably in view, not only at its top
+        var probe = y + Math.min(340, window.innerHeight * 0.45);
+        var current = null;
+        for (var i = 0; i < navItems.length; i++) {
+          if (navItems[i].el.offsetTop <= probe) current = navItems[i];
+        }
+        if (current !== activeItem) {
+          if (activeItem) activeItem.a.classList.remove('nav-active');
+          if (current) current.a.classList.add('nav-active');
+          activeItem = current;
+        }
+      }
+
+      // 3. hero recede
+      if (hero) {
+        var p = Math.min(1, y / 600);
+        hero.style.opacity = (1 - 0.55 * p).toFixed(3);
+        hero.style.transform = 'translate3d(0,' + (-14 * p).toFixed(1) + 'px,0)';
+        hero.style.willChange = 'opacity, transform';
+      }
+
+      lastY = y;
     }
     function onScroll() { if (!queued) { queued = true; requestAnimationFrame(paint); } }
     window.addEventListener('scroll', onScroll, { passive: true });
