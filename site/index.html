@@ -2734,6 +2734,7 @@ the public sandbox key already in echoes/sandbox.json.</pre>
     });
   </script>
 
+
   <script id="echoes-motion-js">
   (function () {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -2840,6 +2841,15 @@ the public sandbox key already in echoes/sandbox.json.</pre>
 
     // reveal everything already on screen at load, no scroll event needed
     sweepReveals();
+
+    // full-page captures, print, and crawlers must never see blank sections:
+    // after 6s (or on print) drop the curtain on whatever is still hidden.
+    function revealAll() {
+      var el;
+      while ((el = pendingTargets.pop())) el.classList.add('rv-in');
+    }
+    window.addEventListener('beforeprint', revealAll);
+    setTimeout(revealAll, 6000);
 
     // failsafe: never leave content invisible
     setTimeout(sweepReveals, 600);
