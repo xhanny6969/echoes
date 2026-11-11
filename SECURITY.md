@@ -21,13 +21,17 @@ present in git history (commit `a6a759c`). They have since been untracked and `.
 is now gitignored, but history is history, so here is the verifiable state instead of a
 promise.
 
-Checked against `rpc.testnet.fastnear.com` on **2026-11-10 08:15 UTC**:
+Checked against `rpc.testnet.fastnear.com` on **2026-11-11 01:35 UTC**:
 
 | account | leaked key | permission | receiver | methods | allowance |
 |---|---|---|---|---|---|
-| `demo.allowance-merchant.testnet` | `ed25519:GiemQuxw…` | FunctionCall | itself | `["spend_as"]` | 0.247325 N |
+| `demo.allowance-merchant.testnet` | `ed25519:GiemQuxw…` | FunctionCall | itself | `["spend_as"]` | 0.244064 N |
 | `lab.allowance-swarm.testnet` | `ed25519:5jAbzxos…` | FunctionCall | itself | `["spend_as"]` | 0.248499 N |
 | `sandbox.allowance-merchant.testnet` | `ed25519:9FGvU6MA…` | FunctionCall | itself | `["spend_as"]` | 0.247957 N |
+
+Allowance is a gas budget that only goes **down** — every call signed with one of these keys
+burns a little of it, so the numbers above drift. They are a snapshot, not a constant; re-run
+the query below before quoting them.
 
 Reproduce it yourself:
 
