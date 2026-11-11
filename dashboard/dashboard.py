@@ -2386,18 +2386,25 @@ class Handler(BaseHTTPRequestHandler):
         try:
             path_only = self.path.split("?", 1)[0]
             if path_only.startswith("/assets/"):
-                # The console loads one lazy asset: the multi-wallet bundle
-                # (built by `npm run build:wallet`). Served from site/assets so
-                # the dashboard and the static site share a single copy.
-                name = path_only[len("/assets/"):]
-                if "/" in name or not name.endswith(".js"):
+                # Static assets the console loads: the lazy multi-wallet bundle
+                # (`npm run build:wallet`) and the wallet logos next to it.
+                # Served from site/assets so the dashboard and the static site
+                # share one copy — path is resolved and jail-checked, never
+                # string-concatenated.
+                base = (Path(__file__).resolve().parent.parent / "site" / "assets").resolve()
+                target = (base / path_only[len("/assets/"):]).resolve()
+                ctype = {
+                    ".js": "application/javascript; charset=utf-8",
+                    ".png": "image/png",
+                    ".svg": "image/svg+xml",
+                    ".webp": "image/webp",
+                    ".jpg": "image/jpeg",
+                    ".ico": "image/x-icon",
+                }.get(target.suffix.lower())
+                if base not in target.parents or not target.is_file() or ctype is None:
                     self._send(404, b"not found", "text/plain; charset=utf-8")
                     return
-                asset = Path(__file__).resolve().parent.parent / "site" / "assets" / name
-                if not asset.exists():
-                    self._send(404, b"not found", "text/plain; charset=utf-8")
-                    return
-                self._send(200, asset.read_bytes(), "application/javascript; charset=utf-8")
+                self._send(200, target.read_bytes(), ctype)
             elif self.path.startswith("/api/state"):
                 force = "force=1" in self.path
                 self._send(200, json.dumps(_state(force=force)).encode(), "application/json")
