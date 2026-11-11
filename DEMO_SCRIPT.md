@@ -70,6 +70,30 @@ if you re-record many times.
 
 ---
 
+## Recorded take (the hashes burned into the demo video)
+
+The shipped video (`echoes-demo-1080p.mp4`, 78 s, 1920×1080@30 — attached to the submission post, kept
+out of the repo to keep the clone small) replays one real keyless run captured on
+**2026-11-11T01:12Z**. Those hashes — not the older ones in the table above — are the ones on screen,
+and both were re-queried after the run:
+
+| Run | tx hash | tx status | evidence |
+|---|---|---|---|
+| accepted (allowlisted vendor) | `Go28mAuSovjrrXjKeM1Vz2WZwuGAVBJa7fx5oJyG9ZZL` | `SuccessValue` | 4 `SuccessValue` receipts |
+| blocked (recipient not allowlisted) | `EyffmnZjjwNKWCMdEYka6gNPc8bNe4TBQ2NbH3he23Dw` | `Failure` | receipt `453zCortyH9cwdPa8qD1ByeDEaW7RXXTsCTsAEup4s3A`, log `allowkey: blocked — recipient is not on the allowlist` |
+
+Re-verify either one before re-recording:
+
+```bash
+curl -s -X POST https://rpc.testnet.fastnear.com -H 'content-type: application/json' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tx","params":{"tx_hash":"Go28mAuSovjrrXjKeM1Vz2WZwuGAVBJa7fx5oJyG9ZZL","sender_account_id":"demo.allowance-merchant.testnet","wait_until":"FINAL"}}'
+```
+
+Each run mints new hashes, so a fresh take invalidates this table — update it in the same commit as the
+new video, otherwise a judge comparing the video against the repo finds two different truths.
+
+---
+
 ## Shot list
 
 ### 0:00–0:08 — Hook
