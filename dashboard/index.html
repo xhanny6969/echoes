@@ -31,8 +31,8 @@
   --border-focus: #525252;
   --border-subtle: #262626;
   --text: #F2F1E9;
-  --text-muted: #525252;
-  --text-dim: #525252;
+  --text-muted: #949494;
+  --text-dim: #808080;
   --near-green: #00EC97;
   --near-green-ink: #00EC97;
   --near-green-subtle: rgba(0, 236, 151, 0.1);
@@ -60,21 +60,21 @@
   --border-subtle: #E6E6E6;
   --text: #141414;
   --text-muted: #525252;
-  --text-dim: #858585;
+  --text-dim: #6E6E6E;
   --near-green: #00EC97;
   --near-green-ink: #141414;
   --near-green-subtle: rgba(0, 236, 151, 0.22);
   --near-green-border: rgba(0, 236, 151, 0.25);
-  --blue: #0091FD;
+  --blue: #0074CC;
   --blue-subtle: rgba(0, 145, 253, 0.08);
   --blue-border: rgba(0, 145, 253, 0.25);
-  --amber: #9797FF;
-  --amber-subtle: rgba(151, 151, 255, 0.08);
-  --amber-border: rgba(151, 151, 255, 0.25);
+  --amber: #5B5BD6;
+  --amber-subtle: rgba(151, 151, 255, 0.12);
+  --amber-border: rgba(91, 91, 214, 0.3);
   --red: #FF7966;
   --red-subtle: rgba(255, 121, 102, 0.08);
   --red-border: rgba(255, 121, 102, 0.25);
-  --purple: #9797FF;
+  --purple: #5B5BD6;
   --shadow: 0 1px 3px rgba(20,20,20,0.06), 0 8px 20px -6px rgba(20,20,20,0.08);
 }
 
@@ -87,6 +87,14 @@ body {
   font-size: 13.5px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Form controls do NOT inherit color from their ancestors by default — the UA
+   stylesheet gives every <button> a hard-coded black. Without this reset every
+   button without an explicit `color` renders black-on-black in dark mode. */
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
 }
 
 .mono {
@@ -761,6 +769,7 @@ tbody tr:hover { background: var(--panel-hover); }
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 6px;
+  color: var(--text);
   cursor: pointer;
   transition: border-color .15s ease, transform .15s ease;
 }

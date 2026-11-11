@@ -2366,6 +2366,18 @@ if _INDEX.exists():
 _LANDING = Path(__file__).resolve().parent / "landing.html"
 
 
+def _index_html() -> str:
+    """Read index.html per request so UI edits show up without a restart.
+
+    The module-level HTML above is only the embedded fallback for when
+    dashboard.py is copied somewhere on its own.
+    """
+    try:
+        return _INDEX.read_text(encoding="utf-8")
+    except OSError:
+        return HTML
+
+
 def _landing_html() -> str:
     try:
         return _LANDING.read_text(encoding="utf-8")
@@ -2415,7 +2427,7 @@ class Handler(BaseHTTPRequestHandler):
             elif self.path.split("?")[0].rstrip("/") in ("/landing", "/pitch", "/showcase"):
                 self._send(200, _landing_html().encode(), "text/html; charset=utf-8")
             else:
-                self._send(200, HTML.encode(), "text/html; charset=utf-8")
+                self._send(200, _index_html().encode(), "text/html; charset=utf-8")
         except Exception as exc:  # keep the demo alive
             self._send(500, json.dumps({"error": str(exc)}).encode(), "application/json")
 
