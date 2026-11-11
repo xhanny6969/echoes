@@ -26,11 +26,11 @@ import { setupNightly } from "@near-wallet-selector/nightly";
 
 const NETWORK = "testnet";
 const ICONS = {
-  "my-near-wallet": "https://raw.githubusercontent.com/near/wallet-selector/main/packages/my-near-wallet/src/lib/assets/my-near-wallet-icon.png",
-  "meteor-wallet": "https://raw.githubusercontent.com/near/wallet-selector/main/packages/meteor-wallet/src/lib/assets/meteor-icon.png",
-  "here-wallet": "https://raw.githubusercontent.com/near/wallet-selector/main/packages/here-wallet/src/lib/assets/here-wallet-icon.png",
-  sender: "https://raw.githubusercontent.com/near/wallet-selector/main/packages/sender/src/lib/assets/sender-icon.png",
-  nightly: "https://raw.githubusercontent.com/near/wallet-selector/main/packages/nightly/src/lib/assets/nightly-icon.png",
+  "my-near-wallet": "assets/wallets/my-near-wallet.png",
+  "meteor-wallet": "assets/wallets/meteor.png",
+  "here-wallet": "assets/wallets/here.png",
+  sender: "assets/wallets/sender.png",
+  nightly: "assets/wallets/nightly.png",
 };
 
 // Order matters: the same order the console's picker renders.
