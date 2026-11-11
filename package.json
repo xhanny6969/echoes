@@ -11,12 +11,29 @@
     "status": "node echoes/cli.js status",
     "demo": "node echoes/agent/demo.js",
     "sandbox": "node echoes/sandbox.js",
-    "acceptance": "node scripts/acceptance.js"
+    "acceptance": "node scripts/acceptance.js",
+    "build:wallet": "esbuild site/wallet/entry.js --bundle --minify --format=iife --target=es2020 --alias:buffer=buffer --alias:process=process --alias:util=util --alias:stream=stream-browserify --alias:crypto=crypto-browserify --alias:vm=vm-browserify --inject:site/wallet/shim.js --define:global=globalThis --outfile=site/assets/wallet-selector.js"
   },
   "dependencies": {
     "near-api-js": "^3.0.4"
   },
   "engines": {
     "node": ">=18"
+  },
+  "devDependencies": {
+    "@near-wallet-selector/core": "^10.1.4",
+    "@near-wallet-selector/here-wallet": "^10.1.4",
+    "@near-wallet-selector/meteor-wallet": "^10.1.4",
+    "@near-wallet-selector/modal-ui": "^10.1.4",
+    "@near-wallet-selector/my-near-wallet": "^10.1.4",
+    "@near-wallet-selector/nightly": "^10.1.4",
+    "@near-wallet-selector/sender": "^10.1.4",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.1",
+    "esbuild": "^0.28.2",
+    "process": "^0.11.10",
+    "stream-browserify": "^3.0.0",
+    "util": "^0.12.5",
+    "vm-browserify": "^1.1.2"
   }
 }

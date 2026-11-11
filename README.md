@@ -61,6 +61,39 @@ with its own budget. The agent never sees a full-access key.
 
 ---
 
+## Connect from the browser console — five wallets
+
+The live console ([console.html](https://xhanny6969.github.io/echoes/console.html)) has a
+working wallet picker, not a screenshot of one. Any of these can sign in against NEAR
+testnet and broadcast a real `spend_as`:
+
+| Wallet | How it connects | Key it receives |
+|---|---|---|
+| MyNearWallet | web, redirect | `FunctionCall(spend_as)` on the vault |
+| Meteor | extension or popup | same |
+| HERE | popup sign-in | same |
+| Sender | extension | same |
+| Nightly | extension or app | same |
+
+Every one of them goes through [`@near-wallet-selector`](https://github.com/near/wallet-selector)
+with `contractId = <the vault you loaded>` and `methodNames = ["spend_as"]`, so the wallet
+mints a scoped function-call key — signing in never hands the page a full-access key. The
+console shows the connected account in the header and routes *Sign & Broadcast Tx* through
+the wallet's own approval popup.
+
+The signing layer is `site/wallet/entry.js`, bundled to `site/assets/wallet-selector.js`:
+
+```bash
+npm run build:wallet      # esbuild → site/assets/wallet-selector.js (~800 KB gzipped)
+```
+
+That bundle is fetched **lazily** — only when someone opens the wallet modal and picks a
+wallet. A judge pressing the keyless 60-second path, or anyone just reading the page, never
+downloads it. No wallet installed? The picker says so explicitly instead of hanging, and
+the in-browser scoped-key signer below it stays available.
+
+---
+
 ## The problem
 
 Handing an autonomous agent a wallet today means handing it a **full-access key**. One
@@ -203,6 +236,8 @@ echoes/cli.js    one-command bootstrap: account + contract + scoped key + policy
 echoes/agent/    real LLM agent (careful + compromised profiles) and the demo runner
 echoes/evidence/ transcript of the last demo run, including revert logs
 dashboard/       live console + showcase page, reads chain state through /api/state
+site/            static site (GitHub Pages / Vercel): landing, console, wallet bundle
+site/wallet/     multi-wallet signing layer source — `npm run build:wallet` builds it
 agent/           original swarm demo + invariant checker used during development
 ```
 

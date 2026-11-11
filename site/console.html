@@ -746,6 +746,38 @@ tbody tr:hover { background: var(--panel-hover); }
   gap: 8px;
 }
 
+/* --- Wallet picker grid --- */
+.wallet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+}
+.wallet-card {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  text-align: left;
+  padding: 9px 10px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color .15s ease, transform .15s ease;
+}
+.wallet-card:hover:not(:disabled) { border-color: var(--near-green); transform: translateY(-1px); }
+.wallet-card:disabled { opacity: .55; cursor: progress; }
+.wallet-card.active { border-color: var(--near-green); box-shadow: 0 0 0 1px var(--near-green-border); }
+.wallet-card .wc-mark {
+  width: 26px; height: 26px; border-radius: 6px; flex: 0 0 26px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono, monospace); font-size: 11px; font-weight: 700;
+  background: var(--panel-muted); border: 1px solid var(--border); color: var(--near-green);
+}
+.wallet-card .wc-name { font-size: 12.5px; font-weight: 600; line-height: 1.1; }
+.wallet-card .wc-note { font-size: 10.5px; color: var(--text-dim); line-height: 1.2; }
+.wallet-picker-msg { font-size: 11.5px; color: var(--text-dim); min-height: 14px; }
+.wallet-picker-msg.err { color: var(--red); }
+
 /* --- Footer --- */
 footer {
   max-width: 1360px;
@@ -1256,18 +1288,38 @@ footer {
 
     <div class="modal-sec">
       <div style="display:flex;justify-content:space-between;align-items:center">
-        <strong style="font-size:12.5px">1. MyNearWallet (NEAR Testnet)</strong>
-        <span class="badge info mono" style="font-size:10px">Browser Redirect</span>
+        <strong style="font-size:12.5px">1. Connect a NEAR testnet wallet</strong>
+        <span class="badge info mono" style="font-size:10px">5 wallets · key scoped spend_as</span>
       </div>
       <div style="font-size:12px;color:var(--text-muted)">
-        Sign in with your own <code class="mono">.testnet</code> account. If you are the vault owner, you can toggle <code class="mono">set_paused</code> or reset agent budgets; if you are another user, you can test that the contract rejects unauthorized callers on-chain.
+        Sign in with your own <code class="mono">.testnet</code> account. If you are the vault owner, you can toggle <code class="mono">set_paused</code> or reset agent budgets; if you are another user, you can test that the contract rejects unauthorized callers on-chain. The access key created for you is <code class="mono">FunctionCall(spend_as)</code> on this vault only — never a full-access key.
       </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button class="btn btn-primary" id="mynear-connect-btn" onclick="connectMyNearWallet()" style="width:100%">
-          Connect MyNearWallet (Testnet) ↗
+      <div class="wallet-grid" id="wallet-grid">
+        <button class="wallet-card" id="w-my-near-wallet" data-wallet-id="my-near-wallet" onclick="connectWithWallet('my-near-wallet')">
+          <span class="wc-mark">M</span>
+          <span><span class="wc-name">MyNearWallet</span><br><span class="wc-note">web · redirect</span></span>
         </button>
-        <button class="btn" id="mynear-disconnect-btn" onclick="disconnectWallet()" style="display:none">
-          Disconnect
+        <button class="wallet-card" id="w-meteor-wallet" data-wallet-id="meteor-wallet" onclick="connectWithWallet('meteor-wallet')">
+          <span class="wc-mark">Mt</span>
+          <span><span class="wc-name">Meteor</span><br><span class="wc-note">extension or popup</span></span>
+        </button>
+        <button class="wallet-card" id="w-here-wallet" data-wallet-id="here-wallet" onclick="connectWithWallet('here-wallet')">
+          <span class="wc-mark">H</span>
+          <span><span class="wc-name">HERE</span><br><span class="wc-note">popup sign-in</span></span>
+        </button>
+        <button class="wallet-card" id="w-sender" data-wallet-id="sender" onclick="connectWithWallet('sender')">
+          <span class="wc-mark">S</span>
+          <span><span class="wc-name">Sender</span><br><span class="wc-note">extension</span></span>
+        </button>
+        <button class="wallet-card" id="w-nightly" data-wallet-id="nightly" onclick="connectWithWallet('nightly')">
+          <span class="wc-mark">N</span>
+          <span><span class="wc-name">Nightly</span><br><span class="wc-note">extension or app</span></span>
+        </button>
+      </div>
+      <div class="wallet-picker-msg" id="wallet-picker-msg"></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn" id="mynear-disconnect-btn" onclick="disconnectWallet()" style="display:none;width:100%">
+          Disconnect wallet
         </button>
       </div>
     </div>
@@ -1322,6 +1374,10 @@ let SIM_RUNNING = false;
 let NEAR_CONN = null;
 let WALLET_CONN = null;
 let SESSION_SIGNER = null; // { accountId, keyPair, publicKey }
+let WALLET_SELECTOR = null; // window.EchoesWallet, loaded on first picker use
+let SELECTOR_ACCOUNT = null; // { accountId, walletId } when signed in through the picker
+let WALLET_BUNDLE_PROMISE = null;
+let WALLET_WATCH_ATTACHED = false;
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -1919,8 +1975,8 @@ function evaluatePlayground(highlightTop = false) {
   let stopGate = 4;
 
   // Gate 1: Signer Key
-  const g1Pass = caller === 'agent-alpha' || caller === 'agent-beta' || (caller === 'wallet' && (SESSION_SIGNER || (WALLET_CONN && WALLET_CONN.isSignedIn())));
-  const signerLabel = ag ? shortKey(ag.public_key, 12, 4) : (caller === 'rogue' ? 'ed25519:RogueUnregisteredKey' : (SESSION_SIGNER ? shortKey(SESSION_SIGNER.publicKey, 12, 4) : (WALLET_CONN && WALLET_CONN.isSignedIn() ? WALLET_CONN.getAccountId() : 'unconnected')));
+  const g1Pass = caller === 'agent-alpha' || caller === 'agent-beta' || (caller === 'wallet' && (SESSION_SIGNER || activeWalletAccount()));
+  const signerLabel = ag ? shortKey(ag.public_key, 12, 4) : (caller === 'rogue' ? 'ed25519:RogueUnregisteredKey' : (SESSION_SIGNER ? shortKey(SESSION_SIGNER.publicKey, 12, 4) : (activeWalletAccount() || 'unconnected')));
   gates.push({ name: '1. Signer Key Attribution', detail: signerLabel, status: 'PASS', cls: 'ok' });
 
   // Gate 2: Protocol Method Scope
@@ -1941,7 +1997,7 @@ function evaluatePlayground(highlightTop = false) {
     if (method !== 'spend_as') {
       const ownerId = (s.policy && s.policy.owner) || VAULT_ID;
       const connectedId = caller === 'wallet'
-        ? (SESSION_SIGNER ? SESSION_SIGNER.accountId : (WALLET_CONN && WALLET_CONN.isSignedIn() ? WALLET_CONN.getAccountId() : ''))
+        ? (SESSION_SIGNER ? SESSION_SIGNER.accountId : activeWalletAccount())
         : '';
       if (connectedId !== ownerId) {
         g3Fail = 'allowkey: blocked — only the vault owner can call this';
@@ -2034,6 +2090,89 @@ function closeWalletModal() {
   $('wallet-modal').classList.remove('open');
 }
 
+/* --- Multi-wallet connect (MyNearWallet · Meteor · HERE · Sender · Nightly) ---
+ * The picker is rendered here; the signing logic lives in assets/wallet-selector.js,
+ * which is only fetched the first time someone actually picks a wallet. Judges reading
+ * the page never download it, and the keyless self-test path never touches it.
+ */
+const WALLET_BUNDLE_URL = 'assets/wallet-selector.js';
+
+function loadWalletBundle() {
+  if (window.EchoesWallet) return Promise.resolve(window.EchoesWallet);
+  if (WALLET_BUNDLE_PROMISE) return WALLET_BUNDLE_PROMISE;
+  WALLET_BUNDLE_PROMISE = new Promise((resolve, reject) => {
+    const tag = document.createElement('script');
+    tag.src = WALLET_BUNDLE_URL;
+    tag.async = true;
+    tag.onload = () => (window.EchoesWallet
+      ? resolve(window.EchoesWallet)
+      : reject(new Error('wallet bundle loaded but exposed nothing')));
+    tag.onerror = () => reject(new Error(`could not load ${WALLET_BUNDLE_URL}`));
+    document.head.appendChild(tag);
+  });
+  return WALLET_BUNDLE_PROMISE;
+}
+
+function activeWalletAccount() {
+  if (SELECTOR_ACCOUNT && SELECTOR_ACCOUNT.accountId) return SELECTOR_ACCOUNT.accountId;
+  if (WALLET_CONN && WALLET_CONN.isSignedIn()) return WALLET_CONN.getAccountId();
+  return '';
+}
+
+function setPickerBusy(busy, activeId) {
+  document.querySelectorAll('.wallet-card').forEach(el => {
+    el.disabled = busy;
+    el.classList.toggle('active', Boolean(activeId) && el.dataset.walletId === activeId);
+  });
+}
+
+function pickerMessage(text, isError) {
+  const el = $('wallet-picker-msg');
+  if (!el) return;
+  el.textContent = text || '';
+  el.className = 'wallet-picker-msg' + (isError ? ' err' : '');
+}
+
+async function connectWithWallet(walletId) {
+  const label = ({ 'my-near-wallet': 'MyNearWallet', 'meteor-wallet': 'Meteor', 'here-wallet': 'HERE', sender: 'Sender', nightly: 'Nightly' })[walletId] || walletId;
+  if (document.querySelector('.wallet-card[disabled]')) return; // one handshake at a time
+  if (window.location.protocol === 'file:') {
+    pickerMessage('Wallet sign-in needs http:// or https:// so the wallet can redirect back. Run "python3 dashboard/dashboard.py" (http://localhost:8088), or use section 2 (in-browser key) below.', true);
+    return;
+  }
+  pickerMessage(`Opening ${label}… approve the request in your wallet.`);
+  setPickerBusy(true, walletId);
+  try {
+    const bundle = await loadWalletBundle();
+    WALLET_SELECTOR = bundle;
+    if (!WALLET_WATCH_ATTACHED) {
+      WALLET_WATCH_ATTACHED = true;
+      bundle.onChange(state => {
+        SELECTOR_ACCOUNT = state && state.signedIn ? { accountId: state.accountId, walletId: state.walletId } : null;
+        updateWalletUI();
+      });
+    }
+    // A popup that never resolves must not lock the picker forever.
+    const handshake = bundle.connect(walletId, VAULT_ID);
+    const accountId = await Promise.race([
+      handshake,
+      new Promise((_, reject) => setTimeout(() => reject(new Error('no response after 60s — popup blocked or wallet closed')), 60000)),
+    ]);
+    if (accountId) {
+      pickerMessage(`Signed in as ${accountId} — the key is scoped to ${VAULT_ID} only.`);
+      closeWalletModal();
+    } else if (!bundle.isSignedIn()) {
+      pickerMessage(`${label} did not return an account. If nothing opened, that wallet is not installed in this browser — copy the URL into its app instead.`, true);
+    }
+  } catch (err) {
+    const raw = String((err && err.message) || err);
+    pickerMessage(`${label}: ${raw}`, true);
+  } finally {
+    setPickerBusy(false, null);
+    updateWalletUI();
+  }
+}
+
 async function initNearWallet() {
   if (!window.nearApi) return;
   try {
@@ -2055,7 +2194,14 @@ function updateWalletUI() {
   const lbl = $('wallet-btn-label');
   const note = $('wallet-status-note');
   const disBtn = $('mynear-disconnect-btn');
-  const conBtn = $('mynear-connect-btn');
+  const pickerAcc = SELECTOR_ACCOUNT && SELECTOR_ACCOUNT.accountId ? SELECTOR_ACCOUNT : null;
+  const walletLabel = {
+    'my-near-wallet': 'MyNearWallet',
+    'meteor-wallet': 'Meteor',
+    'here-wallet': 'HERE',
+    sender: 'Sender',
+    nightly: 'Nightly'
+  };
 
   if (SESSION_SIGNER) {
     dot.className = 'pulse-dot live';
@@ -2063,48 +2209,42 @@ function updateWalletUI() {
     note.textContent = `Active in-browser signer: ${SESSION_SIGNER.accountId} (${shortKey(SESSION_SIGNER.publicKey, 12, 4)})`;
     note.style.color = 'var(--near-green)';
     disBtn.style.display = 'inline-flex';
+  } else if (pickerAcc) {
+    dot.className = 'pulse-dot live';
+    lbl.textContent = pickerAcc.accountId;
+    note.textContent = `Connected via ${walletLabel[pickerAcc.walletId] || pickerAcc.walletId} · access key scoped to spend_as on ${VAULT_ID}`;
+    note.style.color = 'var(--near-green)';
+    disBtn.style.display = 'inline-flex';
   } else if (WALLET_CONN && WALLET_CONN.isSignedIn()) {
     const acc = WALLET_CONN.getAccountId();
     dot.className = 'pulse-dot live';
     lbl.textContent = acc;
-    note.textContent = `Connected via MyNearWallet: ${acc}`;
+    note.textContent = `Connected via MyNearWallet (legacy redirect session): ${acc}`;
     note.style.color = 'var(--near-green)';
-    conBtn.textContent = `Connected: ${acc}`;
     disBtn.style.display = 'inline-flex';
   } else {
     dot.className = 'pulse-dot';
     lbl.textContent = 'Connect Wallet';
     note.textContent = 'Mode: Read-Only + Guardrail Simulator active';
     note.style.color = 'var(--text-dim)';
-    conBtn.textContent = 'Connect MyNearWallet (Testnet) ↗';
     disBtn.style.display = 'none';
   }
   evaluatePlayground();
 }
 
-async function connectMyNearWallet() {
-  if (window.location.protocol === 'file:') {
-    alert('MyNearWallet web redirect requires http:// or https:// so it can redirect back. Run "python dashboard.py" (http://localhost:8088) or use Option 2 (In-Browser Key Signer) right below!');
-    return;
-  }
-  if (!WALLET_CONN) await initNearWallet();
-  if (!WALLET_CONN) {
-    alert('near-api-js is still loading or blocked by offline mode.');
-    return;
-  }
-  WALLET_CONN.requestSignIn({
-    contractId: VAULT_ID,
-    successUrl: window.location.href,
-    failureUrl: window.location.href
-  });
-}
-
 function disconnectWallet() {
   SESSION_SIGNER = null;
-  if (WALLET_CONN && WALLET_CONN.isSignedIn()) {
-    WALLET_CONN.signOut();
+  const finish = () => {
+    if (WALLET_CONN && WALLET_CONN.isSignedIn()) WALLET_CONN.signOut();
+    SELECTOR_ACCOUNT = null;
+    pickerMessage('');
+    updateWalletUI();
+  };
+  if (WALLET_SELECTOR && WALLET_SELECTOR.isSignedIn()) {
+    WALLET_SELECTOR.disconnect().catch(() => {}).then(finish);
+  } else {
+    finish();
   }
-  updateWalletUI();
 }
 
 function useInBrowserKey() {
@@ -2215,6 +2355,53 @@ async function broadcastPlaygroundTx() {
     return;
   }
 
+  if (WALLET_SELECTOR && SELECTOR_ACCOUNT && WALLET_SELECTOR.isSignedIn()) {
+    const btn = $('pg-broadcast-btn');
+    const connectedId = SELECTOR_ACCOUNT.accountId;
+    btn.textContent = 'Waiting for wallet approval…';
+    try {
+      const res = await WALLET_SELECTOR.signAndSend({
+        receiverId: VAULT_ID,
+        methodName: method,
+        args,
+        gas: '100000000000000',
+        deposit: '0'
+      });
+      if (LAST_STATE) {
+        LAST_STATE.audit.unshift({
+          ts: new Date().toISOString().slice(0, 19) + 'Z',
+          event: 'spend',
+          tx: res.txHash,
+          agent: connectedId,
+          wallet: SELECTOR_ACCOUNT.walletId,
+          intent: { method, amount_near: amount, recipient, memo }
+        });
+        applyState(LAST_STATE, 'LIVE RPC');
+      }
+      pickerMessage(`Broadcast as ${connectedId} · tx ${res.txHash || 'submitted'}`);
+      tick(true);
+    } catch (err) {
+      const msg = String(err?.message || err);
+      if (LAST_STATE) {
+        LAST_STATE.audit.unshift({
+          ts: new Date().toISOString().slice(0, 19) + 'Z',
+          event: 'blocked_onchain',
+          tx: null,
+          error: msg,
+          reason: msg,
+          agent: connectedId,
+          wallet: SELECTOR_ACCOUNT.walletId,
+          intent: { method, amount_near: amount, recipient, memo }
+        });
+        applyState(LAST_STATE, 'LIVE RPC');
+      }
+      pickerMessage(`Wallet rejected or chain refused: ${msg}`, true);
+    } finally {
+      btn.textContent = 'Sign & Broadcast Tx';
+    }
+    return;
+  }
+
   if (WALLET_CONN && WALLET_CONN.isSignedIn()) {
     const account = WALLET_CONN.account();
     await account.functionCall({
@@ -2232,9 +2419,33 @@ async function broadcastPlaygroundTx() {
 
 applyState(INITIAL_STATE, 'TESTNET SNAPSHOT');
 evaluatePlayground();
-window.addEventListener('load', () => { initNearWallet(); });
+window.addEventListener('load', () => {
+  initNearWallet();
+  restoreWalletSession();
+});
 tick();
 setInterval(() => tick(false), 12000);
+
+/* Bring back a picker session after reload — only if one was ever stored, so a
+ * first-time visitor never downloads the wallet bundle. */
+async function restoreWalletSession() {
+  try {
+    const stored = Object.keys(window.localStorage || {});
+    if (!stored.some(k => k.indexOf('near-wallet-selector') === 0)) return;
+    const bundle = await loadWalletBundle();
+    WALLET_SELECTOR = bundle;
+    if (!WALLET_WATCH_ATTACHED) {
+      WALLET_WATCH_ATTACHED = true;
+      bundle.onChange(state => {
+        SELECTOR_ACCOUNT = state && state.signedIn ? { accountId: state.accountId, walletId: state.walletId } : null;
+        updateWalletUI();
+      });
+    }
+    await bundle.restore(VAULT_ID);
+  } catch (_) {
+    /* a failed restore must leave the console in read-only mode, not throw */
+  }
+}
 </script>
 
 
