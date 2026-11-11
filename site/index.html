@@ -1,7 +1,18 @@
 <!DOCTYPE html>
-<html lang="en" class="dark scroll-smooth">
+<html lang="en" data-theme="dark" class="dark scroll-smooth">
 <head>
   <meta charset="UTF-8" />
+  <script>
+    /* Theme is opt-in: dark is the primary design, light is the alternate.
+       The console writes 'allowkey-theme' too, so a pick on either page carries over. */
+    try {
+      var t = localStorage.getItem('echoes-theme') || localStorage.getItem('allowkey-theme');
+      if (t === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+        document.documentElement.classList.remove('dark');
+      }
+    } catch (_) {}
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ECHOES // On-Chain Allowance & Guardrail Vault on NEAR Protocol</title>
   
@@ -41,14 +52,17 @@
               cyan: '#0091FD',
               red: '#FF7966',
               amber: '#9797FF',
-              obsidian: '#000000',
-              carbon: '#141414',
-              panel: '#262626',
-              border: '#262626',
-              borderBright: '#525252',
-              alabaster: '#F2F1E9',
-              slate: '#858585',
-              dim: '#525252'
+              /* Neutrals go through channel vars so the light theme can flip the whole
+                 page without touching a single utility class, while `/opacity`
+                 modifiers (bg-near-obsidian/80 …) keep working. */
+              obsidian: 'rgb(var(--ch-obsidian) / <alpha-value>)',
+              carbon: 'rgb(var(--ch-carbon) / <alpha-value>)',
+              panel: 'rgb(var(--ch-panel) / <alpha-value>)',
+              border: 'rgb(var(--ch-border) / <alpha-value>)',
+              borderBright: 'rgb(var(--ch-border-bright) / <alpha-value>)',
+              alabaster: 'rgb(var(--ch-alabaster) / <alpha-value>)',
+              slate: 'rgb(var(--ch-slate) / <alpha-value>)',
+              dim: 'rgb(var(--ch-dim) / <alpha-value>)'
             }
           },
           fontFamily: {
@@ -75,7 +89,44 @@
       --bg-carbon: #141414;
       --bg-panel: #262626;
       --border-hairline: #262626;
+
+      /* Channel triplets consumed by the Tailwind near.* neutrals. */
+      --ch-obsidian: 0 0 0;
+      --ch-carbon: 20 20 20;
+      --ch-panel: 38 38 38;
+      --ch-border: 38 38 38;
+      --ch-border-bright: 82 82 82;
+      --ch-alabaster: 242 241 233;
+      --ch-slate: 133 133 133;
+      --ch-dim: 82 82 82;
+      --grid-line: rgba(38, 38, 38, 0.35);
+      --panel-bg: rgba(0, 0, 0, 0.9);
     }
+
+    /* Light is the alternate: same grid, same accents, inverted neutrals. */
+    [data-theme="light"] {
+      --bg-obsidian: #F2F1E9;
+      --bg-carbon: #FFFFFF;
+      --bg-panel: #E6E6E6;
+      --border-hairline: #E6E6E6;
+      --ch-obsidian: 242 241 233;
+      --ch-carbon: 255 255 255;
+      --ch-panel: 230 230 230;
+      --ch-border: 230 230 230;
+      --ch-border-bright: 133 133 133;
+      --ch-alabaster: 20 20 20;
+      --ch-slate: 82 82 82;
+      --ch-dim: 133 133 133;
+      --grid-line: rgba(20, 20, 20, 0.07);
+      --panel-bg: rgba(255, 255, 255, 0.92);
+    }
+
+    /* Inked-on-accent: near-obsidian is the paper colour in light mode, but on a
+       green chip/button it must stay ink, otherwise the label turns white-on-green. */
+    [data-theme="light"] .text-near-obsidian,
+    [data-theme="light"] .hover\:text-near-obsidian:hover { color: #141414 !important; }
+    [data-theme="light"] .btn-near-primary .bg-near-obsidian,
+    [data-theme="light"] .bg-near-green .bg-near-obsidian { background-color: #141414 !important; }
 
     * {
       box-sizing: border-box;
@@ -90,13 +141,14 @@
 
     body {
       background-color: var(--bg-obsidian);
-      color: #F2F1E9;
+      color: rgb(var(--ch-alabaster));
       font-family: 'Space Grotesk', sans-serif;
       overflow-x: hidden;
       background-image: 
-        linear-gradient(to right, rgba(38, 38, 38, 0.35) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(38, 38, 38, 0.35) 1px, transparent 1px);
+        linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
       background-size: 48px 48px;
+      transition: background-color .2s ease, color .2s ease;
     }
 
     /* Subtle technical blueprint micro-grid overlay */
@@ -114,8 +166,9 @@
     .swiss-box {
       position: relative;
       border: 1px solid var(--border-hairline);
-      background-color: rgba(0, 0, 0, 0.9);
+      background-color: var(--panel-bg);
       backdrop-filter: blur(8px);
+      transition: background-color .2s ease, border-color .2s ease;
     }
 
     .swiss-corner::before,
@@ -125,7 +178,7 @@
       font-family: 'JetBrains Mono', monospace;
       font-size: 12px;
       line-height: 1;
-      color: #525252;
+      color: rgb(var(--ch-dim));
       pointer-events: none;
       z-index: 10;
     }
@@ -160,11 +213,11 @@
     }
 
     .btn-near-ghost {
-      background-color: #141414;
-      color: #F2F1E9;
+      background-color: rgb(var(--ch-carbon));
+      color: rgb(var(--ch-alabaster));
       font-family: 'JetBrains Mono', monospace;
       font-weight: 500;
-      border: 1px solid #525252;
+      border: 1px solid rgb(var(--ch-border-bright));
       transition: all 0.15s ease;
     }
     .btn-near-ghost:hover {
@@ -242,10 +295,10 @@
       height: 6px;
     }
     ::-webkit-scrollbar-track {
-      background: #000000;
+      background: var(--bg-obsidian);
     }
     ::-webkit-scrollbar-thumb {
-      background: #262626;
+      background: rgb(var(--ch-panel));
       border-radius: 2px;
     }
     ::-webkit-scrollbar-thumb:hover {
@@ -426,6 +479,11 @@
         <button onclick="scrollToSection('brand-kit')" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded text-xs font-mono border border-near-border hover:border-near-cyan text-near-slate hover:text-near-cyan transition-colors" title="Download SVG Logo Assets">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
           <span>SVG KIT</span>
+        </button>
+
+        <button id="themeBtn" onclick="toggleTheme()" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded text-xs font-mono border border-near-border hover:border-near-green text-near-slate hover:text-near-green transition-colors" title="Switch Light/Dark Mode">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          <span id="themeBtnLabel">LIGHT</span>
         </button>
 
         <button id="walletBtn" onclick="openWalletModal()" class="btn-near-primary px-3.5 py-2 rounded text-xs flex items-center gap-2">
@@ -2686,6 +2744,32 @@ the public sandbox key already in echoes/sandbox.json.</pre>
       for (let i = 0; i < 4; i++) b += chars.charAt(Math.floor(Math.random() * chars.length));
       return `${a}...${b}`;
     }
+
+    /* --- Theme: dark is primary, light is the alternate --- */
+    function applyTheme(theme, persist) {
+      const el = document.documentElement;
+      el.setAttribute('data-theme', theme);
+      el.classList.toggle('dark', theme !== 'light');
+      const label = document.getElementById('themeBtnLabel');
+      if (label) label.textContent = theme === 'light' ? 'DARK' : 'LIGHT';
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute('content', theme === 'light' ? '#F2F1E9' : '#000000');
+      if (persist) {
+        try {
+          localStorage.setItem('echoes-theme', theme);
+          localStorage.setItem('allowkey-theme', theme);
+        } catch (_) {}
+      }
+    }
+
+    function toggleTheme() {
+      const cur = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      applyTheme(cur, true);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      applyTheme(document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark', false);
+    });
 
     function scrollToSection(id) {
       const el = document.getElementById(id);

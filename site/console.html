@@ -1415,7 +1415,10 @@ function toggleTheme() {
   const cur = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
   document.documentElement.setAttribute('data-theme', cur);
   $('theme-btn').textContent = cur === 'light' ? 'Dark' : 'Light';
-  try { localStorage.setItem('allowkey-theme', cur); } catch (_) {}
+  try {
+    localStorage.setItem('allowkey-theme', cur);
+    localStorage.setItem('echoes-theme', cur); // shared with the landing page
+  } catch (_) {}
 }
 
 function toggleRpcDrawer() {
