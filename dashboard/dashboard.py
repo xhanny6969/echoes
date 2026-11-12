@@ -1162,7 +1162,7 @@ footer {
         </div>
         <div class="kv-row">
           <span class="k">Recorded Spend Ledger</span>
-          <span class="v mono" id="pol-loglen">33 transactions</span>
+          <span class="v mono" id="pol-loglen">34 transactions</span>
         </div>
       </div>
     </div>
@@ -1658,90 +1658,403 @@ const DEFAULT_AUDIT = [
 ];
 
 const INITIAL_STATE = {
-  vault: VAULT_ID,
-  rpc: RPC_URL,
-  policy: {
-    owner: VAULT_ID,
-    per_tx: "500000000000000000000000",
-    daily: "5000000000000000000000000",
-    spent_today: "1550000000000000000000000",
-    day: 20767,
-    recipients: ["allowance-merchant.testnet"],
-    paused: false,
-    agent_count: 2
+  "vault": "allowance-swarm.testnet",
+  "rpc": "https://rpc.testnet.fastnear.com",
+  "policy": {
+    "owner": "allowance-swarm.testnet",
+    "per_tx": "500000000000000000000000",
+    "daily": "5000000000000000000000000",
+    "spent_today": "0",
+    "day": 20769,
+    "recipients": [
+      "allowance-merchant.testnet"
+    ],
+    "paused": false,
+    "agent_count": 2
   },
-  balance: "1900544007761576300000000",
-  balance_near: "1.90",
-  total_spent_near: "3.02",
-  total_spent_raw: 3.02e24,
-  remaining_near: "5.00",
-  per_tx_near: "0.5",
-  daily_near: "5",
-  spent_today_near: "0.00",
-  used_pct: 0.0,
-  agents: [
+  "balance": "1847349553092017900000000",
+  "balance_near": "1.84735",
+  "total_spent_near": "0",
+  "total_spent_raw": 0,
+  "remaining_near": "5",
+  "per_tx_near": "0.5",
+  "daily_near": "5",
+  "spent_today_near": "0",
+  "used_pct": 0.0,
+  "agents": [
     {
-      agent_id: "agent-alpha",
-      public_key: "ed25519:GY1SXN4zftJ7u2iY3RZ5GgwWBAQBtb6g5TMcTpm8ps17",
-      per_tx: "200000000000000000000000",
-      daily: "1000000000000000000000000",
-      spent_today: "250000000000000000000000",
-      remaining_today: "750000000000000000000000",
-      active: true,
-      key_allowance_near: "1.471",
-      key_methods: ["spend_as"],
-      key_receiver: "allowance-swarm.testnet",
-      key_nonce: 104281941,
-      per_tx_near: "0.2",
-      daily_near: "1",
-      spent_near: "0.25",
-      remaining_near: "0.75",
-      used_pct: 25.0
+      "agent_id": "agent-alpha",
+      "public_key": "ed25519:GY1SXN4zftJ7u2iY3RZ5GgwWBAQBtb6g5TMcTpm8ps17",
+      "per_tx": "200000000000000000000000",
+      "daily": "1000000000000000000000000",
+      "spent_today": "0",
+      "remaining_today": "1000000000000000000000000",
+      "active": true,
+      "key_allowance_near": "1.488145",
+      "key_methods": [
+        "spend_as"
+      ],
+      "key_receiver": "allowance-swarm.testnet",
+      "key_nonce": 276868524000056,
+      "per_tx_near": "0.2",
+      "daily_near": "1",
+      "spent_near": "0",
+      "remaining_near": "1",
+      "used_pct": 0.0
     },
     {
-      agent_id: "agent-beta",
-      public_key: "ed25519:GYSHUupms2UpXfwhzagtPixTm7m65gvQuFWAXB9NGKEQ",
-      per_tx: "200000000000000000000000",
-      daily: "1000000000000000000000000",
-      spent_today: "150000000000000000000000",
-      remaining_today: "850000000000000000000000",
-      active: true,
-      key_allowance_near: "1.484",
-      key_methods: ["spend_as"],
-      key_receiver: "allowance-swarm.testnet",
-      key_nonce: 104281952,
-      per_tx_near: "0.2",
-      daily_near: "1",
-      spent_near: "0.15",
-      remaining_near: "0.85",
-      used_pct: 15.0
+      "agent_id": "agent-beta",
+      "public_key": "ed25519:GYSHUupms2UpXfwhzagtPixTm7m65gvQuFWAXB9NGKEQ",
+      "per_tx": "200000000000000000000000",
+      "daily": "1000000000000000000000000",
+      "spent_today": "0",
+      "remaining_today": "1000000000000000000000000",
+      "active": true,
+      "key_allowance_near": "1.497542",
+      "key_methods": [
+        "spend_as"
+      ],
+      "key_receiver": "allowance-swarm.testnet",
+      "key_nonce": 276868544000012,
+      "per_tx_near": "0.2",
+      "daily_near": "1",
+      "spent_near": "0",
+      "remaining_near": "1",
+      "used_pct": 0.0
     }
   ],
-  agent_count: 2,
-  scoped_keys: [
+  "agent_count": 2,
+  "scoped_keys": [
     {
-      public_key: "ed25519:GY1SXN4zftJ7u2iY3RZ5GgwWBAQBtb6g5TMcTpm8ps17",
-      receiver_id: "allowance-swarm.testnet",
-      method_names: ["spend_as"],
-      allowance_near: "1.471",
-      nonce: 104281941
+      "public_key": "ed25519:GY1SXN4zftJ7u2iY3RZ5GgwWBAQBtb6g5TMcTpm8ps17",
+      "receiver_id": "allowance-swarm.testnet",
+      "method_names": [
+        "spend_as"
+      ],
+      "allowance_near": "1.488145",
+      "nonce": 276868524000056
     },
     {
-      public_key: "ed25519:GYSHUupms2UpXfwhzagtPixTm7m65gvQuFWAXB9NGKEQ",
-      receiver_id: "allowance-swarm.testnet",
-      method_names: ["spend_as"],
-      allowance_near: "1.484",
-      nonce: 104281952
+      "public_key": "ed25519:GYSHUupms2UpXfwhzagtPixTm7m65gvQuFWAXB9NGKEQ",
+      "receiver_id": "allowance-swarm.testnet",
+      "method_names": [
+        "spend_as"
+      ],
+      "allowance_near": "1.497542",
+      "nonce": 276868544000012
     }
   ],
-  log: [
-    { id: 17, caller: "allowance-swarm.testnet", agent: "agent-alpha", amount: "150000000000000000000000", recipient: "allowance-merchant.testnet", memo: "alpha invoice #1", timestamp: 1794209038000000000 },
-    { id: 18, caller: "allowance-swarm.testnet", agent: "agent-beta", amount: "150000000000000000000000", recipient: "allowance-merchant.testnet", memo: "beta invoice #1", timestamp: 1794209042000000000 },
-    { id: 19, caller: "allowance-swarm.testnet", agent: "agent-alpha", amount: "100000000000000000000000", recipient: "allowance-merchant.testnet", memo: "alpha invoice #2", timestamp: 1794209049000000000 }
+  "log": [
+    {
+      "id": 1,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "150000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "alpha invoice #1",
+      "timestamp": 1794196463105528635
+    },
+    {
+      "id": 2,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-beta",
+      "amount": "150000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "beta invoice #1",
+      "timestamp": 1794196466541011107
+    },
+    {
+      "id": 3,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "100000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "alpha invoice #2",
+      "timestamp": 1794196473431905171
+    },
+    {
+      "id": 4,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "150000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "alpha invoice #1",
+      "timestamp": 1794196932628042975
+    },
+    {
+      "id": 5,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-beta",
+      "amount": "150000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "beta invoice #1",
+      "timestamp": 1794196936242046821
+    },
+    {
+      "id": 6,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "100000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "alpha invoice #2",
+      "timestamp": 1794196942940091278
+    },
+    {
+      "id": 7,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "100000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "vault-cap-proof",
+      "timestamp": 1794208361464589809
+    },
+    {
+      "id": 8,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "100000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "vault-counter-proof",
+      "timestamp": 1794208366822977438
+    },
+    {
+      "id": 9,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "100000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "vault-counter-proof",
+      "timestamp": 1794208419201825417
+    },
+    {
+      "id": 10,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "100000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "vault-counter-proof",
+      "timestamp": 1794208522629547358
+    },
+    {
+      "id": 11,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "100000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "vault-counter-proof",
+      "timestamp": 1794208648111428454
+    },
+    {
+      "id": 12,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-beta",
+      "amount": "150000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "beta invoice #1",
+      "timestamp": 1794208676702573403
+    },
+    {
+      "id": 13,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "100000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "vault-counter-proof",
+      "timestamp": 1794208822613435671
+    },
+    {
+      "id": 14,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "150000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "alpha invoice #1",
+      "timestamp": 1794208888149413069
+    },
+    {
+      "id": 15,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-beta",
+      "amount": "150000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "beta invoice #1",
+      "timestamp": 1794208910644155439
+    },
+    {
+      "id": 16,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "100000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "alpha invoice #2",
+      "timestamp": 1794208958685105863
+    },
+    {
+      "id": 17,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "150000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "alpha invoice #1",
+      "timestamp": 1794209036905203020
+    },
+    {
+      "id": 18,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-beta",
+      "amount": "150000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "beta invoice #1",
+      "timestamp": 1794209040516278188
+    },
+    {
+      "id": 19,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "100000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "alpha invoice #2",
+      "timestamp": 1794209047210095783
+    },
+    {
+      "id": 20,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "100000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "vault-counter-proof",
+      "timestamp": 1794211131940509871
+    },
+    {
+      "id": 21,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "10000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "near-api-js smoke test",
+      "timestamp": 1794251981274721951
+    },
+    {
+      "id": 22,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "50000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "H100 hour invoice 0042",
+      "timestamp": 1794252022384439742
+    },
+    {
+      "id": 23,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "50000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "H100 hour invoice 0043",
+      "timestamp": 1794252043191275459
+    },
+    {
+      "id": 24,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "50000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "H100 hour invoice 0042",
+      "timestamp": 1794252062553421793
+    },
+    {
+      "id": 25,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "50000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "H100 hour invoice 0043",
+      "timestamp": 1794252068594607185
+    },
+    {
+      "id": 26,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "50000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "H100 hour invoice 0042",
+      "timestamp": 1794252087446944847
+    },
+    {
+      "id": 27,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "50000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "H100 hour invoice 0043",
+      "timestamp": 1794252095451221176
+    },
+    {
+      "id": 28,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "50000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "H100 hour invoice 0043",
+      "timestamp": 1794252116170738136
+    },
+    {
+      "id": 29,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "50000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "H100 hour invoice 0043",
+      "timestamp": 1794252155569349439
+    },
+    {
+      "id": 30,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "50000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "H100 hour invoice 0043",
+      "timestamp": 1794252180426822879
+    },
+    {
+      "id": 31,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "50000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "acceptance: allowlisted",
+      "timestamp": 1794298728752510493
+    },
+    {
+      "id": 32,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "50000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "acceptance: allowlisted",
+      "timestamp": 1794298777858345654
+    },
+    {
+      "id": 33,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-beta",
+      "amount": "10000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "reactivated",
+      "timestamp": 1794298823896828205
+    },
+    {
+      "id": 34,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "50000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "acceptance: allowlisted",
+      "timestamp": 1794449021563389572
+    }
   ],
-  log_len: 19,
-  audit: DEFAULT_AUDIT,
-  fetched_at: "2026-11-09T07:24:15Z"
+  "log_len": 34,
+  "audit": [],
+  "fetched_at": "2026-11-12T02:05:56Z"
 };
 
 function applyState(s, sourceLabel = 'LIVE RPC') {

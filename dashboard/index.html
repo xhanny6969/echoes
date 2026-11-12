@@ -1095,7 +1095,7 @@ footer {
         </div>
         <div class="kv-row">
           <span class="k">Recorded Spend Ledger</span>
-          <span class="v mono" id="pol-loglen">33 transactions</span>
+          <span class="v mono" id="pol-loglen">34 transactions</span>
         </div>
       </div>
     </div>
@@ -1630,15 +1630,15 @@ const INITIAL_STATE = {
     "per_tx": "500000000000000000000000",
     "daily": "5000000000000000000000000",
     "spent_today": "0",
-    "day": 20767,
+    "day": 20769,
     "recipients": [
       "allowance-merchant.testnet"
     ],
     "paused": false,
     "agent_count": 2
   },
-  "balance": "1900544007761576300000000",
-  "balance_near": "1.900544",
+  "balance": "1847349553092017900000000",
+  "balance_near": "1.84735",
   "total_spent_near": "0",
   "total_spent_raw": 0,
   "remaining_near": "5",
@@ -1655,12 +1655,12 @@ const INITIAL_STATE = {
       "spent_today": "0",
       "remaining_today": "1000000000000000000000000",
       "active": true,
-      "key_allowance_near": "1.488983",
+      "key_allowance_near": "1.488145",
       "key_methods": [
         "spend_as"
       ],
       "key_receiver": "allowance-swarm.testnet",
-      "key_nonce": 276868524000052,
+      "key_nonce": 276868524000056,
       "per_tx_near": "0.2",
       "daily_near": "1",
       "spent_near": "0",
@@ -1696,8 +1696,8 @@ const INITIAL_STATE = {
       "method_names": [
         "spend_as"
       ],
-      "allowance_near": "1.488983",
-      "nonce": 276868524000052
+      "allowance_near": "1.488145",
+      "nonce": 276868524000056
     },
     {
       "public_key": "ed25519:GYSHUupms2UpXfwhzagtPixTm7m65gvQuFWAXB9NGKEQ",
@@ -2006,11 +2006,20 @@ const INITIAL_STATE = {
       "recipient": "allowance-merchant.testnet",
       "memo": "reactivated",
       "timestamp": 1794298823896828205
+    },
+    {
+      "id": 34,
+      "caller": "allowance-swarm.testnet",
+      "agent": "agent-alpha",
+      "amount": "50000000000000000000000",
+      "recipient": "allowance-merchant.testnet",
+      "memo": "acceptance: allowlisted",
+      "timestamp": 1794449021563389572
     }
   ],
-  "log_len": 33,
+  "log_len": 34,
   "audit": [],
-  "fetched_at": "2026-11-12T01:51:40Z"
+  "fetched_at": "2026-11-12T02:05:56Z"
 };
 
 function applyState(s, sourceLabel = 'LIVE RPC') {
