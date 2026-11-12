@@ -141,7 +141,7 @@ new video, otherwise a judge comparing the video against the repo finds two diff
 # 1. terminal prep — big font, clean shell, dark theme
 cd "$(git rev-parse --show-toplevel)"   # any checkout, not one machine
 export OPENROUTER_API_KEY=...           # any OpenRouter key; the model only writes the invoice text
-node echoes/cli.js status --vault lab.allowance-swarm.testnet   # warm-up, show nothing
+node echoes/cli.js status --vault allowance-swarm.testnet   # warm-up, show nothing
 
 # 2. record terminal (this is the money shot)
 node echoes/agent/demo.js echoes/sandbox.json                   # both runs, one take (public sandbox key)
