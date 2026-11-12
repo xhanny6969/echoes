@@ -1150,7 +1150,7 @@ footer {
         </div>
         <div class="kv-row">
           <span class="k">Total Spent Today</span>
-          <span class="v mono" id="pol-spent">1.55 NEAR</span>
+          <span class="v mono" id="pol-spent">0.00 NEAR</span>
         </div>
         <div class="kv-row">
           <span class="k">Allowlisted Merchant</span>
@@ -1162,7 +1162,7 @@ footer {
         </div>
         <div class="kv-row">
           <span class="k">Recorded Spend Ledger</span>
-          <span class="v mono" id="pol-loglen">19 transactions</span>
+          <span class="v mono" id="pol-loglen">33 transactions</span>
         </div>
       </div>
     </div>
@@ -1665,20 +1665,20 @@ const INITIAL_STATE = {
     per_tx: "500000000000000000000000",
     daily: "5000000000000000000000000",
     spent_today: "1550000000000000000000000",
-    day: 20766,
+    day: 20767,
     recipients: ["allowance-merchant.testnet"],
     paused: false,
     agent_count: 2
   },
-  balance: "5670000000000000000000000",
-  balance_near: "5.67",
-  total_spent_near: "1.55",
-  total_spent_raw: 1.55e24,
-  remaining_near: "3.45",
+  balance: "1900544007761576300000000",
+  balance_near: "1.90",
+  total_spent_near: "3.02",
+  total_spent_raw: 3.02e24,
+  remaining_near: "5.00",
   per_tx_near: "0.5",
   daily_near: "5",
-  spent_today_near: "1.55",
-  used_pct: 31.0,
+  spent_today_near: "0.00",
+  used_pct: 0.0,
   agents: [
     {
       agent_id: "agent-alpha",
